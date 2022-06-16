@@ -1,26 +1,7 @@
 const APPLICABLE_PROTOCOLS = ["http:", "https:"];
-const TITLE_REMOVE = "Remove CSS";
-
-
-function draw(size, starty, startx) {
-  var canvas = document.createElement('canvas');
-  var context = canvas.getContext('2d');
-  var img = new Image();
-  img.src = "icon_16.png"
-  img.onload = function () {
-    context.drawImage(img, 0, 2);
-  }
-  //context.clearRect(0, 0, canvas.width, canvas.height);
-  context.fillStyle = "rgba(255,0,0,1)";
-  // context.fillRect(startx % 19, starty % 19, 10, 10);
-  context.fillStyle = "red";
-  context.font = "15px Arial";
-  context.fillText(size.toString(), 0, 15);
-  return context.getImageData(0, 0, 19, 19);
-}
+const TITLE_REMOVE = "Estimate good website";
 
 async function initializePageAction(tab) {
-  console.log('hhh');
   if (protocolIsApplicable(tab.url)) {
     localStorage.setItem('da_'+tab.id, JSON.stringify({'req': 0, 'vald': 0}));
     updateTab(tab.id);
@@ -30,8 +11,15 @@ async function initializePageAction(tab) {
 function updateTab(tab_id){
   const stats = localStorage.getItem('da_'+tab_id);
   const statsJson = null === stats ? JSON.parse("{'req': 0, 'vald': 0}") : JSON.parse(stats);
-  browser.pageAction.setIcon({tabId: tab_id, imageData: draw(statsJson.vald, 10, 0)});
-  browser.pageAction.setTitle({tabId: tab_id, title: TITLE_REMOVE});
+
+  let temp = 'icons/good.svg';
+  if(statsJson.vald > 5000)
+    temp = 'icons/middle.svg';
+  else fi(statsJson.vald > 10000)
+    temp = 'icons/bad.svg';
+
+  browser.pageAction.setIcon({tabId: tab_id, imageData: temp});
+  browser.pageAction.setTitle({tabId: tab_id, title: (statsJson.req + 'requête(s) envoyées pour ' + statsJson.vald + ' bytes')});
   browser.pageAction.show(tab_id);
 }
 
@@ -43,16 +31,6 @@ function protocolIsApplicable(url) {
   const protocol = (new URL(url)).protocol;
   return APPLICABLE_PROTOCOLS.includes(protocol);
 }
-
-/*
-When first loaded, initialize the page action for all tabs.
-*/
-// var gettingAllTabs = browser.tabs.query({});
-// gettingAllTabs.then((tabs) => {
-//   for (let tab of tabs) {
-//     initializePageAction(tab);
-//   }
-// });
 
 extractHostname = (url) => {
   let hostname = url.indexOf("//") > -1 ? url.split('/')[2] : url.split('/')[0];
@@ -81,14 +59,12 @@ function contentSize(element){
 }
 
 headersReceivedListener = (requestDetails) => {
-  // console.log('kkdsfds',requestDetails);
   content = requestDetails.responseHeaders.find(contentSize);
   if(content){
     setByteLengthPerOrigin(requestDetails.tabId, content.value);
   }
   else
     setByteLengthPerOrigin(requestDetails.tabId, 1);
-
 
 //   let filters= browser.webRequest.filterResponseData(requestDetails.requestId);
 //
@@ -103,7 +79,6 @@ headersReceivedListener = (requestDetails) => {
 //     filters.write(event.data);
 //     filters.disconnect();
 //   };
-
 
   return {};
 }
