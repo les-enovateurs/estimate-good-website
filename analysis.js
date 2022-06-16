@@ -15,7 +15,7 @@ function updateTab(tab_id){
   let temp = 'icons/good.svg';
   if(statsJson.vald > 5000)
     temp = 'icons/middle.svg';
-  else fi(statsJson.vald > 10000)
+  else if(statsJson.vald > 10000)
     temp = 'icons/bad.svg';
 
   browser.pageAction.setIcon({tabId: tab_id, imageData: temp});
