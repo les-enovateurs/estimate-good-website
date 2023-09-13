@@ -1,6 +1,8 @@
 const APPLICABLE_PROTOCOLS = ["http:", "https:"];
 const TITLE_REMOVE = "Estimate good website";
 
+console.log("fdhfjdhfhdjfhhdfh")
+
 async function initializePageAction(tab) {
   if (protocolIsApplicable(tab.url)) {
     localStorage.setItem('da_'+tab.id, JSON.stringify({'req': 0, 'vald': 0}));
@@ -8,17 +10,32 @@ async function initializePageAction(tab) {
   }
 }
 
+function getImagesPathFromScore(score) {
+  const DIRECTORY_PATH = "icons";
+  if(score > 5000) {
+    return {
+      16: `${DIRECTORY_PATH}/bad-16.jpg`,
+      32: `${DIRECTORY_PATH}/bad-32.jpg`,
+    }
+  } else if(score > 10000) {
+    return {
+      16: `${DIRECTORY_PATH}/bad-16.jpg`,
+      32: `${DIRECTORY_PATH}/bad-32.jpg`,
+    }    
+  }
+
+  return {
+    16: `${DIRECTORY_PATH}/good-16.jpg`,
+    32: `${DIRECTORY_PATH}/good-32.jpg`,
+  }
+}
+
 function updateTab(tab_id){
+  console.log("tabId ", tab_id);
   const stats = localStorage.getItem('da_'+tab_id);
   const statsJson = null === stats ? JSON.parse("{'req': 0, 'vald': 0}") : JSON.parse(stats);
 
-  let temp = 'icons/good.svg';
-  if(statsJson.vald > 5000)
-    temp = 'icons/middle.svg';
-  else if(statsJson.vald > 10000)
-    temp = 'icons/bad.svg';
-
-  browser.pageAction.setIcon({tabId: tab_id, imageData: temp});
+  browser.pageAction.setIcon({tabId: tab_id, path: getImagesPathFromScore(statsJson.vald)});
   browser.pageAction.setTitle({tabId: tab_id, title: (statsJson.req + 'requête(s) envoyées pour ' + statsJson.vald + ' bytes')});
   browser.pageAction.show(tab_id);
 }
@@ -83,11 +100,12 @@ headersReceivedListener = (requestDetails) => {
   return {};
 }
 
-
+console.log(browser);
 /*
 Each time a tab is updated, reset the page action for that tab.
 */
 browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
+  console.log("onUpdated");
   initializePageAction(tab);
 });
 
