@@ -1,10 +1,10 @@
 const APPLICABLE_PROTOCOLS = ["http:", "https:"];
 const TITLE_REMOVE = "Estimate good website";
+const PREFIX_LOCALSTORAGE_KEY = "estimate_good_website";
 
 async function initializePageAction(tab) {
   if (protocolIsApplicable(tab.url)) {
-    localStorage.setItem('da_'+tab.id, JSON.stringify({'req': 0, 'vald': 0}));
-    updateTab(tab.id);
+    updateTab(tab.id, tab.url);
   }
 }
 
@@ -35,7 +35,6 @@ function bytesToSize(bytes) {
   }
 
   const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
-  console.log(bytes)
   if (i === 0)  {
     return `${bytes} ${sizes[i]}`;
   }
@@ -43,21 +42,47 @@ function bytesToSize(bytes) {
   return `${(bytes / (1024 ** i)).toFixed(1)} ${sizes[i]}`;
 }
 
-function updateTab(tabId){
-  console.log("tabId ", tabId);
-  const stats = localStorage.getItem('da_'+tabId);
-  const statsJson = null === stats ? JSON.parse("{'req': 0, 'vald': 0}") : JSON.parse(stats);
+function fetchDataFromTheWebsite() {
+  //TODO: query greenIT
+  const fakeNumberOfQueries = 1;
+  const fakeBytes = parseInt((Math.random() * 10000));
+  return { numberOfQueries: fakeNumberOfQueries, bytes: fakeBytes };
+}
+
+function localeStoragKey(url) {
+  return `${PREFIX_LOCALSTORAGE_KEY}@${url}`;
+}
+
+function getDataFromLocalStorage(url) {
+  const statsInJson = localStorage.getItem(localeStoragKey(url));
+  if(!statsInJson) {
+    return null;
+  }
+  return JSON.parse(statsInJson);
+}
+
+function getData(url) {
+  const stats = getDataFromLocalStorage(url);
+  if(!stats) {
+    return fetchDataFromTheWebsite();
+  } else {
+    return stats;
+  }
+}
+
+function updateTab(tabId, url){
+  const stats = getData(url);
 
   browser.pageAction.setIcon(
     {  tabId,
-      path: getImagesPathFromScore(statsJson.vald)
+      path: getImagesPathFromScore(stats.bytes)
     }
   );
   
   browser.pageAction.setTitle(
     {
       tabId,
-      title: `${statsJson.req} requête(s) envoyées pour ${bytesToSize(statsJson.vald)}`
+      title: `${stats.numberOfQueries} requête(s) envoyées pour ${bytesToSize(stats.bytes)}`
     }
   );
 
@@ -84,15 +109,14 @@ extractHostname = (url) => {
   return hostname;
 };
 
-setByteLengthPerOrigin = (tab_id, byteLength) => {
-  const stats = localStorage.getItem('da_'+tab_id);
-  const statsJson = null === stats ? JSON.parse("{'req': 0, 'vald': 0}") : JSON.parse(stats);
-  let req = null === statsJson.req || undefined === statsJson.req ? 1 : parseInt(statsJson.req) + 1;
-  let vald = undefined === statsJson.vald ? byteLength : parseInt(statsJson.vald) + byteLength;
-  statsJson.req = req;
-  statsJson.vald = vald;
-  localStorage.setItem('da_'+tab_id, JSON.stringify(statsJson));
-  updateTab(tab_id);
+setByteLengthPerOrigin = (tabId, originUrl, byteLength) => {
+  const stats = getData(originUrl);
+  const numberOfQueries = parseInt(stats.numberOfQueries) + 1;
+  const bytes = parseInt(stats.bytes) + parseInt(byteLength);
+  const newLocaleStorageValues = { numberOfQueries, bytes };
+  
+  localStorage.setItem(localeStoragKey(originUrl), JSON.stringify(newLocaleStorageValues));
+  updateTab(tabId, originUrl);
 };
 
 function contentSize(element){
@@ -102,10 +126,10 @@ function contentSize(element){
 headersReceivedListener = (requestDetails) => {
   content = requestDetails.responseHeaders.find(contentSize);
   if(content) {
-    setByteLengthPerOrigin(requestDetails.tabId, content.value);
+    setByteLengthPerOrigin(requestDetails.tabId, requestDetails.originUrl, content.value);
   }
   else {
-    setByteLengthPerOrigin(requestDetails.tabId, 1);
+    setByteLengthPerOrigin(requestDetails.tabId, requestDetails.originUrl, 1);
   }
   return {};
 }
