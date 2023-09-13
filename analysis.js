@@ -1,8 +1,6 @@
 const APPLICABLE_PROTOCOLS = ["http:", "https:"];
 const TITLE_REMOVE = "Estimate good website";
 
-console.log("fdhfjdhfhdjfhhdfh")
-
 async function initializePageAction(tab) {
   if (protocolIsApplicable(tab.url)) {
     localStorage.setItem('da_'+tab.id, JSON.stringify({'req': 0, 'vald': 0}));
@@ -30,14 +28,40 @@ function getImagesPathFromScore(score) {
   }
 }
 
-function updateTab(tab_id){
-  console.log("tabId ", tab_id);
-  const stats = localStorage.getItem('da_'+tab_id);
+function bytesToSize(bytes) {
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
+  if (bytes === 0) {
+    return 'n/a';
+  }
+
+  const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
+  console.log(bytes)
+  if (i === 0)  {
+    return `${bytes} ${sizes[i]}`;
+  }
+
+  return `${(bytes / (1024 ** i)).toFixed(1)} ${sizes[i]}`;
+}
+
+function updateTab(tabId){
+  console.log("tabId ", tabId);
+  const stats = localStorage.getItem('da_'+tabId);
   const statsJson = null === stats ? JSON.parse("{'req': 0, 'vald': 0}") : JSON.parse(stats);
 
-  browser.pageAction.setIcon({tabId: tab_id, path: getImagesPathFromScore(statsJson.vald)});
-  browser.pageAction.setTitle({tabId: tab_id, title: (statsJson.req + 'requête(s) envoyées pour ' + statsJson.vald + ' bytes')});
-  browser.pageAction.show(tab_id);
+  browser.pageAction.setIcon(
+    {  tabId,
+      path: getImagesPathFromScore(statsJson.vald)
+    }
+  );
+  
+  browser.pageAction.setTitle(
+    {
+      tabId,
+      title: `${statsJson.req} requête(s) envoyées pour ${bytesToSize(statsJson.vald)}`
+    }
+  );
+
+  browser.pageAction.show(tabId);
 }
 
 /*
@@ -77,38 +101,21 @@ function contentSize(element){
 
 headersReceivedListener = (requestDetails) => {
   content = requestDetails.responseHeaders.find(contentSize);
-  if(content){
+  if(content) {
     setByteLengthPerOrigin(requestDetails.tabId, content.value);
   }
-  else
+  else {
     setByteLengthPerOrigin(requestDetails.tabId, 1);
-
-//   let filters= browser.webRequest.filterResponseData(requestDetails.requestId);
-//
-// // console.log('kddk',filters);
-//   filters.ondata = event => {
-//     // console.log('rqsdqr',requestDetails.tabId);
-//
-//     // const origin = extractHostname(!requestDetails.originUrl ? requestDetails.url : requestDetails.originUrl);
-//     // setByteLengthPerOrigin(requestDetails.tabId, origin, event.data.byteLength);
-//     setByteLengthPerOrigin(requestDetails.tabId, event.data.byteLength);
-// // console.log('rr',requestDetails.tabId);
-//     filters.write(event.data);
-//     filters.disconnect();
-//   };
-
+  }
   return {};
 }
 
-console.log(browser);
 /*
 Each time a tab is updated, reset the page action for that tab.
 */
 browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
-  console.log("onUpdated");
   initializePageAction(tab);
 });
-
 
 browser.webRequest.onCompleted.addListener(
     headersReceivedListener,
