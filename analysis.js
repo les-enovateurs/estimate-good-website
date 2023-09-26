@@ -4,7 +4,13 @@ const PREFIX_LOCALSTORAGE_KEY = "estimate_good_website";
 
 async function initializePageAction(tab) {
   if (protocolIsApplicable(tab.url)) {
-    updateTab(tab.id, tab.url);
+    initLocalStorage(tab.url);
+  }
+}
+
+async function computeData(tabId, url) {
+  if (protocolIsApplicable(tab.url)) {
+    updateTabUrlBar(tab.id, tab.url);
   }
 }
 
@@ -53,6 +59,13 @@ function localeStoragKey(url) {
   return `${PREFIX_LOCALSTORAGE_KEY}@${url}`;
 }
 
+function initLocalStorage(originUrl) {
+  const numberOfQueries = 0;
+  const bytes = 0;
+  const initialStorageValues = { numberOfQueries, bytes };
+  localStorage.setItem(localeStoragKey(originUrl), JSON.stringify(newLocaleStorageValues));
+}
+
 function getDataFromLocalStorage(url) {
   const statsInJson = localStorage.getItem(localeStoragKey(url));
   if(!statsInJson) {
@@ -70,11 +83,12 @@ function getData(url) {
   }
 }
 
-function updateTab(tabId, url){
+function updateTabUrlBar(tabId, url){
   const stats = getData(url);
 
   browser.pageAction.setIcon(
-    {  tabId,
+    {
+      tabId,
       path: getImagesPathFromScore(stats.bytes)
     }
   );
@@ -98,7 +112,7 @@ function protocolIsApplicable(url) {
   return APPLICABLE_PROTOCOLS.includes(protocol);
 }
 
-extractHostname = (url) => {
+function extractHostname(url) {
   let hostname = url.indexOf("//") > -1 ? url.split('/')[2] : url.split('/')[0];
 
   // find & remove port number
@@ -109,21 +123,21 @@ extractHostname = (url) => {
   return hostname;
 };
 
-setByteLengthPerOrigin = (tabId, originUrl, byteLength) => {
+function setByteLengthPerOrigin (tabId, originUrl, byteLength) {
   const stats = getData(originUrl);
   const numberOfQueries = parseInt(stats.numberOfQueries) + 1;
   const bytes = parseInt(stats.bytes) + parseInt(byteLength);
   const newLocaleStorageValues = { numberOfQueries, bytes };
   
   localStorage.setItem(localeStoragKey(originUrl), JSON.stringify(newLocaleStorageValues));
-  updateTab(tabId, originUrl);
+  updateTabUrlBar(tabId, originUrl);
 };
 
 function contentSize(element){
   return element.name === 'content-length'
 }
 
-headersReceivedListener = (requestDetails) => {
+function headersReceivedListener(requestDetails) {
   content = requestDetails.responseHeaders.find(contentSize);
   if(content) {
     setByteLengthPerOrigin(requestDetails.tabId, requestDetails.originUrl, content.value);
@@ -138,6 +152,20 @@ headersReceivedListener = (requestDetails) => {
 Each time a tab is updated, reset the page action for that tab.
 */
 browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
+  console.log("addListener ", id, "  ", changeInfo, " +++ ", tab);
+  initializePageAction(tab);
+  
+    if (tab.status == "complete" && tab.active) { 
+      console.log("it's loaded my dear");
+      computeData(tab);
+
+      // Perform you task after page loaded completely 
+    }
+});
+
+browser.tabs.onActivated.addListener( ({ previousTabId, tabId }) => {
+  console.log("onActivated");
+  // todo find urlOrigin
   initializePageAction(tab);
 });
 
