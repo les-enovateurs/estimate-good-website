@@ -1,176 +1,94 @@
 const APPLICABLE_PROTOCOLS = ["http:", "https:"];
 const TITLE_REMOVE = "Estimate good website";
-const PREFIX_LOCALSTORAGE_KEY = "estimate_good_website";
 
-async function initializePageAction(tab) {
-  if (protocolIsApplicable(tab.url)) {
-    initLocalStorage(tab.url);
-  }
-}
 
-async function computeData(tabId, url) {
-  if (protocolIsApplicable(tab.url)) {
-    updateTabUrlBar(tab.id, tab.url);
-  }
+
+function updateTabUrlBar(tabId, grade){
+  browser.pageAction.setIcon(
+    {
+      tabId,
+      path: getImagesPathFromScore(grade)
+    }
+  );
+  browser.pageAction.show(tabId);
 }
 
 function getImagesPathFromScore(score) {
   const DIRECTORY_PATH = "icons";
-  if(score > 5000) {
-    return {
-      16: `${DIRECTORY_PATH}/bad-16.jpg`,
-      32: `${DIRECTORY_PATH}/bad-32.jpg`,
-    }
-  } else if(score > 10000) {
-    return {
-      16: `${DIRECTORY_PATH}/bad-16.jpg`,
-      32: `${DIRECTORY_PATH}/bad-32.jpg`,
-    }    
-  }
+   if(!score) {
+      return {
+          16: `${DIRECTORY_PATH}/loading-16.jpg`,
+          32: `${DIRECTORY_PATH}/loading-32.jpg`,
+      };
+
+   }
+   console.log(score)
 
   return {
-    16: `${DIRECTORY_PATH}/good-16.jpg`,
-    32: `${DIRECTORY_PATH}/good-32.jpg`,
+    16: `${DIRECTORY_PATH}/bad-16.jpg`,
+    32: `${DIRECTORY_PATH}/bad-32.jpg`,
+  };
+}
+
+async function callEcoIndex(tabId, url) {
+  const grade = await getCachedResult(tabId, url);
+  if(!grade) {
+    const gradeComputed = askToComputeEvaluation(tabId, url);
+    if(!gradeComputed) {
+      updateTabUrlBar(tabId, null)
+    }
+    updateTabUrlBar(tabId, gradeComputed);
   }
+  updateTabUrlBar(tabId, grade);
 }
 
-function bytesToSize(bytes) {
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB']
-  if (bytes === 0) {
-    return 'n/a';
-  }
-
-  const i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)), 10);
-  if (i === 0)  {
-    return `${bytes} ${sizes[i]}`;
-  }
-
-  return `${(bytes / (1024 ** i)).toFixed(1)} ${sizes[i]}`;
-}
-
-function fetchDataFromTheWebsite() {
-  //TODO: query greenIT
-  const fakeNumberOfQueries = 1;
-  const fakeBytes = parseInt((Math.random() * 10000));
-  return { numberOfQueries: fakeNumberOfQueries, bytes: fakeBytes };
-}
-
-function localeStoragKey(url) {
-  return `${PREFIX_LOCALSTORAGE_KEY}@${url}`;
-}
-
-function initLocalStorage(originUrl) {
-  const numberOfQueries = 0;
-  const bytes = 0;
-  const initialStorageValues = { numberOfQueries, bytes };
-  localStorage.setItem(localeStoragKey(originUrl), JSON.stringify(newLocaleStorageValues));
-}
-
-function getDataFromLocalStorage(url) {
-  const statsInJson = localStorage.getItem(localeStoragKey(url));
-  if(!statsInJson) {
+async function getCachedResult(tabId, url) {
+  const ecoIndexResponse = await fetch(`https://bff.ecoindex.fr/api/results/?url=${url}`);
+  if(ecoIndexResponse.ok) {
+    const ecoIndexResponseObject = await ecoIndexResponse.json();
+    const { grade } = ecoIndexResponseObject["latest-result"];
+    if(grade === "") {
+      const hostResults = ecoIndexResponseObject["host-results"];
+      if(hostResults.length > 0) {
+        const { grade } = hostResults[0];
+        console.log(`depuis l'origin c'est ${grade}`);
+        return grade;
+      } else {
+        throw new Error("Cannot retrieve the grade");
+      }
+    } else {
+      console.log(grade)
+      return grade;
+    }
+  } else {
+    console.log("this is not ok man")
     return null;
   }
-  return JSON.parse(statsInJson);
 }
 
-function getData(url) {
-  const stats = getDataFromLocalStorage(url);
-  if(!stats) {
-    return fetchDataFromTheWebsite();
-  } else {
-    return stats;
-  }
-}
-
-function updateTabUrlBar(tabId, url){
-  const stats = getData(url);
-
-  browser.pageAction.setIcon(
-    {
-      tabId,
-      path: getImagesPathFromScore(stats.bytes)
-    }
-  );
-  
-  browser.pageAction.setTitle(
-    {
-      tabId,
-      title: `${stats.numberOfQueries} requête(s) envoyées pour ${bytesToSize(stats.bytes)}`
-    }
-  );
-
-  browser.pageAction.show(tabId);
-}
-
-/*
-Returns true only if the URL's protocol is in APPLICABLE_PROTOCOLS.
-Argument url must be a valid URL string.
-*/
-function protocolIsApplicable(url) {
-  const protocol = (new URL(url)).protocol;
-  return APPLICABLE_PROTOCOLS.includes(protocol);
-}
-
-function extractHostname(url) {
-  let hostname = url.indexOf("//") > -1 ? url.split('/')[2] : url.split('/')[0];
-
-  // find & remove port number
-  hostname = hostname.split(':')[0];
-  // find & remove "?"
-  hostname = hostname.split('?')[0];
-
-  return hostname;
-};
-
-function setByteLengthPerOrigin (tabId, originUrl, byteLength) {
-  const stats = getData(originUrl);
-  const numberOfQueries = parseInt(stats.numberOfQueries) + 1;
-  const bytes = parseInt(stats.bytes) + parseInt(byteLength);
-  const newLocaleStorageValues = { numberOfQueries, bytes };
-  
-  localStorage.setItem(localeStoragKey(originUrl), JSON.stringify(newLocaleStorageValues));
-  updateTabUrlBar(tabId, originUrl);
-};
-
-function contentSize(element){
-  return element.name === 'content-length'
-}
-
-function headersReceivedListener(requestDetails) {
-  content = requestDetails.responseHeaders.find(contentSize);
-  if(content) {
-    setByteLengthPerOrigin(requestDetails.tabId, requestDetails.originUrl, content.value);
-  }
-  else {
-    setByteLengthPerOrigin(requestDetails.tabId, requestDetails.originUrl, 1);
-  }
-  return {};
+async function askToComputeEvaluation(url) {
+  // get the token
+  const tokenResponse = await fetch("https://bff.ecoindex.fr/api/tasks", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ url })
+  });
+  const token = await tokenResponse.json();
+  // try to get the task result in X seconds. If the task is not processed, then return empty grade
+  //const ecoIndexResponse = await fetch(`https://bff.ecoindex.fr/api/tasks/${token}`);
+  //const { ecoindex_result: {detail: { grade } } } = await ecoIndexResponse.json()
+  //console.log(grade);
+  return grade;
 }
 
 /*
 Each time a tab is updated, reset the page action for that tab.
 */
 browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
-  console.log("addListener ", id, "  ", changeInfo, " +++ ", tab);
-  initializePageAction(tab);
-  
-    if (tab.status == "complete" && tab.active) { 
-      console.log("it's loaded my dear");
-      computeData(tab);
-
-      // Perform you task after page loaded completely 
+    if (tab.status == "complete" && tab.active) {
+      // try to get results cached in the ecoindex server
+      callEcoIndex(tab.id, tab.url)
     }
 });
-
-browser.tabs.onActivated.addListener( ({ previousTabId, tabId }) => {
-  console.log("onActivated");
-  // todo find urlOrigin
-  initializePageAction(tab);
-});
-
-browser.webRequest.onCompleted.addListener(
-    headersReceivedListener,
-    {urls: ['<all_urls>']},
-    ['responseHeaders']
-);
