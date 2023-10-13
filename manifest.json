@@ -1,6 +1,6 @@
 {
 
-  "description": "Display if tab contain heavy website",
+  "description": "Display EcoIndex Score",
   "manifest_version": 2,
   "name": "estimate-good-website",
   "version": "1.0",
@@ -9,18 +9,17 @@
   "background": {
     "scripts": ["analysis.js"]
   },
-
-  "page_action": {
-    "default_icon": "icons/bad.svg",
-    "browser_style": true
-  },
-  
   "permissions": [
     "activeTab",
-    "tabs",
-    "webRequest",
-    "<all_urls>",
-    "webRequestBlocking"
-  ]
+    "tabs"
+  ],
 
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "bbe1cfbd-4983-4c8a-b4eb-5a460f1f9da8@les-enovateurs"
+    },
+    "gecko_android": {
+      "id": "abe1cfbd-4983-4c8a-b4eb-5a460f1f9da8@les-enovateurs"
+    }
+  }
 }

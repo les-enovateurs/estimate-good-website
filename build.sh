@@ -1,0 +1,1 @@
+web-ext build --overwrite-dest --ignore-files web-ext-artifacts .idea build.sh README.md LICENCE
