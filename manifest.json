@@ -3,11 +3,14 @@
   "description": "Display EcoIndex Score",
   "manifest_version": 2,
   "name": "estimate-good-website",
-  "version": "1.0",
+  "version": "1.1",
   "homepage_url": "https://github.com/les-enovateurs/estimate-good-website",
 
   "background": {
     "scripts": ["analysis.js"]
+  },
+  "page_action": {
+    "browser_style": true
   },
   "permissions": [
     "activeTab",
