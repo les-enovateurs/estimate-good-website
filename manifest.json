@@ -17,9 +17,6 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "bbe1cfbd-4983-4c8a-b4eb-5a460f1f9da8@les-enovateurs"
-    },
-    "gecko_android": {
-      "id": "abe1cfbd-4983-4c8a-b4eb-5a460f1f9da8@les-enovateurs"
     }
   }
 }
