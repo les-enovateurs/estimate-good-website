@@ -1,8 +1,7 @@
 {
-
   "description": "Display EcoIndex Score",
   "manifest_version": 2,
-  "name": "estimate-good-website",
+  "name": "EcoSurf Analyser",
   "version": "1.1",
   "homepage_url": "https://github.com/les-enovateurs/estimate-good-website",
 
@@ -16,7 +15,6 @@
     "activeTab",
     "tabs"
   ],
-
   "browser_specific_settings": {
     "gecko": {
       "id": "bbe1cfbd-4983-4c8a-b4eb-5a460f1f9da8@les-enovateurs"

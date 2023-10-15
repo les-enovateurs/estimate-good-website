@@ -1,4 +1,9 @@
-function updateTabUrlBar(tabId, grade, score, requests) {
+//prod
+const baseURL = 'https://compressor.les-enovateurs.com/';
+//dev
+// const baseURL = 'http://localhost:8080/';
+
+function updateTabUrlBar(tabId, grade, score, requests, url=null) {
     browser.pageAction.setIcon(
         {
             tabId,
@@ -12,6 +17,10 @@ function updateTabUrlBar(tabId, grade, score, requests) {
                 title: 'Score: ' + score + '/100, ' + requests + ' requests (source EcoIndex)'
             }
         );
+
+        //requests great or bad website message to make effort
+       fetch(`${baseURL}ecoindex?pth=${url}&scr=${score}&rqt=${requests}&bge=${grade}`);
+
     } else {
         browser.pageAction.setTitle(
             {
@@ -68,7 +77,7 @@ async function callEcoIndex(tabId, url) {
         }
         updateTabUrlBar(tabId, gradeComputed, null, null);
     }
-    updateTabUrlBar(tabId, grade, score, requests);
+    updateTabUrlBar(tabId, grade, score, requests, url);
 }
 
 async function getCachedResult(tabId, url) {
