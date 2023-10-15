@@ -18,8 +18,10 @@ function updateTabUrlBar(tabId, grade, score, requests, url=null) {
             }
         );
 
-        //requests great or bad website message to make effort
-       fetch(`${baseURL}ecoindex?pth=${url}&scr=${score}&rqt=${requests}&bge=${grade}`);
+        //we can contact bad score website owner
+        if(score < 50){
+            fetch(`${baseURL}ecoindex?pth=${url}&scr=${score}&rqt=${requests}&bge=${grade}`);
+        }
 
     } else {
         browser.pageAction.setTitle(
