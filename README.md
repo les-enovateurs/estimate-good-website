@@ -32,4 +32,5 @@ As mention above, [the EcoIndex API](https://github.com/cnumr/ecoindex_api)
 ## Contribute
 
 If you found a bug, please open a [issue](https://github.com/les-enovateurs/estimate-good-website/issues) (please search first if the bug is already mention on an existing issue).
-Feel free to contribute by creation a [pull request](https://github.com/les-enovateurs/estimate-good-website/pulls)
+
+Feel free to contribute by creating a [pull request](https://github.com/les-enovateurs/estimate-good-website/pulls)
