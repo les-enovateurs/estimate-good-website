@@ -71,7 +71,7 @@ function getImagesPathFromScore(score) {
 }
 
 async function callEcoIndex(tabId, url) {
-    const {grade, score, requests} = await getCachedResult(tabId, url);
+    const {grade, score, requests} = await getEcoIndexCachetResult(tabId, url);
     if (!grade) {
         const gradeComputed = askToComputeEvaluation(tabId, url);
         if (!gradeComputed) {
@@ -82,7 +82,7 @@ async function callEcoIndex(tabId, url) {
     updateTabUrlBar(tabId, grade, score, requests, url);
 }
 
-async function getCachedResult(tabId, url) {
+async function getEcoIndexCachetResult(tabId, url) {
     const ecoIndexResponse = await fetch(`https://bff.ecoindex.fr/api/results/?url=${url}`);
     if (ecoIndexResponse.ok) {
         const ecoIndexResponseObject = await ecoIndexResponse.json();
@@ -129,7 +129,6 @@ Each time a tab is updated, reset the page action for that tab.
 */
 browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
     if (tab.status == "complete" && tab.active) {
-        console.log('tab', tab.url)
         // try to get results cached in the ecoindex server
         callEcoIndex(tab.id, tab.url)
     }
