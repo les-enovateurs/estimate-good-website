@@ -11,10 +11,11 @@ function updateTabUrlBar(tabId, grade, score, requests, url=null) {
         }
     );
     if (score && requests) {
+        const title = browser.i18n.getMessage("popUpScoreResult", [score, requests]);
         browser.pageAction.setTitle(
             {
                 tabId,
-                title: 'Score: ' + score + '/100, ' + requests + ' requests (source EcoIndex)'
+                title
             }
         );
 
@@ -24,10 +25,11 @@ function updateTabUrlBar(tabId, grade, score, requests, url=null) {
         }
 
     } else {
+        const title = browser.i18n.getMessage("popUpNoGrade");
         browser.pageAction.setTitle(
             {
                 tabId,
-                title: 'Analysis in progress...'
+                title
             }
         );
     }
