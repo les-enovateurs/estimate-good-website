@@ -70,6 +70,28 @@ function getImagesPathFromScore(score) {
     };
 }
 
+// select only the information we need for the app
+function parseData(data) {
+    const {grade, score, requests} = data;
+    return { grade, score, requests };
+}
+
+function parseEcoIndexPayload(ecoIndexPayload) {
+    const dataParsed = parseData(ecoIndexPayload["latest-result"]);
+
+    // if grade exist, we assume the others fields are here as well
+    if(dataParsed.grade !== "") {
+        return dataParsed;
+    }
+
+    const hostResults = ecoIndexPayload["host-results"];
+    if(hostResults.length === 0) {
+        throw new Error("Cannot retrieve the grade");
+    }
+
+    return parseData(hostResults[0]);
+}
+
 async function callEcoIndex(tabId, url) {
     const {grade, score, requests} = await getEcoIndexCachetResult(tabId, url);
     if (!grade) {
@@ -86,20 +108,7 @@ async function getEcoIndexCachetResult(tabId, url) {
     const ecoIndexResponse = await fetch(`https://bff.ecoindex.fr/api/results/?url=${url}`);
     if (ecoIndexResponse.ok) {
         const ecoIndexResponseObject = await ecoIndexResponse.json();
-        const {grade, score, requests} = ecoIndexResponseObject["latest-result"];
-        if (grade === "") {
-            const hostResults = ecoIndexResponseObject["host-results"];
-            if (hostResults.length > 0) {
-                const {grade, score, requests} = hostResults[0];
-                console.log(`depuis l'origin c'est ${grade}`);
-                return {grade:grade, score:score, requests:requests};
-            } else {
-                throw new Error("Cannot retrieve the grade");
-            }
-        } else {
-            console.log(grade)
-            return {grade:grade, score:score, requests:requests};
-        }
+        return parseEcoIndexPayload(ecoIndexResponseObject);
     } else {
         console.log("this is not ok man")
         return {grade:null, score:null, requests:null};
