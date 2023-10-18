@@ -17,7 +17,6 @@ function updateTitle(tabId, title) {
 }
 
 function getImagesPathFromScore(score) {
-    console.log(score)
     const DIRECTORY_PATH = "icons";
     if (score) {
         return {
@@ -78,12 +77,13 @@ async function callEcoIndex(tabId, url, retry) {
 
     // if no result. Ask EcoIndex to analyse the url
     if(ecoIndexResult === null) {
-        const tokenFromTaskResponse = await askToComputeEvaluation(tabId, url);
-        if (tokenFromTaskResponse.ok) {
-            // try again in case of the task is processed within 10 seconds
+        const tokenFromTaskResponse = await askToComputeEvaluation(url);
+        if (tokenFromTaskResponse.ok && retry === false) {
+            // try again in case of the task is processed within 30 seconds
             setTimeout(() => {
                 callEcoIndex(tabId, url, true);
-            },10000);
+            },30000);
+            return;
         } else {
             renderResult(tabId, null);
             return;
@@ -123,22 +123,20 @@ browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
     }
 });
 
-if(browser.pageAction){
-    browser.pageAction.onClicked.addListener((tab) => {
-        // Hide the page action icon for the current tab
-        browser.pageAction.hide(tab.id);
+browser.pageAction.onClicked.addListener((tab) => {
+    // Hide the page action icon for the current tab
+    browser.pageAction.hide(tab.id);
 
-        // Define the URL you want to open in the new tab
-        const ECO_URL = "https://bff.ecoindex.fr/redirect/?url=";
+    // Define the URL you want to open in the new tab
+    const ECO_URL = "https://bff.ecoindex.fr/redirect/?url=";
 
-        // Get the current tab's URL and pass it as a parameter to the new tab
-        browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
-            const currentTabUrl = tabs[0].url;
+    // Get the current tab's URL and pass it as a parameter to the new tab
+    browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
+        const currentTabUrl = tabs[0].url;
 
-            // Open a new tab with the specified URL and the current tab's URL as a parameter
-            browser.tabs.create({
-                url: `${ECO_URL}${encodeURIComponent(currentTabUrl)}`
-            });
+        // Open a new tab with the specified URL and the current tab's URL as a parameter
+        browser.tabs.create({
+            url: `${ECO_URL}${encodeURIComponent(currentTabUrl)}`
         });
     });
-}
+});
