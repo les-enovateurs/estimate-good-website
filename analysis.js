@@ -96,7 +96,7 @@ async function callEcoIndex(tabId, url) {
     const ecoIndexResult = await getEcoIndexCachetResult(tabId, url);
 
     // if no result. Ask EcoIndex to analayse the url
-    if(result === null) {
+    if(ecoIndexResult === null) {
         const gradeComputed = askToComputeEvaluation(tabId, url);
         if (!gradeComputed) {
             updateTabUrlBar(tabId, null, null, null)
@@ -104,6 +104,7 @@ async function callEcoIndex(tabId, url) {
         updateTabUrlBar(tabId, gradeComputed, null, null);
     }
 
+    const { grade, score, requests} = ecoIndexResult;
     updateTabUrlBar(tabId, grade, score, requests, url);
 }
 
@@ -130,6 +131,7 @@ async function askToComputeEvaluation(url) {
     if(token === null) {
         return null;
     }
+
     // try to get the task result in X seconds. If the task is not processed, then return empty grade
     //const ecoIndexResponse = await fetch(`https://bff.ecoindex.fr/api/tasks/${token}`);
     //const { ecoindex_result: {detail: { grade } } } = await ecoIndexResponse.json()
