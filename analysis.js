@@ -93,14 +93,17 @@ function parseEcoIndexPayload(ecoIndexPayload) {
 }
 
 async function callEcoIndex(tabId, url) {
-    const {grade, score, requests} = await getEcoIndexCachetResult(tabId, url);
-    if (!grade) {
+    const ecoIndexResult = await getEcoIndexCachetResult(tabId, url);
+
+    // if no result. Ask EcoIndex to analayse the url
+    if(result === null) {
         const gradeComputed = askToComputeEvaluation(tabId, url);
         if (!gradeComputed) {
             updateTabUrlBar(tabId, null, null, null)
         }
         updateTabUrlBar(tabId, gradeComputed, null, null);
     }
+
     updateTabUrlBar(tabId, grade, score, requests, url);
 }
 
@@ -110,8 +113,7 @@ async function getEcoIndexCachetResult(tabId, url) {
         const ecoIndexResponseObject = await ecoIndexResponse.json();
         return parseEcoIndexPayload(ecoIndexResponseObject);
     } else {
-        console.log("this is not ok man")
-        return {grade:null, score:null, requests:null};
+        return null;
     }
 }
 
@@ -125,6 +127,9 @@ async function askToComputeEvaluation(url) {
         body: JSON.stringify({url})
     });
     const token = await tokenResponse.json();
+    if(token === null) {
+        return null;
+    }
     // try to get the task result in X seconds. If the task is not processed, then return empty grade
     //const ecoIndexResponse = await fetch(`https://bff.ecoindex.fr/api/tasks/${token}`);
     //const { ecoindex_result: {detail: { grade } } } = await ecoIndexResponse.json()
