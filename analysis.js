@@ -3,59 +3,21 @@ const baseURL = 'https://compressor.les-enovateurs.com/';
 //dev
 // const baseURL = 'http://localhost:8080/';
 
-function updateTabUrlBar(tabId, grade, score, requests, url=null) {
+function updateIcon(tabId, grade) {
     browser.pageAction.setIcon(
         {
             tabId,
             path: getImagesPathFromScore(grade)
         }
     );
-    if (score && requests) {
-        browser.pageAction.setTitle(
-            {
-                tabId,
-                title: 'Score: ' + score + '/100, ' + requests + ' requests (source EcoIndex)'
-            }
-        );
-
-        //we can contact bad score website owner
-        if(score < 50){
-            fetch(`${baseURL}ecoindex?pth=${url}&scr=${score}&rqt=${requests}&bge=${grade}`);
-        }
-
-    } else {
-        browser.pageAction.setTitle(
-            {
-                tabId,
-                title: 'Analysis in progress...'
-            }
-        );
-    }
-
-    browser.pageAction.show(tabId);
 }
 
-if(browser.pageAction){
-    browser.pageAction.onClicked.addListener((tab) => {
-        // Hide the page action icon for the current tab
-        browser.pageAction.hide(tab.id);
-
-        // Define the URL you want to open in the new tab
-        const ECO_URL = "https://bff.ecoindex.fr/redirect/?url=";
-
-        // Get the current tab's URL and pass it as a parameter to the new tab
-        browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
-            const currentTabUrl = tabs[0].url;
-
-            // Open a new tab with the specified URL and the current tab's URL as a parameter
-            browser.tabs.create({
-                url: `${ECO_URL}${encodeURIComponent(currentTabUrl)}`
-            });
-        });
-    });
+function updateTitle(tabId, title) {
+    browser.pageAction.setTitle({ tabId, title });
 }
 
 function getImagesPathFromScore(score) {
+    console.log(score)
     const DIRECTORY_PATH = "icons";
     if (score) {
         return {
@@ -70,6 +32,25 @@ function getImagesPathFromScore(score) {
     };
 }
 
+function renderResult(tabId, parsedData) {
+    if(parsedData === null ) {
+        updateIcon(tabId, null);
+        updateTitle(tabId, 'Analysis in progress...');
+    } else {
+        const { grade, score, requests } = parsedData;
+        updateIcon(tabId, grade);
+        updateTitle(tabId,`Score: ${score}/100.\n${requests} requests.\n(Source: EcoIndex)`);
+    }
+
+    browser.pageAction.show(tabId);
+}
+
+function storeResult(url, { score, requests, grade }) {
+    if(score < 50) {
+        fetch(`${baseURL}ecoindex?pth=${url}&scr=${score}&rqt=${requests}&bge=${grade}`);
+    }
+}
+
 // select only the information we need for the app
 function parseData(data) {
     const {grade, score, requests} = data;
@@ -77,11 +58,11 @@ function parseData(data) {
 }
 
 function parseEcoIndexPayload(ecoIndexPayload) {
-    const dataParsed = parseData(ecoIndexPayload["latest-result"]);
+    const parsedData = parseData(ecoIndexPayload["latest-result"]);
 
     // if grade exist, we assume the others fields are here as well
-    if(dataParsed.grade !== "") {
-        return dataParsed;
+    if(parsedData.grade !== "") {
+        return parsedData;
     }
 
     const hostResults = ecoIndexPayload["host-results"];
@@ -95,7 +76,7 @@ function parseEcoIndexPayload(ecoIndexPayload) {
 async function callEcoIndex(tabId, url, retry) {
     const ecoIndexResult = await getEcoIndexCachetResult(tabId, url);
 
-    // if no result. Ask EcoIndex to analayse the url
+    // if no result. Ask EcoIndex to analyse the url
     if(ecoIndexResult === null) {
         const tokenFromTaskResponse = await askToComputeEvaluation(tabId, url);
         if (tokenFromTaskResponse.ok) {
@@ -104,13 +85,12 @@ async function callEcoIndex(tabId, url, retry) {
                 callEcoIndex(tabId, url, true);
             },10000);
         } else {
-            // display an icon Error
-            updateTabUrlBar(tabId, null, null, null);
+            renderResult(tabId, null);
+            return;
         }
     }
-
-    const { grade, score, requests} = ecoIndexResult;
-    updateTabUrlBar(tabId, grade, score, requests, url);
+    renderResult(tabId, ecoIndexResult);
+    storeResult(url, ecoIndexResult);
 }
 
 async function getEcoIndexCachetResult(tabId, url) {
@@ -142,3 +122,23 @@ browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
         callEcoIndex(tab.id, tab.url, false);
     }
 });
+
+if(browser.pageAction){
+    browser.pageAction.onClicked.addListener((tab) => {
+        // Hide the page action icon for the current tab
+        browser.pageAction.hide(tab.id);
+
+        // Define the URL you want to open in the new tab
+        const ECO_URL = "https://bff.ecoindex.fr/redirect/?url=";
+
+        // Get the current tab's URL and pass it as a parameter to the new tab
+        browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
+            const currentTabUrl = tabs[0].url;
+
+            // Open a new tab with the specified URL and the current tab's URL as a parameter
+            browser.tabs.create({
+                url: `${ECO_URL}${encodeURIComponent(currentTabUrl)}`
+            });
+        });
+    });
+}
