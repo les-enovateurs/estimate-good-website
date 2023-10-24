@@ -34,11 +34,15 @@ function getImagesPathFromScore(score) {
 function renderResult(tabId, parsedData) {
     if(parsedData === null ) {
         updateIcon(tabId, null);
-        updateTitle(tabId, 'Analysis in progress...');
+
+        const title = browser.i18n.getMessage("popUpNoGrade");
+        updateTitle(tabId, title);
     } else {
         const { grade, score, requests } = parsedData;
         updateIcon(tabId, grade);
-        updateTitle(tabId,`Score: ${score}/100.\n${requests} requests.\n(Source: EcoIndex)`);
+
+        const title = browser.i18n.getMessage("popUpScoreResult", [score, requests]);
+        updateTitle(tabId, title);
     }
 
     browser.pageAction.show(tabId);
