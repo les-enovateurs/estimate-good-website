@@ -77,6 +77,7 @@ function parseEcoIndexPayload(ecoIndexPayload) {
 }
 
 async function callEcoIndex(tabId, url, retry) {
+    //console.log(url)
     const ecoIndexResult = await getEcoIndexCachetResult(tabId, url);
 
     // if no result. Ask EcoIndex to analyse the url
@@ -128,15 +129,13 @@ browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
 });
 
 browser.pageAction.onClicked.addListener((tab) => {
-    // Hide the page action icon for the current tab
-    browser.pageAction.hide(tab.id);
-
     // Define the URL you want to open in the new tab
     const ECO_URL = "https://bff.ecoindex.fr/redirect/?url=";
 
     // Get the current tab's URL and pass it as a parameter to the new tab
     browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
         const currentTabUrl = tabs[0].url;
+        //console.log(currentTabUrl);
 
         // Open a new tab with the specified URL and the current tab's URL as a parameter
         browser.tabs.create({
