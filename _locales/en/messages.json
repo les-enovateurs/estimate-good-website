@@ -1,0 +1,21 @@
+{
+  "popUpNoGrade": {
+    "message": "Analysis in progress...",
+    "description": "No result available for the website"
+  },
+
+  "popUpScoreResult": {
+    "message": "Score: $SCORE$/100\n.$REQUESTS$ requests.\n(source EcoIndex).",
+    "description": "Tells the user more data about the website.",
+    "placeholders": {
+      "score" : {
+        "content" : "$1",
+        "example" : "58"
+      },
+      "requests": {
+        "content" : "$2",
+        "example" : "123"
+      }
+    }
+  }
+}
