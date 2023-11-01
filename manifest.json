@@ -10,8 +10,8 @@
   },
   "page_action": {
     "default_icon": {
-      "16": "icons/A-16.png",
-      "32": "icons/A.png"
+      "16": "icons/16/A.jpg",
+      "32": "icons/A.jpg"
     },
     "default_title": "EcoSurf Analyser"
   },
