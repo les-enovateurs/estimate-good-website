@@ -1,0 +1,23 @@
+{
+  "description": "Display EcoIndex Score",
+  "manifest_version": 3,
+  "name": "EcoSurf Analyser",
+  "version": "1.1",
+  "homepage_url": "https://github.com/les-enovateurs/estimate-good-website",
+  "background": {
+    "service_worker": "analysis.js"
+  },
+  "action": {
+    "default_icon": {
+      "16": "icons/16/A.jpg",
+      "32": "icons/A.jpg"
+    },
+    "default_title": "EcoSurf Analyser"
+  },
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "storage",
+    "scripting"
+  ]
+}

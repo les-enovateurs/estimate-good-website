@@ -4,7 +4,7 @@ const baseURL = 'https://compressor.les-enovateurs.com/';
 // const baseURL = 'http://localhost:8080/';
 
 function updateIcon(tabId, grade) {
-    chrome.action.setIcon(
+    browser.pageAction.setIcon(
         {
             tabId,
             path: getImagesPathFromScore(grade)
@@ -13,7 +13,7 @@ function updateIcon(tabId, grade) {
 }
 
 function updateTitle(tabId, title) {
-    chrome.action.setTitle({ tabId, title });
+    browser.pageAction.setTitle({ tabId, title });
 }
 
 function getImagesPathFromScore(score) {
@@ -30,7 +30,7 @@ function getImagesPathFromScore(score) {
         32: `${DIRECTORY_PATH}/unknown.jpg`,
     };
 }
-console.log("fdjfdjfk")
+
 function renderResult(tabId, parsedData) {
     if(parsedData === null ) {
         updateIcon(tabId, null);
@@ -41,7 +41,7 @@ function renderResult(tabId, parsedData) {
         updateTitle(tabId,`Score: ${score}/100.\n${requests} requests.\n(Source: EcoIndex)`);
     }
 
-    //chrome.action.show(tabId);
+    browser.pageAction.show(tabId);
 }
 
 function storeResult(url, { score, requests, grade }) {
@@ -112,31 +112,30 @@ async function askToComputeEvaluation(url) {
         body: JSON.stringify({url})
     });
 }
-console.log("nicke ")
+
 /*
 Each time a tab is updated, reset the page action for that tab.
 */
-
-chrome.tabs.onUpdated.addListener((id, changeInfo, tab) => {
+browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
     if (tab.status == "complete" && tab.active) {
         // try to get results cached in the ecoindex server
         callEcoIndex(tab.id, tab.url, false);
     }
 });
 
-chrome.action.onClicked.addListener((tab) => {
+browser.pageAction.onClicked.addListener((tab) => {
     // Hide the page action icon for the current tab
-    chrome.action.hide(tab.id);
+    browser.pageAction.hide(tab.id);
 
     // Define the URL you want to open in the new tab
     const ECO_URL = "https://bff.ecoindex.fr/redirect/?url=";
 
     // Get the current tab's URL and pass it as a parameter to the new tab
-    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
+    browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
         const currentTabUrl = tabs[0].url;
 
         // Open a new tab with the specified URL and the current tab's URL as a parameter
-        chrome.tabs.create({
+        browser.tabs.create({
             url: `${ECO_URL}${encodeURIComponent(currentTabUrl)}`
         });
     });
