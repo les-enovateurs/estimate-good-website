@@ -34,11 +34,15 @@ console.log("fdjfdjfk")
 function renderResult(tabId, parsedData) {
     if(parsedData === null ) {
         updateIcon(tabId, null);
-        updateTitle(tabId, 'Analysis in progress...');
+
+        const title = browser.i18n.getMessage("popUpNoGrade");
+        updateTitle(tabId, title);
     } else {
         const { grade, score, requests } = parsedData;
         updateIcon(tabId, grade);
-        updateTitle(tabId,`Score: ${score}/100.\n${requests} requests.\n(Source: EcoIndex)`);
+
+        const title = browser.i18n.getMessage("popUpScoreResult", [score, requests]);
+        updateTitle(tabId, title);
     }
 
     //chrome.action.show(tabId);
@@ -73,6 +77,7 @@ function parseEcoIndexPayload(ecoIndexPayload) {
 }
 
 async function callEcoIndex(tabId, url, retry) {
+    //console.log(url)
     const ecoIndexResult = await getEcoIndexCachetResult(tabId, url);
 
     // if no result. Ask EcoIndex to analyse the url
@@ -127,13 +132,13 @@ chrome.tabs.onUpdated.addListener((id, changeInfo, tab) => {
 chrome.action.onClicked.addListener((tab) => {
     // Hide the page action icon for the current tab
     chrome.action.hide(tab.id);
-
     // Define the URL you want to open in the new tab
     const ECO_URL = "https://bff.ecoindex.fr/redirect/?url=";
 
     // Get the current tab's URL and pass it as a parameter to the new tab
     chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
         const currentTabUrl = tabs[0].url;
+        //console.log(currentTabUrl);
 
         // Open a new tab with the specified URL and the current tab's URL as a parameter
         chrome.tabs.create({
