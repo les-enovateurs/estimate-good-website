@@ -51,12 +51,13 @@ function renderResult(tabId, parsedData) {
 function storeResult(url, parsedData) {
     localStorage.setItem(url, JSON.stringify(parsedData));
 
-    const { score } = parsedData;
-    // for statistics purpose
-    if(score < 50) {
-        const { score, requests, grade } = parsedData;
-        fetch(`${baseURL}ecoindex?pth=${url}&scr=${score}&rqt=${requests}&bge=${grade}`);
-    }
+    //disable statistics
+    // const { score } = parsedData;
+    // // for statistics purpose
+    // if(score < 50) {
+    //     const { score, requests, grade } = parsedData;
+    //     fetch(`${baseURL}ecoindex?pth=${url}&scr=${score}&rqt=${requests}&bge=${grade}`);
+    // }
 
 }
 
