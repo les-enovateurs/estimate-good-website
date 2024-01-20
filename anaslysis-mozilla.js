@@ -4,7 +4,7 @@ const baseURL = 'https://compressor.les-enovateurs.com/';
 // const baseURL = 'http://localhost:8080/';
 
 function updateIcon(tabId, grade) {
-    chrome.action.setIcon(
+    browser.pageAction.setIcon(
         {
             tabId,
             path: getImagesPathFromScore(grade)
@@ -13,7 +13,7 @@ function updateIcon(tabId, grade) {
 }
 
 function updateTitle(tabId, title) {
-    chrome.action.setTitle({ tabId, title });
+    browser.pageAction.setTitle({ tabId, title });
 }
 
 function getImagesPathFromScore(score) {
@@ -35,21 +35,21 @@ function renderResult(tabId, parsedData) {
     if(parsedData === null ) {
         updateIcon(tabId, null);
 
-        const title = chrome.i18n.getMessage("popUpNoGrade");
+        const title = browser.i18n.getMessage("popUpNoGrade");
         updateTitle(tabId, title);
     } else {
         const { grade, score, requests } = parsedData;
         updateIcon(tabId, grade);
 
-        const title = chrome.i18n.getMessage("popUpScoreResult", [score, requests]);
+        const title = browser.i18n.getMessage("popUpScoreResult", [score, requests]);
         updateTitle(tabId, title);
     }
 
-    //chrome.action.show(tabId);
+    browser.pageAction.show(tabId);
 }
 
-async function storeResult(url, parsedData) {
-    await chrome.storage.local.set({[url]: JSON.stringify(parsedData)});
+function storeResult(url, parsedData) {
+    localStorage.setItem(url, JSON.stringify(parsedData));
 
     const { score } = parsedData;
     // for statistics purpose
@@ -63,10 +63,7 @@ async function storeResult(url, parsedData) {
 // select only the information we need for the app
 function parseData(data) {
     const { grade, score, requests, id } = data;
-    // cache duration : 7 days
-    const expirationDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).getTime();
-
-    return { grade, score, requests, id, expirationDate };
+    return { grade, score, requests, id };
 }
 
 function parseEcoIndexPayload(ecoIndexPayload) {
@@ -125,39 +122,27 @@ async function askToComputeEvaluation(url) {
         body: JSON.stringify({url})
     });
 }
+
 /*
 Each time a tab is updated, reset the page action for that tab.
 */
-
-chrome.tabs.onUpdated.addListener((id, changeInfo, tab) => {
+browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
     if (tab.status == "complete" && tab.active) {
         // try to get results cached in the ecoindex server
         callEcoIndex(tab.id, tab.url, false);
     }
 });
 
-chrome.tabs.onRemoved.addListener((tabId) => {
-    chrome.storage.local.get(null, function(items) {
-        Object.entries(items).map(([key, value]) => {
-            const parsedData = JSON.parse(value);
-            const { expirationDate } = parsedData;
-            if(expirationDate < new Date().getTime()) {
-                chrome.storage.local.remove(key);
-            }
-        });
-    });
-});
-
-chrome.action.onClicked.addListener((tab) => {
-    chrome.storage.local.get([tab.url]).then((localStorageData) => {
-    if(!localStorageData) {
+browser.pageAction.onClicked.addListener((tab) => {
+    localStorageData = localStorage.getItem(tab.url);
+    if(!localStorage) {
         return;
     }
-    const parsedData = JSON.parse(localStorageData[tab.url]);
+
+    const parsedData = JSON.parse(localStorageData);
     const { id } = parsedData;
     const ecoIndexPage = `https://www.ecoindex.fr/resultat/?id=${id}`;
-    chrome.tabs.create({
+    browser.tabs.create({
         url: ecoIndexPage
     });
-  });
 });
