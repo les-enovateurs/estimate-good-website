@@ -43,3 +43,8 @@ tfoot th {
 tfoot td {
   font-weight: bold;
 }
+
+.link-url {
+  max-width: 100px;
+  text-overflow: ellipsis;
+}

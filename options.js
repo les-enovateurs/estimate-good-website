@@ -1,6 +1,6 @@
 window.addEventListener('DOMContentLoaded', (event) => {
-    console.log('DOM fully loaded and parsed');
-    console.log({...localStorage});
+    //console.log('DOM fully loaded and parsed');
+    //console.log({...localStorage});
 
     const table = document.getElementById("list-of-url-table");
     if(!table) {
@@ -13,8 +13,28 @@ window.addEventListener('DOMContentLoaded', (event) => {
     table.appendChild(tbody);
 
     const items = { ...localStorage };
-    Object.entries(items).map(([key, value]) => {
+    const rows = Object.entries(items)
+    // sort desc by visited at
+    const rowsSortedByVisitedAt = rows.slice().sort(([keyA, valueA],[keyB, valueB]) => {
+        const a = JSON.parse(valueA);
+        const b = JSON.parse(valueB);
+        console.log(a["visitedAt"] < b["visitedAt"])
+        return a["visitedAt"] < b["visitedAt"];
+    });
+
+    rowsSortedByVisitedAt.map(([key, value]) => {
         tbody.appendChild(createRow(key, value));
+    });
+
+
+    // listener
+    const removeHistoryButton = document.getElementById("clearHistory");
+    if(!removeHistoryButton) {
+        throw new Error("Cannot find the button id");
+    }
+
+    removeHistoryButton.addEventListener('click', () => {
+        localStorage.clear();
     });
     
 });
@@ -46,10 +66,15 @@ function createHead() {
     thRequests.setAttribute("scope", "col");
     thRequests.innerHTML = "Nb Requests";
 
+    const thVisitedAt = document.createElement("th");
+    thVisitedAt.setAttribute("scope", "col");
+    thVisitedAt.innerHTML = "Visited At";
+
     tr.appendChild(thLink);
     tr.appendChild(thGrade);
     tr.appendChild(thScore);
     tr.appendChild(thRequests);
+    tr.appendChild(thVisitedAt);
     
     head.appendChild(tr);
     return  head;
@@ -61,7 +86,8 @@ function createRow(link, otherData) {
 
     const thLink = document.createElement("th");
     thLink.setAttribute("scope", "row");
-    thLink.innerHTML = "link";
+    thLink.classList.add("link-url")
+    thLink.innerHTML = link;
 
     const tdGrade = document.createElement("td");
     tdGrade.innerHTML = parsedData["grade"];
@@ -72,10 +98,14 @@ function createRow(link, otherData) {
     const tdRequests = document.createElement("td");
     tdRequests.innerHTML = parsedData["requests"];
 
+    const tdVisitedAt = document.createElement("td");
+    tdVisitedAt.innerHTML = parsedData["visitedAt"];
+
     tr.appendChild(thLink);
     tr.appendChild(tdGrade);
     tr.appendChild(tdScore);
     tr.appendChild(tdRequests);
+    tr.appendChild(tdVisitedAt);
 
     return tr;
 
