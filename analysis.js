@@ -49,7 +49,8 @@ function renderResult(tabId, parsedData) {
 }
 
 function storeResult(url, parsedData) {
-    localStorage.setItem(url, JSON.stringify(parsedData));
+    const visitedAt = new Date();
+    localStorage.setItem(url, JSON.stringify({...parsedData, visitedAt }));
 
     //disable statistics
     // const { score } = parsedData;
