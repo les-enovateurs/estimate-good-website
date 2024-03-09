@@ -1,6 +1,6 @@
 window.addEventListener('DOMContentLoaded', (event) => {
     //console.log('DOM fully loaded and parsed');
-    //console.log({...localStorage});
+    console.log(JSON.stringify({...localStorage}));
 
     const table = document.getElementById("list-of-url-table");
     if(!table) {
@@ -12,13 +12,17 @@ window.addEventListener('DOMContentLoaded', (event) => {
     const tbody = document.createElement("tbody");
     table.appendChild(tbody);
 
-    const items = { ...localStorage };
+    //const items = { ...localStorage };
+    const items = {
+        "https://www.google.com/url": '{"grade":"C","score":63,"requests":44,"id":"5277e57b-ec03-4c2b-85b5-b389a4914b5c","expirationDate":1710454961512,"visitedAt":"2024-03-07T22:22:41.514Z"}',
+        "https://www.google.com/search?q=tables+html+20241nuoq29qENwEYxw": '{"grade":"D","score":44,"requests":54,"id":"9ef62ed4-46e8-4890-93b1-75955595b047","expirationDate":1710626047905,"visitedAt":"2024-03-09T21:54:07.906Z"}',
+        "https://developer.mozilla.org/fr/docs/Web/CSS/text-overflow": '{"grade":"D","score":52,"requests":31,"id":"77e24428-ad2f-4599-9cd2-fb85a81bcd16","expirationDate":1710454139769,"visitedAt":"2024-03-07T22:08:59.772Z"}'
+    };
     const rows = Object.entries(items)
     // sort desc by visited at
     const rowsSortedByVisitedAt = rows.slice().sort(([keyA, valueA],[keyB, valueB]) => {
         const a = JSON.parse(valueA);
         const b = JSON.parse(valueB);
-        console.log(a["visitedAt"] < b["visitedAt"])
         return a["visitedAt"] < b["visitedAt"];
     });
 
@@ -90,10 +94,10 @@ function createRow(link, otherData) {
     thLink.innerHTML = link;
 
     const tdGrade = document.createElement("td");
-    tdGrade.innerHTML = parsedData["grade"];
+    tdGrade.innerHTML = `<img src="icons/${parsedData["grade"]}.jpg" />`;
 
     const tdScore = document.createElement("td");
-    tdScore.innerHTML = `${parsedData["score"]} / 100`;
+    tdScore.innerHTML = `<span style="font-weight:bold">${parsedData["score"]}</span> / 100`;
 
     const tdRequests = document.createElement("td");
     tdRequests.innerHTML = parsedData["requests"];
