@@ -17,5 +17,27 @@
         "example" : "123"
       }
     }
+  },
+
+  "linkTable": {
+    "message": "link"
+  },
+  "gradeTable": {
+    "message": "Grade"
+  },
+  "scoreTable": {
+    "message": "Score"
+  },
+  "nbRequestsTable": {
+    "message": "Number of requests"
+  },
+  "visitedAtTable": {
+    "message": "Visited at"
+  },
+  "clearHistory": {
+    "message": "Clear History"
+  },
+  "settingsHeader": {
+    "message": "Settings"
   }
 }

@@ -37,9 +37,18 @@ window.addEventListener('DOMContentLoaded', (event) => {
         throw new Error("Cannot find the button id");
     }
 
+    removeHistoryButton.innerHTML = browser.i18n.getMessage("clearHistory");
     removeHistoryButton.addEventListener('click', () => {
         localStorage.clear();
     });
+
+    // header
+    const header = document.getElementById('settings-header');
+    if(!header) {
+        throw new Error("Cannot find the header");
+    }
+    header.innerHTML = browser.i18n.getMessage("settingsHeader");
+
     
 });
 
@@ -56,23 +65,23 @@ function createHead() {
 
     const thLink = document.createElement("th");
     thLink.setAttribute("scope", "col");
-    thLink.innerHTML = "Link";
+    thLink.innerHTML = browser.i18n.getMessage("linkTable");
 
     const thGrade = document.createElement("th");
     thGrade.setAttribute("scope", "col");
-    thGrade.innerHTML = "Grade";
+    thGrade.innerHTML = browser.i18n.getMessage("gradeTable");
 
     const thScore = document.createElement("th");
     thScore.setAttribute("scope", "col");
-    thScore.innerHTML = "Score";
+    thScore.innerHTML = browser.i18n.getMessage("scoreTable");
 
     const thRequests = document.createElement("th");
     thRequests.setAttribute("scope", "col");
-    thRequests.innerHTML = "Nb Requests";
+    thRequests.innerHTML = browser.i18n.getMessage("nbRequestsTable");
 
     const thVisitedAt = document.createElement("th");
     thVisitedAt.setAttribute("scope", "col");
-    thVisitedAt.innerHTML = "Visited At";
+    thVisitedAt.innerHTML = browser.i18n.getMessage("visitedAtTable");
 
     tr.appendChild(thLink);
     tr.appendChild(thGrade);
