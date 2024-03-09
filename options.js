@@ -91,7 +91,7 @@ function createRow(link, otherData) {
     const thLink = document.createElement("th");
     thLink.setAttribute("scope", "row");
     thLink.classList.add("link-url")
-    thLink.innerHTML = link;
+    thLink.innerHTML = `<a style="color:white" href="${link}">${link}</a>`;
 
     const tdGrade = document.createElement("td");
     tdGrade.innerHTML = `<img src="icons/${parsedData["grade"]}.jpg" />`;
