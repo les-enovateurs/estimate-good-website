@@ -24,6 +24,7 @@ thead,
 tfoot {
   background-color: #00614f;
   font-weight: bold;
+  font-size: 1.2rem;
 }
 
 th,
@@ -58,3 +59,11 @@ tbody > tr {
 }
 
 /* END table */
+
+
+button {
+  background-color: #00614f;
+  color: white;
+  border-radius: 6px;
+  padding: 10px;
+}

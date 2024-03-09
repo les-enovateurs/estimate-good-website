@@ -1,6 +1,6 @@
 window.addEventListener('DOMContentLoaded', (event) => {
     //console.log('DOM fully loaded and parsed');
-    console.log(JSON.stringify({...localStorage}));
+    //console.log(JSON.stringify({...localStorage}));
 
     const table = document.getElementById("list-of-url-table");
     if(!table) {
@@ -12,12 +12,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
     const tbody = document.createElement("tbody");
     table.appendChild(tbody);
 
-    //const items = { ...localStorage };
-    const items = {
+    const items = { ...localStorage };
+    /*const items = {
         "https://www.google.com/url": '{"grade":"C","score":63,"requests":44,"id":"5277e57b-ec03-4c2b-85b5-b389a4914b5c","expirationDate":1710454961512,"visitedAt":"2024-03-07T22:22:41.514Z"}',
         "https://www.google.com/search?q=tables+html+20241nuoq29qENwEYxw": '{"grade":"D","score":44,"requests":54,"id":"9ef62ed4-46e8-4890-93b1-75955595b047","expirationDate":1710626047905,"visitedAt":"2024-03-09T21:54:07.906Z"}',
         "https://developer.mozilla.org/fr/docs/Web/CSS/text-overflow": '{"grade":"D","score":52,"requests":31,"id":"77e24428-ad2f-4599-9cd2-fb85a81bcd16","expirationDate":1710454139769,"visitedAt":"2024-03-07T22:08:59.772Z"}'
-    };
+    };*/
     const rows = Object.entries(items)
     // sort desc by visited at
     const rowsSortedByVisitedAt = rows.slice().sort(([keyA, valueA],[keyB, valueB]) => {
@@ -103,7 +103,7 @@ function createRow(link, otherData) {
     tdRequests.innerHTML = parsedData["requests"];
 
     const tdVisitedAt = document.createElement("td");
-    tdVisitedAt.innerHTML = parsedData["visitedAt"];
+    tdVisitedAt.innerHTML = prettyDate(parsedData["visitedAt"]);
 
     tr.appendChild(thLink);
     tr.appendChild(tdGrade);
@@ -113,4 +113,23 @@ function createRow(link, otherData) {
 
     return tr;
 
+}
+
+
+
+function prettyDate(time) {
+    var date = new Date((time || "").replace(/-/g, "/").replace(/[TZ]/g, " ")),
+        diff = (((new Date()).getTime() - date.getTime()) / 1000),
+        day_diff = Math.floor(diff / 86400);
+
+    if (isNaN(day_diff) || day_diff < 0 || day_diff >= 31) return;
+
+    return day_diff == 0 && (
+    diff < 60 && "just now" 
+    || diff < 120 && "1 minute ago" 
+    || diff < 3600 && Math.floor(diff / 60) + " minutes ago" 
+    || diff < 7200 && "1 hour ago" 
+    || diff < 86400 && Math.floor(diff / 3600) + " hours ago") 
+    || day_diff == 1 && "Yesterday" || day_diff < 7 && day_diff + " days ago" 
+    || day_diff < 31 && Math.ceil(day_diff / 7) + " weeks ago";
 }
