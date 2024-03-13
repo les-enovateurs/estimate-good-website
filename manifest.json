@@ -8,6 +8,9 @@
   "background": {
     "scripts": ["analysis.js"]
   },
+  "options_ui": {
+    "page": "options.html"
+  },
   "page_action": {
     "default_icon": {
       "16": "icons/16/A.jpg",
