@@ -13,6 +13,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
         return a["visitedAt"] < b["visitedAt"];
     });
 
+
     rowsSortedByVisitedAt.map(([key, value]) => {
         tbody.appendChild(createRow(key, value));
     });
@@ -38,7 +39,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
     // progress bar
     const gradeIconProgressBar = findById("grade-average-icon-progress-bar");
 
-    const averageGrade = "C";
+
+    const averageGrade = computeAverageNote(rowsSortedByVisitedAt, firstDateOfMonth(new Date()), lastDateOfMonth(new Date()));
     computeGradeIconAndPositionOnProgressBar(gradeIconProgressBar, averageGrade);
 });
 
@@ -124,6 +126,74 @@ function prettyDate(time) {
     || day_diff < 31 && browser.i18n.getMessage("weeks", [Math.ceil(day_diff / 7)]);
 }
 
+function computeAverageNote(rowsSortedByVisitedAt, fromDate, toDate) {
+    const rowsSortedByVisitedRange = rowsSortedByVisitedAt.slice().filter( ([key, value]) => {
+        const a = JSON.parse(value);
+        const date =  new Date(a["visitedAt"]);
+        return date >= fromDate && date <= toDate;
+    });
+
+    const sumNotes = rowsSortedByVisitedRange.reduce((acc, [currentKey, currentValue]) => {
+        const a = JSON.parse(currentValue);
+        return fromGradeToNote(a["grade"]) + acc;
+    } ,0);
+
+    const averageNote = Math.ceil(sumNotes/rowsSortedByVisitedRange.length);
+
+    return fromToNoteGrade(averageNote);
+}
+
+function firstDateOfMonth(date) {
+    return new Date(date.getFullYear(), date.getMonth(), 1);
+}
+
+
+function lastDateOfMonth(date) {
+    // 0 as day return the last day of the previous month
+  return new Date(date.getFullYear(), date.getMonth() + 1, 0);
+}
+
+function fromGradeToNote(grade) {
+    switch(grade){
+        case 'A':
+        default:
+            return 0;
+        case 'B':
+            return 1;
+        case 'C':
+            return 2;
+        case 'D':
+            return 3;
+        case 'E':
+            return 4;
+        case 'F':
+            return 5;
+        case 'G':
+            return 6;
+    }
+}
+
+
+function fromToNoteGrade(note) {
+    switch(note){
+        case 0:
+        default:
+            return 'A';
+        case  1:
+            return 'B';
+        case  2:
+            return 'C';
+        case 3:
+            return 'D';
+        case 4:
+            return 'E';
+        case 5:
+            return 'F';
+        case 6:
+            return 'G';
+    }
+}
+
 function computeGradeIconAndPositionOnProgressBar(gradeIconProgressBar, grade) {
     let positionInPercent = "0%";
     switch(grade){
@@ -153,6 +223,7 @@ function computeGradeIconAndPositionOnProgressBar(gradeIconProgressBar, grade) {
     gradeIconProgressBar.style.left = positionInPercent;
     gradeIconProgressBar.src = `icons/${grade}.jpg`;
 }
+
 
 // tool functions
 function findById(id) {
