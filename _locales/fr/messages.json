@@ -40,6 +40,12 @@
   "settingsHeader": {
     "message": "Parametres"
   },
+  "averageMonthTitle": {
+    "message": "La moyenne des notes ce mois-ci"
+  },
+  "browserHistoryTitle": {
+    "message": "Historique"
+  },
 
   "now": {
     "message": "maintenant"
