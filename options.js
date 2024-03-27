@@ -1,8 +1,5 @@
 window.addEventListener('DOMContentLoaded', (event) => {
-    //console.log('DOM fully loaded and parsed');
-    //console.log(JSON.stringify({...localStorage}));
-
-    const table = findById("list-of-url-table");
+    const table = document.getElementById("list-of-url-table");
     table.appendChild(createHead());
     const tbody = document.createElement("tbody");
     table.appendChild(tbody);
@@ -19,7 +16,6 @@ window.addEventListener('DOMContentLoaded', (event) => {
     rowsSortedByVisitedAt.map(([key, value]) => {
         tbody.appendChild(createRow(key, value));
     });
-
 
     // listener
     const removeHistoryButton = findById("clearHistory");
@@ -39,11 +35,10 @@ window.addEventListener('DOMContentLoaded', (event) => {
     const browserHistoryTitle = findById("browser-history-title");
     browserHistoryTitle.innerHTML = browser.i18n.getMessage("browserHistoryTitle");
 
-
     // progress bar
     const gradeIconProgressBar = findById("grade-average-icon-progress-bar");
 
-    const averageGrade = "D";
+    const averageGrade = "C";
     computeGradeIconAndPositionOnProgressBar(gradeIconProgressBar, averageGrade);
 });
 
