@@ -154,7 +154,7 @@ function computeGradeIconAndPositionOnProgressBar(gradeIconProgressBar, grade) {
     gradeIconProgressBar.src = `icons/${grade}.jpg`;
 }
 
-// tool function
+// tool functions
 function findById(id) {
     const domElement = document.getElementById(id);
     if(!domElement) {
