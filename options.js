@@ -2,22 +2,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
     //console.log('DOM fully loaded and parsed');
     //console.log(JSON.stringify({...localStorage}));
 
-    const table = document.getElementById("list-of-url-table");
-    if(!table) {
-        throw new Error("Cannot find the table id");
-    }
-
-    table.appendChild(createCaption());
+    const table = findById("list-of-url-table");
     table.appendChild(createHead());
     const tbody = document.createElement("tbody");
     table.appendChild(tbody);
 
     const items = { ...localStorage };
-    /*const items = {
-        "https://www.google.com/url": '{"grade":"C","score":63,"requests":44,"id":"5277e57b-ec03-4c2b-85b5-b389a4914b5c","expirationDate":1710454961512,"visitedAt":"2024-03-07T22:22:41.514Z"}',
-        "https://www.google.com/search?q=tables+html+20241nuoq29qENwEYxw": '{"grade":"D","score":44,"requests":54,"id":"9ef62ed4-46e8-4890-93b1-75955595b047","expirationDate":1710626047905,"visitedAt":"2024-03-09T21:54:07.906Z"}',
-        "https://developer.mozilla.org/fr/docs/Web/CSS/text-overflow": '{"grade":"D","score":52,"requests":31,"id":"77e24428-ad2f-4599-9cd2-fb85a81bcd16","expirationDate":1710454139769,"visitedAt":"2024-03-07T22:08:59.772Z"}'
-    };*/
     const rows = Object.entries(items)
     // sort desc by visited at
     const rowsSortedByVisitedAt = rows.slice().sort(([keyA, valueA],[keyB, valueB]) => {
@@ -32,32 +22,30 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
 
     // listener
-    const removeHistoryButton = document.getElementById("clearHistory");
-    if(!removeHistoryButton) {
-        throw new Error("Cannot find the button id");
-    }
-
+    const removeHistoryButton = findById("clearHistory");
     removeHistoryButton.innerHTML = browser.i18n.getMessage("clearHistory");
     removeHistoryButton.addEventListener('click', () => {
         localStorage.clear();
     });
 
     // header
-    const header = document.getElementById('settings-header');
-    if(!header) {
-        throw new Error("Cannot find the header");
-    }
+    const header = findById('settings-header');
     header.innerHTML = browser.i18n.getMessage("settingsHeader");
 
-    
+    // header settings
+    const averageMonthTitle = findById("average-month-title");
+    averageMonthTitle.innerHTML = browser.i18n.getMessage("averageMonthTitle");
+
+    const browserHistoryTitle = findById("browser-history-title");
+    browserHistoryTitle.innerHTML = browser.i18n.getMessage("browserHistoryTitle");
+
+
+    // progress bar
+    const gradeIconProgressBar = findById("grade-average-icon-progress-bar");
+
+    const averageGrade = "D";
+    computeGradeIconAndPositionOnProgressBar(gradeIconProgressBar, averageGrade);
 });
-
-
-function createCaption() {
-    const caption = document.createElement("caption");
-    caption.innerHTML = "Here is the list of your history";
-    return caption;
-}
 
 function createHead() {
     const head = document.createElement("thead");
@@ -83,8 +71,8 @@ function createHead() {
     thVisitedAt.setAttribute("scope", "col");
     thVisitedAt.innerHTML = browser.i18n.getMessage("visitedAtTable");
 
-    tr.appendChild(thLink);
     tr.appendChild(thGrade);
+    tr.appendChild(thLink);
     tr.appendChild(thScore);
     tr.appendChild(thRequests);
     tr.appendChild(thVisitedAt);
@@ -99,8 +87,8 @@ function createRow(link, otherData) {
 
     const thLink = document.createElement("th");
     thLink.setAttribute("scope", "row");
-    thLink.classList.add("link-url")
-    thLink.innerHTML = `<a style="color:white" href="${link}">${link}</a>`;
+    thLink.classList.add("link-th")
+    thLink.innerHTML = `<a class="link-url" href="${link}">${link}</a>`;
 
     const tdGrade = document.createElement("td");
     tdGrade.innerHTML = `<img src="icons/${parsedData["grade"]}.jpg" />`;
@@ -114,8 +102,8 @@ function createRow(link, otherData) {
     const tdVisitedAt = document.createElement("td");
     tdVisitedAt.innerHTML = prettyDate(parsedData["visitedAt"]);
 
-    tr.appendChild(thLink);
     tr.appendChild(tdGrade);
+    tr.appendChild(thLink);
     tr.appendChild(tdScore);
     tr.appendChild(tdRequests);
     tr.appendChild(tdVisitedAt);
@@ -123,8 +111,6 @@ function createRow(link, otherData) {
     return tr;
 
 }
-
-
 
 function prettyDate(time) {
     var date = new Date((time || "").replace(/-/g, "/").replace(/[TZ]/g, " ")),
@@ -141,4 +127,43 @@ function prettyDate(time) {
     || diff < 86400 && browser.i18n.getMessage("hours", [Math.floor(diff / 3600)])) 
     || day_diff == 1 && browser.i18n.getMessage("yesterday") || day_diff < 7 && browser.i18n.getMessage("days", [day_diff]) 
     || day_diff < 31 && browser.i18n.getMessage("weeks", [Math.ceil(day_diff / 7)]);
+}
+
+function computeGradeIconAndPositionOnProgressBar(gradeIconProgressBar, grade) {
+    let positionInPercent = "0%";
+    switch(grade){
+        case 'A':
+        default:
+            positionInPercent = "2%";
+            break;
+        case 'B':
+            positionInPercent = "10%";
+            break;
+        case 'C':
+            positionInPercent = "30%";
+            break;
+        case 'D':
+            positionInPercent = "50%";
+            break;
+        case 'E':
+            positionInPercent = "55%";
+            break;
+        case 'F':
+            positionInPercent = "80%";
+            break;
+        case 'G':
+            positionInPercent = "95%";
+            break;
+    }
+    gradeIconProgressBar.style.left = positionInPercent;
+    gradeIconProgressBar.src = `icons/${grade}.jpg`;
+}
+
+// tool function
+function findById(id) {
+    const domElement = document.getElementById(id);
+    if(!domElement) {
+        throw new Error(`Cannot find the domElement by id: ${id}`);
+    }
+    return domElement;
 }
