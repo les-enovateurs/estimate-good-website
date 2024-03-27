@@ -40,6 +40,12 @@
   "settingsHeader": {
     "message": "Settings"
   },
+  "averageMonthTitle": {
+    "message": "Average rating for the month"
+  },
+  "browserHistoryTitle": {
+    "message": "Browser history"
+  },
 
   "now": {
     "message": "now"

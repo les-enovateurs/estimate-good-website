@@ -42,6 +42,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
     }
     header.innerHTML = browser.i18n.getMessage("settingsHeader");
 
+    // header settings
+    const averageMonthTitle = document.getElementById("average-month-title");
+    averageMonthTitle.innerHTML = browser.i18n.getMessage("averageMonthTitle");
 
     const averageNoteSpan = document.getElementById('averageNote');
     if(!averageNoteSpan) {
