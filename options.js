@@ -1,23 +1,8 @@
+// variables
+let currentPage = 1;
+let itemsPerPage = 10;
+
 window.addEventListener('DOMContentLoaded', (event) => {
-    const table = document.getElementById("list-of-url-table");
-    table.appendChild(createHead());
-    const tbody = document.createElement("tbody");
-    table.appendChild(tbody);
-
-    const items = { ...localStorage };
-    const rows = Object.entries(items)
-    // sort desc by visited at
-    const rowsSortedByVisitedAt = rows.slice().sort(([keyA, valueA],[keyB, valueB]) => {
-        const a = JSON.parse(valueA);
-        const b = JSON.parse(valueB);
-        return a["visitedAt"] < b["visitedAt"];
-    });
-
-
-    rowsSortedByVisitedAt.map(([key, value]) => {
-        tbody.appendChild(createRow(key, value));
-    });
-
     // listener
     const removeHistoryButton = findById("clearHistory");
     removeHistoryButton.innerHTML = browser.i18n.getMessage("clearHistory");
@@ -39,10 +24,59 @@ window.addEventListener('DOMContentLoaded', (event) => {
     // progress bar
     const gradeIconProgressBar = findById("grade-average-icon-progress-bar");
 
+    const rowsSortedByVisitedAt = computeData();
+
+    renderTable(rowsSortedByVisitedAt);
+    renderPagination(rowsSortedByVisitedAt.length, itemsPerPage);
 
     const averageGrade = computeAverageNote(rowsSortedByVisitedAt, firstDateOfMonth(new Date()), lastDateOfMonth(new Date()));
     computeGradeIconAndPositionOnProgressBar(gradeIconProgressBar, averageGrade);
 });
+
+function computeData() {
+    const items = { ...localStorage };
+    const rows = Object.entries(items)
+    // sort desc by visited at
+    const rowsSortedByVisitedAt = rows.slice().sort(([keyA, valueA],[keyB, valueB]) => {
+        const a = JSON.parse(valueA);
+        const b = JSON.parse(valueB);
+        return a["visitedAt"] < b["visitedAt"];
+    });
+    return rowsSortedByVisitedAt;
+}
+
+function renderTable(rows) {
+    const table = document.getElementById("list-of-url-table");
+    // clear table
+    table.innerHTML = "";
+
+    table.appendChild(createHead());
+    const tbody = document.createElement("tbody");
+    table.appendChild(tbody);
+
+    const start = (currentPage-1)*itemsPerPage;
+    const end = (currentPage) * itemsPerPage;
+    console.log(start, " " , end)
+    rows.slice(start, end).map(([key, value]) => {
+        tbody.appendChild(createRow(key, value));
+    });
+
+    //pagination (items per page)
+    const paginationLabel = findById("paginate-by-label");
+    paginationLabel.innerHTML = browser.i18n.getMessage("paginateBy");
+
+    const paginationSelect = findById("select-paginate-by");
+    paginationSelect.addEventListener('change', (event) => {
+        itemsPerPage = event.target.value;
+        renderTable(rows);
+        console.log(itemsPerPage)
+        renderPagination(rows.length, itemsPerPage);
+        event.preventDefault();
+    });
+
+    return table;
+}
+
 
 function createHead() {
     const head = document.createElement("thead");
@@ -106,6 +140,41 @@ function createRow(link, otherData) {
     tr.appendChild(tdVisitedAt);
 
     return tr;
+}
+
+function renderPagination(numberOfItems, itemsPerPage) {
+    const paginationPages = findById("pagination-pages");
+    // remove inner itemps
+    paginationPages.innerHTML = "";
+
+    const firstPage = document.createElement("button");
+    firstPage.innerHTML = "<<";
+    firstPage.addEventListener('click', (event) => {
+        currentPage = 1;
+        renderTable(computeData());
+        event.preventDefault();
+    });
+
+    const lastPage = document.createElement("button");
+    lastPage.innerHTML = ">>";
+    lastPage.addEventListener('click', (event) => {
+        currentPage = parseInt(Math.ceil(numberOfItems/itemsPerPage));
+        renderTable(computeData());
+        event.preventDefault();
+    });
+
+    paginationPages.appendChild(firstPage);
+    for(let i = 1; i <= Math.ceil(numberOfItems/itemsPerPage); i++) {
+        const buttonIndex = document.createElement("button");
+        buttonIndex.innerHTML = i.toString();
+        buttonIndex.addEventListener('click', (event) => {
+            currentPage = parseInt(i);
+            renderTable(computeData());
+            event.preventDefault();
+        });
+        paginationPages.appendChild(buttonIndex);
+    }
+    paginationPages.appendChild(lastPage);
 
 }
 

@@ -46,6 +46,9 @@
   "browserHistoryTitle": {
     "message": "Historique"
   },
+  "paginateBy": {
+    "message": "Pagination par"
+  },
 
   "now": {
     "message": "maintenant"

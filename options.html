@@ -18,6 +18,19 @@
       <form>
         <h3 class="settings-category" id="browser-history-title"></h3>
         <table id="list-of-url-table"></table>
+        <div class="pagination-container">
+          <div class="number-items-pagination">
+            <p id="paginate-by-label"></p>
+            <select id="select-paginate-by">
+                <option>10</option>
+                <option>20</option>
+                <option>50</option>
+            </select>
+          </div>
+
+          <div id="pagination-pages">
+          </div>
+        </div>
       </form>
       <div>
         <button type="submit" id="clearHistory">Clear History</button>

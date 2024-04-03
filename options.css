@@ -123,3 +123,19 @@ button {
   position: relative;
   bottom: 5px;
 }
+
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.number-items-pagination {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.pagination-pages {
+  display: flex;
+}
