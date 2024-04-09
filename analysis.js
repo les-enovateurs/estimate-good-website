@@ -112,7 +112,6 @@ async function askToComputeEvaluation(url) {
         body: JSON.stringify({url})
     });
 }
-console.log("nicke ")
 /*
 Each time a tab is updated, reset the page action for that tab.
 */
@@ -125,9 +124,6 @@ chrome.tabs.onUpdated.addListener((id, changeInfo, tab) => {
 });
 
 chrome.action.onClicked.addListener((tab) => {
-    // Hide the page action icon for the current tab
-    chrome.action.hide(tab.id);
-
     // Define the URL you want to open in the new tab
     const ECO_URL = "https://bff.ecoindex.fr/redirect/?url=";
 
