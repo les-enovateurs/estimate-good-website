@@ -30,30 +30,43 @@ function getImagesPathFromScore(score) {
         32: `${DIRECTORY_PATH}/unknown.jpg`,
     };
 }
-console.log("fdjfdjfk")
+
 function renderResult(tabId, parsedData) {
     if(parsedData === null ) {
         updateIcon(tabId, null);
-        updateTitle(tabId, 'Analysis in progress...');
+
+        const title = chrome.i18n.getMessage("popUpNoGrade");
+        updateTitle(tabId, title);
     } else {
         const { grade, score, requests } = parsedData;
         updateIcon(tabId, grade);
-        updateTitle(tabId,`Score: ${score}/100.\n${requests} requests.\n(Source: EcoIndex)`);
+
+        const title = chrome.i18n.getMessage("popUpScoreResult", [score, requests]);
+        updateTitle(tabId, title);
     }
 
     //chrome.action.show(tabId);
 }
 
-function storeResult(url, { score, requests, grade }) {
+async function storeResult(url, parsedData) {
+    await chrome.storage.local.set({[url]: JSON.stringify(parsedData)});
+
+    const { score } = parsedData;
+    // for statistics purpose
     if(score < 50) {
+        const { score, requests, grade } = parsedData;
         fetch(`${baseURL}ecoindex?pth=${url}&scr=${score}&rqt=${requests}&bge=${grade}`);
     }
+
 }
 
 // select only the information we need for the app
 function parseData(data) {
-    const {grade, score, requests} = data;
-    return { grade, score, requests };
+    const { grade, score, requests, id } = data;
+    // cache duration : 7 days
+    const expirationDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).getTime();
+
+    return { grade, score, requests, id, expirationDate };
 }
 
 function parseEcoIndexPayload(ecoIndexPayload) {
@@ -123,17 +136,29 @@ chrome.tabs.onUpdated.addListener((id, changeInfo, tab) => {
     }
 });
 
-chrome.action.onClicked.addListener((tab) => {
-    // Define the URL you want to open in the new tab
-    const ECO_URL = "https://bff.ecoindex.fr/redirect/?url=";
 
-    // Get the current tab's URL and pass it as a parameter to the new tab
-    chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
-        const currentTabUrl = tabs[0].url;
-
-        // Open a new tab with the specified URL and the current tab's URL as a parameter
-        chrome.tabs.create({
-            url: `${ECO_URL}${encodeURIComponent(currentTabUrl)}`
+chrome.tabs.onRemoved.addListener((tabId) => {
+    chrome.storage.local.get(null, function(items) {
+        Object.entries(items).map(([key, value]) => {
+            const parsedData = JSON.parse(value);
+            const { expirationDate } = parsedData;
+            if(expirationDate < new Date().getTime()) {
+                chrome.storage.local.remove(key);
+            }
         });
     });
+});
+
+chrome.action.onClicked.addListener((tab) => {
+    chrome.storage.local.get([tab.url]).then((localStorageData) => {
+    if(!localStorageData) {
+        return;
+    }
+    const parsedData = JSON.parse(localStorageData[tab.url]);
+    const { id } = parsedData;
+    const ecoIndexPage = `https://www.ecoindex.fr/resultat/?id=${id}`;
+    chrome.tabs.create({
+        url: ecoIndexPage
+    });
+  });
 });

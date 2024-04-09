@@ -34,26 +34,36 @@ function getImagesPathFromScore(score) {
 function renderResult(tabId, parsedData) {
     if(parsedData === null ) {
         updateIcon(tabId, null);
-        updateTitle(tabId, 'Analysis in progress...');
+
+        const title = browser.i18n.getMessage("popUpNoGrade");
+        updateTitle(tabId, title);
     } else {
         const { grade, score, requests } = parsedData;
         updateIcon(tabId, grade);
-        updateTitle(tabId,`Score: ${score}/100.\n${requests} requests.\n(Source: EcoIndex)`);
+
+        const title = browser.i18n.getMessage("popUpScoreResult", [score, requests]);
+        updateTitle(tabId, title);
     }
 
     browser.pageAction.show(tabId);
 }
 
-function storeResult(url, { score, requests, grade }) {
+function storeResult(url, parsedData) {
+    localStorage.setItem(url, JSON.stringify(parsedData));
+
+    const { score } = parsedData;
+    // for statistics purpose
     if(score < 50) {
+        const { score, requests, grade } = parsedData;
         fetch(`${baseURL}ecoindex?pth=${url}&scr=${score}&rqt=${requests}&bge=${grade}`);
     }
+
 }
 
 // select only the information we need for the app
 function parseData(data) {
-    const {grade, score, requests} = data;
-    return { grade, score, requests };
+    const { grade, score, requests, id } = data;
+    return { grade, score, requests, id };
 }
 
 function parseEcoIndexPayload(ecoIndexPayload) {
@@ -124,19 +134,15 @@ browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
 });
 
 browser.pageAction.onClicked.addListener((tab) => {
-    // Hide the page action icon for the current tab
-    browser.pageAction.hide(tab.id);
+    localStorageData = localStorage.getItem(tab.url);
+    if(!localStorage) {
+        return;
+    }
 
-    // Define the URL you want to open in the new tab
-    const ECO_URL = "https://bff.ecoindex.fr/redirect/?url=";
-
-    // Get the current tab's URL and pass it as a parameter to the new tab
-    browser.tabs.query({active: true, currentWindow: true}, (tabs) => {
-        const currentTabUrl = tabs[0].url;
-
-        // Open a new tab with the specified URL and the current tab's URL as a parameter
-        browser.tabs.create({
-            url: `${ECO_URL}${encodeURIComponent(currentTabUrl)}`
-        });
+    const parsedData = JSON.parse(localStorageData);
+    const { id } = parsedData;
+    const ecoIndexPage = `https://www.ecoindex.fr/resultat/?id=${id}`;
+    browser.tabs.create({
+        url: ecoIndexPage
     });
 });
