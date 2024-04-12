@@ -2,11 +2,14 @@
   "description": "Display EcoIndex Score",
   "manifest_version": 3,
   "name": "EcoSurf Analyser",
-  "version": "1.1",
+  "version": "1.5",
   "homepage_url": "https://github.com/les-enovateurs/estimate-good-website",
   "default_locale": "en",
   "background": {
     "scripts": ["analysis.js"]
+  },
+  "options_ui": {
+    "page": "options.html"
   },
   "page_action": {
     "default_icon": {
