@@ -65,10 +65,7 @@ function storeResult(url, parsedData) {
 // select only the information we need for the app
 function parseData(data) {
     const { grade, score, requests, id } = data;
-    // cache duration : 7 days
-    const expirationDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).getTime();
-
-    return { grade, score, requests, id, expirationDate };
+    return { grade, score, requests, id };
 }
 
 function parseEcoIndexPayload(ecoIndexPayload) {
@@ -137,18 +134,6 @@ browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
         callEcoIndex(tab.id, tab.url, false);
     }
 });
-
-browser.tabs.onRemoved.addListener((tabId) => {
-    const items = { ...localStorage };
-    Object.entries(items).map(([key, value]) => {
-        const parsedData = JSON.parse(value);
-        const { expirationDate } = parsedData;
-        if(expirationDate < new Date().getTime()) {
-            localStorage.removeItem(key);
-        }
-    });
-});
-
 
 browser.pageAction.onClicked.addListener((tab) => {
     localStorageData = localStorage.getItem(tab.url);
