@@ -1,51 +1,36 @@
+// variables
+let currentPage = 1;
+let itemsPerPage = 10;
+
 window.addEventListener('DOMContentLoaded', async (event) => {
-    const table = document.getElementById("list-of-url-table");
-    if(!table) {
-        throw new Error("Cannot find the table id");
-    }
-
-    table.appendChild(createCaption());
-    table.appendChild(createHead());
-    const tbody = document.createElement("tbody");
-    table.appendChild(tbody);
-
-    const rowsSortedByVisitedAt = await computeData();
-    console.log(rowsSortedByVisitedAt)
-
-    rowsSortedByVisitedAt.map(([key, value]) => {
-        tbody.appendChild(createRow(key, value));
-    });
-
     // listener
-    const removeHistoryButton = document.getElementById("clearHistory");
-    if(!removeHistoryButton) {
-        throw new Error("Cannot find the button id");
-    }
-
+    const removeHistoryButton = findById("clearHistory");
     removeHistoryButton.innerHTML = chrome.i18n.getMessage("clearHistory");
     removeHistoryButton.addEventListener('click', () => {
         localStorage.clear();
     });
 
     // header
-    const header = document.getElementById('settings-header');
-    if(!header) {
-        throw new Error("Cannot find the header");
-    }
+    const header = findById('settings-header');
     header.innerHTML = chrome.i18n.getMessage("settingsHeader");
 
     // header settings
-    const averageMonthTitle = document.getElementById("average-month-title");
+    const averageMonthTitle = findById("average-month-title");
     averageMonthTitle.innerHTML = chrome.i18n.getMessage("averageMonthTitle");
 
-    const averageNoteSpan = document.getElementById('averageNote');
-    if(!averageNoteSpan) {
-        throw new Error("Cannot find the average note id");
-    }
+    const browserHistoryTitle = findById("browser-history-title");
+    browserHistoryTitle.innerHTML = chrome.i18n.getMessage("browserHistoryTitle");
 
-    const averageNote = computeAverageNote(rowsSortedByVisitedAt, firstDateOfMonth(new Date()), lastDateOfMonth(new Date()));
-    averageNoteSpan.innerHTML = `<img src="icons/${averageNote}.jpg" />`;
+    // progress bar
+    const gradeIconProgressBar = findById("grade-average-icon-progress-bar");
 
+    const rowsSortedByVisitedAt = await computeData();
+
+    renderTable(rowsSortedByVisitedAt);
+    renderPagination(rowsSortedByVisitedAt.length, itemsPerPage);
+
+    const averageGrade = computeAverageNote(rowsSortedByVisitedAt, firstDateOfMonth(new Date()), lastDateOfMonth(new Date()));
+    computeGradeIconAndPositionOnProgressBar(gradeIconProgressBar, averageGrade);
 });
 
 async function computeData() {
@@ -63,11 +48,39 @@ async function computeData() {
     });
 }
 
-function createCaption() {
-    const caption = document.createElement("caption");
-    caption.innerHTML = "Here is the list of your history";
-    return caption;
+
+function renderTable(rows) {
+    const table = document.getElementById("list-of-url-table");
+    // clear table
+    table.innerHTML = "";
+
+    table.appendChild(createHead());
+    const tbody = document.createElement("tbody");
+    table.appendChild(tbody);
+
+    const start = (currentPage-1)*itemsPerPage;
+    const end = (currentPage) * itemsPerPage;
+    console.log(start, " " , end)
+    rows.slice(start, end).map(([key, value]) => {
+        tbody.appendChild(createRow(key, value));
+    });
+
+    //pagination (items per page)
+    const paginationLabel = findById("paginate-by-label");
+    paginationLabel.innerHTML = chrome.i18n.getMessage("paginateBy");
+
+    const paginationSelect = findById("select-paginate-by");
+    paginationSelect.addEventListener('change', (event) => {
+        itemsPerPage = event.target.value;
+        renderTable(rows);
+        console.log(itemsPerPage)
+        renderPagination(rows.length, itemsPerPage);
+        event.preventDefault();
+    });
+
+    return table;
 }
+
 
 function createHead() {
     const head = document.createElement("thead");
@@ -93,12 +106,12 @@ function createHead() {
     thVisitedAt.setAttribute("scope", "col");
     thVisitedAt.innerHTML = chrome.i18n.getMessage("visitedAtTable");
 
-    tr.appendChild(thLink);
     tr.appendChild(thGrade);
+    tr.appendChild(thLink);
     tr.appendChild(thScore);
     tr.appendChild(thRequests);
     tr.appendChild(thVisitedAt);
-    
+
     head.appendChild(tr);
     return  head;
 }
@@ -109,8 +122,8 @@ function createRow(link, otherData) {
 
     const thLink = document.createElement("th");
     thLink.setAttribute("scope", "row");
-    thLink.classList.add("link-url")
-    thLink.innerHTML = `<a style="color:white" href="${link}">${link}</a>`;
+    thLink.classList.add("link-th")
+    thLink.innerHTML = `<a class="link-url" href="${link}">${link}</a>`;
 
     const tdGrade = document.createElement("td");
     tdGrade.innerHTML = `<img src="icons/${parsedData["grade"]}.jpg" />`;
@@ -124,16 +137,53 @@ function createRow(link, otherData) {
     const tdVisitedAt = document.createElement("td");
     tdVisitedAt.innerHTML = prettyDate(parsedData["visitedAt"]);
 
-    tr.appendChild(thLink);
     tr.appendChild(tdGrade);
+    tr.appendChild(thLink);
     tr.appendChild(tdScore);
     tr.appendChild(tdRequests);
     tr.appendChild(tdVisitedAt);
 
     return tr;
-
 }
 
+async function renderPagination(numberOfItems, itemsPerPage) {
+    const paginationPages = findById("pagination-pages");
+    // remove inner itemps
+    paginationPages.innerHTML = "";
+
+    const firstPage = document.createElement("button");
+    firstPage.innerHTML = "<<";
+    firstPage.addEventListener('click', async (event) => {
+        currentPage = 1;
+        const rows = await computeData();
+        renderTable(rows);
+        event.preventDefault();
+    });
+
+    const lastPage = document.createElement("button");
+    lastPage.innerHTML = ">>";
+    lastPage.addEventListener('click', async (event) => {
+        currentPage = parseInt(Math.ceil(numberOfItems/itemsPerPage));
+        const rows = await computeData();
+        renderTable(rows);
+        event.preventDefault();
+    });
+
+    paginationPages.appendChild(firstPage);
+    for(let i = 1; i <= Math.ceil(numberOfItems/itemsPerPage); i++) {
+        const buttonIndex = document.createElement("button");
+        buttonIndex.innerHTML = i.toString();
+        buttonIndex.addEventListener('click', async (event) => {
+            currentPage = parseInt(i);
+            const rows = await computeData();
+            renderTable(rows);
+            event.preventDefault();
+        });
+        paginationPages.appendChild(buttonIndex);
+    }
+    paginationPages.appendChild(lastPage);
+
+}
 
 function prettyDate(time) {
     var date = new Date((time || "").replace(/-/g, "/").replace(/[TZ]/g, " ")),
@@ -151,7 +201,6 @@ function prettyDate(time) {
     || day_diff == 1 && chrome.i18n.getMessage("yesterday") || day_diff < 7 && chrome.i18n.getMessage("days", [day_diff])
     || day_diff < 31 && chrome.i18n.getMessage("weeks", [Math.ceil(day_diff / 7)]);
 }
-
 
 function computeAverageNote(rowsSortedByVisitedAt, fromDate, toDate) {
     const rowsSortedByVisitedRange = rowsSortedByVisitedAt.slice().filter( ([key, value]) => {
@@ -219,4 +268,44 @@ function fromToNoteGrade(note) {
         case 6:
             return 'G';
     }
+}
+
+function computeGradeIconAndPositionOnProgressBar(gradeIconProgressBar, grade) {
+    let positionInPercent = "0%";
+    switch(grade){
+        case 'A':
+        default:
+            positionInPercent = "2%";
+            break;
+        case 'B':
+            positionInPercent = "10%";
+            break;
+        case 'C':
+            positionInPercent = "30%";
+            break;
+        case 'D':
+            positionInPercent = "50%";
+            break;
+        case 'E':
+            positionInPercent = "55%";
+            break;
+        case 'F':
+            positionInPercent = "80%";
+            break;
+        case 'G':
+            positionInPercent = "95%";
+            break;
+    }
+    gradeIconProgressBar.style.left = positionInPercent;
+    gradeIconProgressBar.src = `icons/${grade}.jpg`;
+}
+
+
+// tool functions
+function findById(id) {
+    const domElement = document.getElementById(id);
+    if(!domElement) {
+        throw new Error(`Cannot find the domElement by id: ${id}`);
+    }
+    return domElement;
 }

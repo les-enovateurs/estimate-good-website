@@ -6,18 +6,36 @@
   </head>
 
   <body>
-    <h1>EcoSurf Analyser</h1>
-    <h2 id="settings-header">Settings</h2>
-    <form>
+    <div class="container">
+      <h1>EcoSurf Analyser</h1>
+      <h2 id="settings-header">Settings</h2>
       <div>
-        <h2 id="average-month-title">
-        <h2>
-        <span id="averageNote"></span>
+        <h3 class="settings-category" id="average-month-title"></h3>
+        <div id="progress-bar">
+          <img id="grade-average-icon-progress-bar" src="icons/A.jpg"/>
+        </div>
       </div>
-      <table id="list-of-url-table"></table>
-      <button type="submit" id="clearHistory">Clear History</button>
+      <form>
+        <h3 class="settings-category" id="browser-history-title"></h3>
+        <table id="list-of-url-table"></table>
+        <div class="pagination-container">
+          <div class="number-items-pagination">
+            <p id="paginate-by-label"></p>
+            <select id="select-paginate-by">
+                <option>10</option>
+                <option>20</option>
+                <option>50</option>
+            </select>
+          </div>
 
-    </form>
+          <div id="pagination-pages">
+          </div>
+        </div>
+      </form>
+      <div>
+        <button type="submit" id="clearHistory">Clear History</button>
+      </div>
+    </div>
 
     <script src="options.js"></script>
   </body>
