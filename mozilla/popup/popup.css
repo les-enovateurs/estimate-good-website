@@ -1,1 +1,26 @@
-popup.css
+:root {
+  --primary-color: #00614f;
+  --background-color: #212529 ;
+}
+
+
+*{
+    margin:0;
+    padding: 0.5rem;
+    box-sizing: border-box;
+}
+
+
+html {
+  font-size: 16px;
+}
+
+body {
+  color: white;
+  background: var(--background-color);
+  font-family: Arial,sans-serif;
+}
+
+a {
+    color: white;
+}

@@ -134,17 +134,3 @@ browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
         callEcoIndex(tab.id, tab.url, false);
     }
 });
-
-browser.pageAction.onClicked.addListener((tab) => {
-    localStorageData = localStorage.getItem(tab.url);
-    if(!localStorage) {
-        return;
-    }
-
-    const parsedData = JSON.parse(localStorageData);
-    const { id } = parsedData;
-    const ecoIndexPage = `https://www.ecoindex.fr/resultat/?id=${id}`;
-    browser.tabs.create({
-        url: ecoIndexPage
-    });
-});
