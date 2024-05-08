@@ -4,7 +4,7 @@
   "name": "EcoSurf Analyser",
   "version": "1.5",
   "homepage_url": "https://github.com/les-enovateurs/estimate-good-website",
-  "default_locale": "en",
+  "default_locale": "fr",
   "background": {
     "scripts": ["analysis.js"]
   },
