@@ -1,4 +1,4 @@
-window.addEventListener('DOMContentLoaded', (event) => {
+window.addEventListener('DOMContentLoaded', async (event) => {
     const table = document.getElementById("list-of-url-table");
     if(!table) {
         throw new Error("Cannot find the table id");
@@ -9,20 +9,12 @@ window.addEventListener('DOMContentLoaded', (event) => {
     const tbody = document.createElement("tbody");
     table.appendChild(tbody);
 
-    const items = { ...localStorage };
-    const rows = Object.entries(items)
-    // sort desc by visited at
-    const rowsSortedByVisitedAt = rows.slice().sort(([keyA, valueA],[keyB, valueB]) => {
-        const a = JSON.parse(valueA);
-        const b = JSON.parse(valueB);
-        return a["visitedAt"] < b["visitedAt"];
-    });
-
+    const rowsSortedByVisitedAt = await computeData();
+    console.log(rowsSortedByVisitedAt)
 
     rowsSortedByVisitedAt.map(([key, value]) => {
         tbody.appendChild(createRow(key, value));
     });
-
 
     // listener
     const removeHistoryButton = document.getElementById("clearHistory");
@@ -56,6 +48,20 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
 });
 
+async function computeData() {
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get(null, function(items) {
+            const rows = Object.entries(items)
+            // sort desc by visited at
+            const rowsSortedByVisitedAt = rows.slice().sort(([keyA, valueA],[keyB, valueB]) => {
+                const a = JSON.parse(valueA);
+                const b = JSON.parse(valueB);
+                return a["visitedAt"] < b["visitedAt"];
+            });
+            resolve(rowsSortedByVisitedAt);
+        });
+    });
+}
 
 function createCaption() {
     const caption = document.createElement("caption");
