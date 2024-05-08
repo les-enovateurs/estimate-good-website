@@ -1,5 +1,4 @@
 // variables
-let currentPage = 1;
 let itemsPerPage = 10;
 
 window.addEventListener('DOMContentLoaded', (event) => {
@@ -25,8 +24,9 @@ window.addEventListener('DOMContentLoaded', (event) => {
     const gradeIconProgressBar = findById("grade-average-icon-progress-bar");
 
     const rowsSortedByVisitedAt = computeData();
+    const currentPage = 1;
 
-    renderTable(rowsSortedByVisitedAt);
+    renderTable(rowsSortedByVisitedAt, currentPage);
     renderPagination(rowsSortedByVisitedAt.length, itemsPerPage);
 
     const averageGrade = computeAverageNote(rowsSortedByVisitedAt, firstDateOfMonth(new Date()), lastDateOfMonth(new Date()));
@@ -45,7 +45,8 @@ function computeData() {
     return rowsSortedByVisitedAt;
 }
 
-function renderTable(rows) {
+function renderTable(rows, currentPage) {
+    console.log(currentPage)
     const table = document.getElementById("list-of-url-table");
     // clear table
     table.innerHTML = "";
@@ -56,7 +57,6 @@ function renderTable(rows) {
 
     const start = (currentPage-1)*itemsPerPage;
     const end = (currentPage) * itemsPerPage;
-    console.log(start, " " , end)
     rows.slice(start, end).map(([key, value]) => {
         tbody.appendChild(createRow(key, value));
     });
@@ -67,11 +67,11 @@ function renderTable(rows) {
 
     const paginationSelect = findById("select-paginate-by");
     paginationSelect.addEventListener('change', (event) => {
-        itemsPerPage = event.target.value;
-        renderTable(rows);
-        console.log(itemsPerPage)
-        renderPagination(rows.length, itemsPerPage);
         event.preventDefault();
+
+        itemsPerPage = event.target.value;
+        renderTable(rows, 1);
+        renderPagination(rows.length, itemsPerPage);
     });
 
     return table;
@@ -150,17 +150,19 @@ function renderPagination(numberOfItems, itemsPerPage) {
     const firstPage = document.createElement("button");
     firstPage.innerHTML = "<<";
     firstPage.addEventListener('click', (event) => {
-        currentPage = 1;
-        renderTable(computeData());
         event.preventDefault();
+
+        const currentPage = 1;
+        renderTable(computeData(), currentPage);
     });
 
     const lastPage = document.createElement("button");
     lastPage.innerHTML = ">>";
     lastPage.addEventListener('click', (event) => {
-        currentPage = parseInt(Math.ceil(numberOfItems/itemsPerPage));
-        renderTable(computeData());
         event.preventDefault();
+
+        const currentPage = parseInt(Math.ceil(numberOfItems/itemsPerPage));
+        renderTable(computeData(), currentPage);
     });
 
     paginationPages.appendChild(firstPage);
@@ -168,9 +170,10 @@ function renderPagination(numberOfItems, itemsPerPage) {
         const buttonIndex = document.createElement("button");
         buttonIndex.innerHTML = i.toString();
         buttonIndex.addEventListener('click', (event) => {
-            currentPage = parseInt(i);
-            renderTable(computeData());
             event.preventDefault();
+
+            const currentPage = parseInt(i);
+            renderTable(computeData(), currentPage);
         });
         paginationPages.appendChild(buttonIndex);
     }
