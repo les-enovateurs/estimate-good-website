@@ -17,5 +17,82 @@
         "example" : "123"
       }
     }
+  },
+
+  "linkTable": {
+    "message": "Lien"
+  },
+  "gradeTable": {
+    "message": "Note"
+  },
+  "scoreTable": {
+    "message": "Score"
+  },
+  "nbRequestsTable": {
+    "message": "Nombre de requêtes"
+  },
+  "visitedAtTable": {
+    "message": "Visité à"
+  },
+  "clearHistory": {
+    "message": "Supprimer l'historique"
+  },
+  "settingsHeader": {
+    "message": "Parametres"
+  },
+  "averageMonthTitle": {
+    "message": "La moyenne des notes ce mois-ci"
+  },
+  "browserHistoryTitle": {
+    "message": "Historique"
+  },
+
+  "now": {
+    "message": "maintenant"
+  },
+  "minute": {
+    "message": "il y a 1 minute"
+  },
+  "minutes": {
+    "message": "il y a $MINUTES$ minutes",
+    "placeholders": {
+      "minutes" : {
+        "content" : "$1",
+        "example" : "3"
+      }
+    }
+  },
+  "hour": {
+    "message": "il y a 1 heure"
+  },
+  "hours": {
+    "message": "il y a $HOURS$ heures",
+    "placeholders": {
+      "hours" : {
+        "content" : "$1",
+        "example" : "5"
+      }
+    }
+  },
+  "yesterday": {
+    "message": "hier"
+  },
+  "days": {
+    "message": "il y a $DAYS$ jours",
+    "placeholders": {
+      "days" : {
+        "content" : "$1",
+        "example" : "3"
+      }
+    }
+  },
+  "weeks": {
+    "message": "il y a $WEEKS$ semaines",
+    "placeholders": {
+      "weeks" : {
+        "content" : "$1",
+        "example" : "3"
+      }
+    }
   }
 }
