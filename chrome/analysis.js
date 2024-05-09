@@ -125,12 +125,22 @@ async function askToComputeEvaluation(url) {
         body: JSON.stringify({url})
     });
 }
+
+function isBlackListedUrl(url) {
+    const blacklistedUrls = ["chrome:"];
+    const found = blacklistedUrls.find(blacklistedUrl => url.includes(blacklistedUrls) );
+
+    return found;
+}
+
 /*
 Each time a tab is updated, reset the page action for that tab.
 */
-
 chrome.tabs.onUpdated.addListener((id, changeInfo, tab) => {
     if (tab.status == "complete" && tab.active) {
+        if(isBlackListedUrl(tab.url)){
+            return;
+        }
         // try to get results cached in the ecoindex server
         callEcoIndex(tab.id, tab.url, false);
     }
