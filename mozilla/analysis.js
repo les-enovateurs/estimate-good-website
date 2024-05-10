@@ -12,10 +12,6 @@ function updateIcon(tabId, grade) {
     );
 }
 
-function updateTitle(tabId, title) {
-    browser.pageAction.setTitle({ tabId, title });
-}
-
 function getImagesPathFromScore(score) {
     const DIRECTORY_PATH = "icons";
     if (score) {
@@ -34,15 +30,9 @@ function getImagesPathFromScore(score) {
 function renderResult(tabId, parsedData) {
     if(parsedData === null ) {
         updateIcon(tabId, null);
-
-        const title = browser.i18n.getMessage("popUpNoGrade");
-        updateTitle(tabId, title);
     } else {
         const { grade, score, requests } = parsedData;
         updateIcon(tabId, grade);
-
-        const title = browser.i18n.getMessage("popUpScoreResult", [score, requests]);
-        updateTitle(tabId, title);
     }
 
     browser.pageAction.show(tabId);
@@ -144,18 +134,4 @@ browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
         // try to get results cached in the ecoindex server
         callEcoIndex(tab.id, tab.url, false);
     }
-});
-
-browser.pageAction.onClicked.addListener((tab) => {
-    localStorageData = localStorage.getItem(tab.url);
-    if(!localStorage) {
-        return;
-    }
-
-    const parsedData = JSON.parse(localStorageData);
-    const { id } = parsedData;
-    const ecoIndexPage = `https://www.ecoindex.fr/resultat/?id=${id}`;
-    browser.tabs.create({
-        url: ecoIndexPage
-    });
 });

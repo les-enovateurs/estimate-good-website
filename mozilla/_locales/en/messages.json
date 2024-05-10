@@ -1,11 +1,6 @@
 {
-  "popUpNoGrade": {
-    "message": "Analysis in progress...",
-    "description": "No result available for the website"
-  },
-
   "popUpScoreResult": {
-    "message": "Score: $SCORE$/100\n.$REQUESTS$ requests.\n(source EcoIndex).",
+    "message": "Score: $SCORE$/100.\n\n$REQUESTS$ requests (source EcoIndex).",
     "description": "Tells the user more data about the website.",
     "placeholders": {
       "score" : {
@@ -39,6 +34,12 @@
   },
   "settingsHeader": {
     "message": "Settings"
+  },
+  "averageMonthTitle": {
+    "message": "Average rating for the month"
+  },
+  "browserHistoryTitle": {
+    "message": "Browser history"
   },
 
   "now": {
@@ -88,5 +89,30 @@
         "example" : "3"
       }
     }
+  },
+
+  "detailedReport": {
+    "message": "Detailed report"
+  },
+  "scoreTitle": {
+    "message": "Score:"
+  },
+  "scoreResult": {
+    "message": "$SCORE$/100",
+    "placeholders": {
+      "score" : {
+        "content" : "$1",
+        "example" : "58"
+      }
+    }
+  },
+  "numberOfRequestsTitle": {
+    "message": "Number of requests:"
+  },
+  "sourceOfData": {
+    "message": "source: Ecoindex"
+  },
+  "settings": {
+    "message": "Settings"
   }
 }
