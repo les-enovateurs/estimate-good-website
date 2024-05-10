@@ -8,9 +8,11 @@ More information about the EcoIndex API [here](https://github.com/cnumr/ecoindex
 
 ## Installation 
 
-### Firefox add-on catalog
+### On your browser
 
-The extension is available [here](https://addons.mozilla.org/firefox/addon/ecosurf-analyser/)
+- Firefox : [here](https://addons.mozilla.org/firefox/addon/ecosurf-analyser/)
+
+- Chrome : [here](https://chromewebstore.google.com/detail/ecosurf-analyser/ikhjihalbdlnjacdnonecbddejboajkl)
 
 ### Install locally
 
