@@ -1,33 +1,48 @@
 browser.tabs.query({currentWindow: true, active: true})
-    .then((tabs) => {
-        const url = tabs[0].url;
-        const parsedData = getResultFromUrl(url);
-        const { id, score, requests } = parsedData;
+.then((tabs) => {
+    const url = tabs[0].url;
+    const parsedData = getResultFromUrl(url);
+    const { id, score, requests } = parsedData;
 
-        updateEcoIndexReportLink(id);
-        updateStats(score, requests);
+    updateUrl(url);
+    updateEcoIndexReportLink(id);
+    updateScore(score);
+    updateNumberOfRequests(requests);
 
-  })
+    const sourceOfData = findById("source-of-data");
+    sourceOfData.innerHTML = browser.i18n.getMessage("source-of-data");
+
+    const settings = findById("settings");
+    settings.innerHTML = browser.i18n.getMessage("settings");
+
+});
+
+function updateNumberOfRequests(requests) {
+    requestsTitle = findById("number-of-requests-title");
+    requestsTitle.innerHTML = browser.i18n.getMessage("number-of-requests-title");
+
+    requestsDom = findById("number-of-requests");
+    requestsDom.innerHTML = requests;
+}
+
+function updateScore(score) {
+    scoreTitle = findById("score-title");
+    scoreTitle.innerHTML = browser.i18n.getMessage("score-title");
+
+    scoreDom = findById("score");
+    scoreDom.innerHTML = browser.i18n.getMessage("score-result", [score]);
+}
+
+function updateUrl(url) {
+    const urlDom = findById("url");
+    urlDom.innerHTML = url;
+}
 
 function updateEcoIndexReportLink(id) {
-    const ecoIndexAnchor = document.getElementById("ecoindex-result")
-    if(!ecoIndexAnchor) {
-        return;
-    }
-
+    const ecoIndexAnchor = findById("ecoindex-result")
+    ecoIndexAnchor.innerHTML = browser.i18n.getMessage("detailed-report");
     ecoIndexAnchor.href = `https://www.ecoindex.fr/resultat/?id=${id}`;
 }
-function updateStats(score, requests) {
-    const stats = document.getElementById('stats');
-    /*if(!stats) {
-        return;
-    }
-
-
-    const title = browser.i18n.getMessage("popUpScoreResult", [score, requests]);
-    stats.innerHTML = title;*/
-}
-
 
 function getResultFromUrl(url) {
     const localStorageData = localStorage.getItem(url);
@@ -36,4 +51,13 @@ function getResultFromUrl(url) {
     }
 
     return JSON.parse(localStorageData);
+}
+
+// tool functions
+function findById(id) {
+    const domElement = document.getElementById(id);
+    if(!domElement) {
+        throw new Error(`Cannot find the domElement by id: ${id}`);
+    }
+    return domElement;
 }

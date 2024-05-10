@@ -1,6 +1,7 @@
 :root {
   --primary-color: #00614f;
-  --background-color: #212529 ;
+  --background-color: #212529;
+  --secondary-color: #30A8A7;
 }
 
 
@@ -26,16 +27,15 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  background: green;
-  border: 2px solid blueviolet;
+  //border: 2px solid blueviolet;
 }
 
 .container-body {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  background: #292e3;
-  border: 2px solid green;
+  background: #292e33;
+  //border: 2px solid green;
   padding: 1rem;
   border-radius: 0.5rem;
 }
@@ -47,18 +47,19 @@ body {
 }
 
 .link-url {
-  color: white;
+  color: var(--secondary-color);
   text-decoration: none;
 }
 
 .link-url:hover {
     text-decoration-line: underline;
-  }
+}
 
 
 
 #url {
-  max-width: 200px;
+  white-space: nowrap;
+  max-width: 300px;
   text-overflow: ellipsis;
   overflow: hidden;
   font-weight: bold;
@@ -69,7 +70,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  border: 2px solid black;
+  //border: 2px solid black;
 }
 
 #score {
@@ -80,11 +81,14 @@ body {
   font-weight: bold;
 }
 
-#source {
+#source-of-data {
   font-weight: italic;
   font-size: 0.8rem;
 }
 
+#ecoindex-result {
+  font-size: larger;
+}
 /*
 moz-extension://9e2a2105-a4d7-4541-ba50-ebe2bddf1e69/popup/popup.html
 */
