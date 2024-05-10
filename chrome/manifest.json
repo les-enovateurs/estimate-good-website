@@ -8,7 +8,7 @@
   "background": {
     "service_worker": "analysis.js"
   },
-  "options_page": "options.html",
+  "options_page": "options/options.html",
   "action": {
     "default_icon": {
       "16": "icons/16/A.jpg",
