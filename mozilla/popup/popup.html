@@ -1,0 +1,36 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="container-body">
+        <div id="stats">
+          <p id="url">fake-url.com</p>
+          <div id="score-container">
+            <span id="score-title">
+              Score:
+            </span>
+            <span id="score">15/100</span>
+          </div>
+          <div id="requests-container">
+            <span id="number-of-requests-title">
+              Number of requests:
+            </span>
+            <span id="number-of-requests">15</span>
+          </div>
+          <span id="source-of-data">source: ecoindex</span>
+        </div>
+        <a id="ecoindex-result" class="link-url" target="_blank" rel="noopener noreferrer">See detailed report</a>
+      </div>
+
+      <div class="container-footer">
+        <a class="link-url" id="settings" href="/options/options.html" target="_blank" rel="noopener noreferrer">Settings</a>
+      </div>
+    </div>
+  </body>
+
+  <script src="popup.js"></script>
+</html>

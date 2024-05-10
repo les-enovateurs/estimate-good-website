@@ -1,24 +1,4 @@
 {
-  "popUpNoGrade": {
-    "message": "Analyse en cours...",
-    "description": "Pas de resultat connus pour le site"
-  },
-
-  "popUpScoreResult": {
-    "message": "Score: $SCORE$/100.\n$REQUESTS$ requêtes.\n(source EcoIndex).",
-    "description": "Donne plus d'informations pour l'utilisateur sur le site",
-    "placeholders": {
-      "score" : {
-        "content" : "$1",
-        "example" : "58"
-      },
-      "requests": {
-        "content" : "$2",
-        "example" : "123"
-      }
-    }
-  },
-
   "linkTable": {
     "message": "Lien"
   },
@@ -39,6 +19,15 @@
   },
   "settingsHeader": {
     "message": "Parametres"
+  },
+  "averageMonthTitle": {
+    "message": "La moyenne des notes ce mois-ci"
+  },
+  "browserHistoryTitle": {
+    "message": "Historique"
+  },
+  "paginateBy": {
+    "message": "Pagination par"
   },
 
   "now": {
@@ -88,5 +77,31 @@
         "example" : "3"
       }
     }
+  },
+
+  "detailedReport": {
+    "message": "Rapport détaillé"
+  },
+  "scoreTitle": {
+    "message": "Score: "
+  },
+  "scoreResult": {
+    "message": "$SCORE$/100",
+    "placeholders": {
+      "score" : {
+        "content" : "$1",
+        "example" : "58"
+      }
+    }
+  },
+  "numberOfRequestsTitle": {
+    "message": "Nombre de requêtes: "
+  },
+  "sourceOfData": {
+    "message": "source: Ecoindex"
+  },
+  "settings": {
+    "message": "Options"
   }
+
 }
