@@ -5,7 +5,7 @@
   },
 
   "popUpScoreResult": {
-    "message": "Score: $SCORE$/100.\n$REQUESTS$ requêtes.\n(source EcoIndex).",
+    "message": "Score: $SCORE$/100.\n\n$REQUESTS$ requêtes (source EcoIndex).",
     "description": "Donne plus d'informations pour l'utilisateur sur le site",
     "placeholders": {
       "score" : {

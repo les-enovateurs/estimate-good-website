@@ -12,10 +12,6 @@ function updateIcon(tabId, grade) {
     );
 }
 
-function updateTitle(tabId, title) {
-    browser.pageAction.setTitle({ tabId, title });
-}
-
 function getImagesPathFromScore(score) {
     const DIRECTORY_PATH = "icons";
     if (score) {
@@ -34,15 +30,9 @@ function getImagesPathFromScore(score) {
 function renderResult(tabId, parsedData) {
     if(parsedData === null ) {
         updateIcon(tabId, null);
-
-        const title = browser.i18n.getMessage("popUpNoGrade");
-        updateTitle(tabId, title);
     } else {
         const { grade, score, requests } = parsedData;
         updateIcon(tabId, grade);
-
-        const title = browser.i18n.getMessage("popUpScoreResult", [score, requests]);
-        updateTitle(tabId, title);
     }
 
     browser.pageAction.show(tabId);
