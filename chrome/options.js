@@ -1,29 +1,29 @@
 // variables
 let itemsPerPage = 10;
 
-window.addEventListener('DOMContentLoaded', (event) => {
+window.addEventListener('DOMContentLoaded', async (event) => {
     // listener
     const removeHistoryButton = findById("clearHistory");
-    removeHistoryButton.innerHTML = browser.i18n.getMessage("clearHistory");
+    removeHistoryButton.innerHTML = chrome.i18n.getMessage("clearHistory");
     removeHistoryButton.addEventListener('click', () => {
         localStorage.clear();
     });
 
     // header
     const header = findById('settings-header');
-    header.innerHTML = browser.i18n.getMessage("settingsHeader");
+    header.innerHTML = chrome.i18n.getMessage("settingsHeader");
 
     // header settings
     const averageMonthTitle = findById("average-month-title");
-    averageMonthTitle.innerHTML = browser.i18n.getMessage("averageMonthTitle");
+    averageMonthTitle.innerHTML = chrome.i18n.getMessage("averageMonthTitle");
 
     const browserHistoryTitle = findById("browser-history-title");
-    browserHistoryTitle.innerHTML = browser.i18n.getMessage("browserHistoryTitle");
+    browserHistoryTitle.innerHTML = chrome.i18n.getMessage("browserHistoryTitle");
 
     // progress bar
     const gradeIconProgressBar = findById("grade-average-icon-progress-bar");
 
-    const rowsSortedByVisitedAt = computeData();
+    const rowsSortedByVisitedAt = await computeData();
     const currentPage = 1;
 
     renderTable(rowsSortedByVisitedAt, currentPage);
@@ -33,20 +33,23 @@ window.addEventListener('DOMContentLoaded', (event) => {
     computeGradeIconAndPositionOnProgressBar(gradeIconProgressBar, averageGrade);
 });
 
-function computeData() {
-    const items = { ...localStorage };
-    const rows = Object.entries(items)
-    // sort desc by visited at
-    const rowsSortedByVisitedAt = rows.slice().sort(([keyA, valueA],[keyB, valueB]) => {
-        const a = JSON.parse(valueA);
-        const b = JSON.parse(valueB);
-        return a["visitedAt"] < b["visitedAt"];
+async function computeData() {
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get(null, function(items) {
+            const rows = Object.entries(items)
+            // sort desc by visited at
+            const rowsSortedByVisitedAt = rows.slice().sort(([keyA, valueA],[keyB, valueB]) => {
+                const a = JSON.parse(valueA);
+                const b = JSON.parse(valueB);
+                return a["visitedAt"] < b["visitedAt"];
+            });
+            resolve(rowsSortedByVisitedAt);
+        });
     });
-    return rowsSortedByVisitedAt;
 }
 
+
 function renderTable(rows, currentPage) {
-    console.log(currentPage)
     const table = document.getElementById("list-of-url-table");
     // clear table
     table.innerHTML = "";
@@ -63,7 +66,7 @@ function renderTable(rows, currentPage) {
 
     //pagination (items per page)
     const paginationLabel = findById("paginate-by-label");
-    paginationLabel.innerHTML = browser.i18n.getMessage("paginateBy");
+    paginationLabel.innerHTML = chrome.i18n.getMessage("paginateBy");
 
     const paginationSelect = findById("select-paginate-by");
     paginationSelect.addEventListener('change', (event) => {
@@ -71,6 +74,7 @@ function renderTable(rows, currentPage) {
 
         itemsPerPage = event.target.value;
         renderTable(rows, 1);
+        console.log(itemsPerPage)
         renderPagination(rows.length, itemsPerPage);
     });
 
@@ -84,30 +88,30 @@ function createHead() {
 
     const thLink = document.createElement("th");
     thLink.setAttribute("scope", "col");
-    thLink.innerHTML = browser.i18n.getMessage("linkTable");
+    thLink.innerHTML = chrome.i18n.getMessage("linkTable");
 
     const thGrade = document.createElement("th");
     thGrade.setAttribute("scope", "col");
-    thGrade.innerHTML = browser.i18n.getMessage("gradeTable");
+    thGrade.innerHTML = chrome.i18n.getMessage("gradeTable");
 
     const thScore = document.createElement("th");
     thScore.setAttribute("scope", "col");
-    thScore.innerHTML = browser.i18n.getMessage("scoreTable");
+    thScore.innerHTML = chrome.i18n.getMessage("scoreTable");
 
     const thRequests = document.createElement("th");
     thRequests.setAttribute("scope", "col");
-    thRequests.innerHTML = browser.i18n.getMessage("nbRequestsTable");
+    thRequests.innerHTML = chrome.i18n.getMessage("nbRequestsTable");
 
     const thVisitedAt = document.createElement("th");
     thVisitedAt.setAttribute("scope", "col");
-    thVisitedAt.innerHTML = browser.i18n.getMessage("visitedAtTable");
+    thVisitedAt.innerHTML = chrome.i18n.getMessage("visitedAtTable");
 
     tr.appendChild(thGrade);
     tr.appendChild(thLink);
     tr.appendChild(thScore);
     tr.appendChild(thRequests);
     tr.appendChild(thVisitedAt);
-    
+
     head.appendChild(tr);
     return  head;
 }
@@ -142,38 +146,41 @@ function createRow(link, otherData) {
     return tr;
 }
 
-function renderPagination(numberOfItems, itemsPerPage) {
+async function renderPagination(numberOfItems, itemsPerPage) {
     const paginationPages = findById("pagination-pages");
     // remove inner itemps
     paginationPages.innerHTML = "";
 
     const firstPage = document.createElement("button");
     firstPage.innerHTML = "<<";
-    firstPage.addEventListener('click', (event) => {
+    firstPage.addEventListener('click', async (event) => {
         event.preventDefault();
 
         const currentPage = 1;
-        renderTable(computeData(), currentPage);
+        const rows = await computeData();
+        renderTable(rows, currentPage);
     });
 
     const lastPage = document.createElement("button");
     lastPage.innerHTML = ">>";
-    lastPage.addEventListener('click', (event) => {
+    lastPage.addEventListener('click', async (event) => {
         event.preventDefault();
 
         const currentPage = parseInt(Math.ceil(numberOfItems/itemsPerPage));
-        renderTable(computeData(), currentPage);
+        const rows = await computeData();
+        renderTable(rows, currentPage);
     });
 
     paginationPages.appendChild(firstPage);
     for(let i = 1; i <= Math.ceil(numberOfItems/itemsPerPage); i++) {
         const buttonIndex = document.createElement("button");
         buttonIndex.innerHTML = i.toString();
-        buttonIndex.addEventListener('click', (event) => {
+        buttonIndex.addEventListener('click', async (event) => {
             event.preventDefault();
 
             const currentPage = parseInt(i);
-            renderTable(computeData(), currentPage);
+            const rows = await computeData();
+            renderTable(rows, currentPage);
         });
         paginationPages.appendChild(buttonIndex);
     }
@@ -189,13 +196,13 @@ function prettyDate(time) {
     if (isNaN(day_diff) || day_diff < 0 || day_diff >= 31) return;
 
     return day_diff == 0 && (
-    diff < 60 && browser.i18n.getMessage("now") 
-    || diff < 120 && browser.i18n.getMessage("minute")
-    || diff < 3600 && browser.i18n.getMessage("minutes", [Math.floor(diff / 60)])
-    || diff < 7200 &&  browser.i18n.getMessage("hour")
-    || diff < 86400 && browser.i18n.getMessage("hours", [Math.floor(diff / 3600)])) 
-    || day_diff == 1 && browser.i18n.getMessage("yesterday") || day_diff < 7 && browser.i18n.getMessage("days", [day_diff]) 
-    || day_diff < 31 && browser.i18n.getMessage("weeks", [Math.ceil(day_diff / 7)]);
+    diff < 60 && chrome.i18n.getMessage("now")
+    || diff < 120 && chrome.i18n.getMessage("minute")
+    || diff < 3600 && chrome.i18n.getMessage("minutes", [Math.floor(diff / 60)])
+    || diff < 7200 &&  chrome.i18n.getMessage("hour")
+    || diff < 86400 && chrome.i18n.getMessage("hours", [Math.floor(diff / 3600)]))
+    || day_diff == 1 && chrome.i18n.getMessage("yesterday") || day_diff < 7 && chrome.i18n.getMessage("days", [day_diff])
+    || day_diff < 31 && chrome.i18n.getMessage("weeks", [Math.ceil(day_diff / 7)]);
 }
 
 function computeAverageNote(rowsSortedByVisitedAt, fromDate, toDate) {

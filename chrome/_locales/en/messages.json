@@ -17,5 +17,82 @@
         "example" : "123"
       }
     }
+  },
+
+  "linkTable": {
+    "message": "link"
+  },
+  "gradeTable": {
+    "message": "Grade"
+  },
+  "scoreTable": {
+    "message": "Score"
+  },
+  "nbRequestsTable": {
+    "message": "Number of requests"
+  },
+  "visitedAtTable": {
+    "message": "Visited at"
+  },
+  "clearHistory": {
+    "message": "Clear History"
+  },
+  "settingsHeader": {
+    "message": "Settings"
+  },
+  "averageMonthTitle": {
+    "message": "Average rating for the month"
+  },
+  "browserHistoryTitle": {
+    "message": "Browser history"
+  },
+
+  "now": {
+    "message": "now"
+  },
+  "minute": {
+    "message": "1 minute ago"
+  },
+  "minutes": {
+    "message": "$MINUTES$ minutes ago",
+    "placeholders": {
+      "minutes" : {
+        "content" : "$1",
+        "example" : "3"
+      }
+    }
+  },
+  "hour": {
+    "message": "1 hour ago"
+  },
+  "hours": {
+    "message": "$HOURS$ hours ago",
+    "placeholders": {
+      "hours" : {
+        "content" : "$1",
+        "example" : "5"
+      }
+    }
+  },
+  "yesterday": {
+    "message": "yesterday"
+  },
+  "days": {
+    "message": "$DAYS$ days ago",
+    "placeholders": {
+      "days" : {
+        "content" : "$1",
+        "example" : "3"
+      }
+    }
+  },
+  "weeks": {
+    "message": "$WEEKS$ weeks ago",
+    "placeholders": {
+      "weeks" : {
+        "content" : "$1",
+        "example" : "3"
+      }
+    }
   }
 }
