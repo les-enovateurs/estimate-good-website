@@ -19,13 +19,13 @@ function updateEcoIndexReportLink(id) {
 }
 function updateStats(score, requests) {
     const stats = document.getElementById('stats');
-    if(!stats) {
+    /*if(!stats) {
         return;
     }
 
 
     const title = browser.i18n.getMessage("popUpScoreResult", [score, requests]);
-    stats.innerHTML = title;
+    stats.innerHTML = title;*/
 }
 
 
