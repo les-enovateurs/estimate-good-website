@@ -115,9 +115,9 @@ async function askToComputeEvaluation(url) {
     });
 }
 
-function isBlackListedUrl(url) {
-    const blacklistedUrls = ["about:"];
-    const found = blacklistedUrls.find(blacklistedUrl => url.includes(blacklistedUrls) );
+function isValidUrl(url) {
+    const validUrls = ["https://", "http://"];
+    const found = validUrls.find(validUrl => url.includes(validUrl) );
 
     return found;
 }
@@ -128,7 +128,7 @@ Each time a tab is updated, reset the page action for that tab.
 browser.tabs.onUpdated.addListener((id, changeInfo, tab) => {
     if (tab.status == "complete" && tab.active) {
 
-        if(isBlackListedUrl(tab.url)) {
+        if(!isValidUrl(tab.url)){
             return;
         }
         // try to get results cached in the ecoindex server
