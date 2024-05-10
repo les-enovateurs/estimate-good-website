@@ -14,7 +14,8 @@
       "16": "icons/16/A.jpg",
       "32": "icons/A.jpg"
     },
-    "default_title": "EcoSurf Analyser"
+    "default_title": "EcoSurf Analyser",
+    "default_popup": "popup/popup.html"
   },
   "permissions": [
     "activeTab",

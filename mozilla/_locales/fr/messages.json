@@ -79,13 +79,13 @@
     }
   },
 
-  "detailed-report": {
+  "detailedReport": {
     "message": "Rapport détaillé"
   },
-  "score-title": {
+  "scoreTitle": {
     "message": "Score: "
   },
-  "score-result": {
+  "scoreResult": {
     "message": "$SCORE$/100",
     "placeholders": {
       "score" : {
@@ -94,10 +94,10 @@
       }
     }
   },
-  "number-of-requests-title": {
+  "numberOfRequestsTitle": {
     "message": "Nombre de requêtes: "
   },
-  "source-of-data": {
+  "sourceOfData": {
     "message": "source: Ecoindex"
   },
   "settings": {

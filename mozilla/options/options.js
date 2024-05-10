@@ -46,7 +46,6 @@ function computeData() {
 }
 
 function renderTable(rows, currentPage) {
-    console.log(currentPage)
     const table = document.getElementById("list-of-url-table");
     // clear table
     table.innerHTML = "";
