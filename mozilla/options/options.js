@@ -46,7 +46,6 @@ function computeData() {
 }
 
 function renderTable(rows, currentPage) {
-    console.log(currentPage)
     const table = document.getElementById("list-of-url-table");
     // clear table
     table.innerHTML = "";
@@ -122,7 +121,7 @@ function createRow(link, otherData) {
     thLink.innerHTML = `<a class="link-url" href="${link}">${link}</a>`;
 
     const tdGrade = document.createElement("td");
-    tdGrade.innerHTML = `<img src="icons/${parsedData["grade"]}.jpg" />`;
+    tdGrade.innerHTML = `<img src="../icons/${parsedData["grade"]}.jpg" />`;
 
     const tdScore = document.createElement("td");
     tdScore.innerHTML = `<span style="font-weight:bold">${parsedData["score"]}</span> / 100`;
@@ -293,7 +292,7 @@ function computeGradeIconAndPositionOnProgressBar(gradeIconProgressBar, grade) {
             break;
     }
     gradeIconProgressBar.style.left = positionInPercent;
-    gradeIconProgressBar.src = `icons/${grade}.jpg`;
+    gradeIconProgressBar.src = `../icons/${grade}.jpg`;
 }
 
 

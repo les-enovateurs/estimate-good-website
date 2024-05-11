@@ -12,10 +12,6 @@ function updateIcon(tabId, grade) {
     );
 }
 
-function updateTitle(tabId, title) {
-    chrome.action.setTitle({ tabId, title });
-}
-
 function getImagesPathFromScore(score) {
     const DIRECTORY_PATH = "icons";
     if (score) {
@@ -34,22 +30,17 @@ function getImagesPathFromScore(score) {
 function renderResult(tabId, parsedData) {
     if(parsedData === null ) {
         updateIcon(tabId, null);
-
-        const title = chrome.i18n.getMessage("popUpNoGrade");
-        updateTitle(tabId, title);
     } else {
         const { grade, score, requests } = parsedData;
         updateIcon(tabId, grade);
-
-        const title = chrome.i18n.getMessage("popUpScoreResult", [score, requests]);
-        updateTitle(tabId, title);
     }
 
     //chrome.action.show(tabId);
 }
 
 async function storeResult(url, parsedData) {
-    await chrome.storage.local.set({[url]: JSON.stringify(parsedData)});
+    const visitedAt = new Date();
+    await chrome.storage.local.set({[url]: JSON.stringify({ ...parsedData, visitedAt })});
 
     const { score } = parsedData;
     // for statistics purpose
@@ -147,18 +138,4 @@ chrome.tabs.onRemoved.addListener((tabId) => {
             }
         });
     });
-});
-
-chrome.action.onClicked.addListener((tab) => {
-    chrome.storage.local.get([tab.url]).then((localStorageData) => {
-    if(!localStorageData) {
-        return;
-    }
-    const parsedData = JSON.parse(localStorageData[tab.url]);
-    const { id } = parsedData;
-    const ecoIndexPage = `https://www.ecoindex.fr/resultat/?id=${id}`;
-    chrome.tabs.create({
-        url: ecoIndexPage
-    });
-  });
 });
