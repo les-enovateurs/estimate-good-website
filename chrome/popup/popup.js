@@ -27,7 +27,7 @@ function updateNumberOfRequests(requests) {
 }
 
 function updateScore(score) {
-    scoreTitle = findById("scoreTitle");
+    scoreTitle = findById("score-title");
     scoreTitle.innerHTML = chrome.i18n.getMessage("scoreTitle");
 
     scoreDom = findById("score");
