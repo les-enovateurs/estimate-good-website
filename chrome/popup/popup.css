@@ -12,16 +12,21 @@
 }
 
 
-html {
-  font-size: 16px;
-}
-
 body {
   color: white;
   background: var(--background-color);
   font-family: Arial, sans-serif;
+  font-size: 16px;
   min-width: 300px;
 }
+
+button {
+  background-color: var(--primary-color);
+  color: white;
+  border-radius: 6px;
+  padding: 10px;
+}
+
 
 .container {
   padding: 1rem;
@@ -90,6 +95,9 @@ body {
 #ecoindex-result {
   font-size: larger;
 }
-/*
-moz-extension://9e2a2105-a4d7-4541-ba50-ebe2bddf1e69/popup/popup.html
-*/
+
+#settings {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}
