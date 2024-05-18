@@ -13,7 +13,12 @@ chrome.tabs.query({currentWindow: true, active: true})
     sourceOfData.innerHTML = chrome.i18n.getMessage("sourceOfData");
 
     const settings = findById("settings");
-    settings.innerHTML = chrome.i18n.getMessage("settings");
+    settings.addEventListener('click', () => {
+        window.open("/options/options.html", '_blank');
+    })
+
+    const settingsText = findById("settings-text")
+    settingsText.innerHTML = chrome.i18n.getMessage("settings");
 
 });
 
