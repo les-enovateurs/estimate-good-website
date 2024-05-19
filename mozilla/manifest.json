@@ -2,7 +2,7 @@
   "description": "Display EcoIndex Score",
   "manifest_version": 3,
   "name": "EcoSurf Analyser",
-  "version": "1.5",
+  "version": "1.6",
   "homepage_url": "https://github.com/les-enovateurs/estimate-good-website",
   "default_locale": "fr",
   "background": {
@@ -13,8 +13,8 @@
   },
   "page_action": {
     "default_icon": {
-      "16": "icons/A-16.png",
-      "32": "icons/A.png"
+      "16": "icons/16/A.jpg",
+      "32": "icons/A.jpg"
     },
     "default_title": "EcoSurf Analyser",
     "default_popup": "popup/popup.html"

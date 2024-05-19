@@ -42,12 +42,12 @@ async function storeResult(url, parsedData) {
     const visitedAt = new Date();
     await chrome.storage.local.set({[url]: JSON.stringify({ ...parsedData, visitedAt })});
 
-    const { score } = parsedData;
+    // const { score } = parsedData;
     // for statistics purpose
-    if(score < 50) {
-        const { score, requests, grade } = parsedData;
-        fetch(`${baseURL}ecoindex?pth=${url}&scr=${score}&rqt=${requests}&bge=${grade}`);
-    }
+    // if(score < 50) {
+    //     const { score, requests, grade } = parsedData;
+    //     fetch(`${baseURL}ecoindex?pth=${url}&scr=${score}&rqt=${requests}&bge=${grade}`);
+    // }
 
 }
 
