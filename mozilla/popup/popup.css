@@ -27,6 +27,10 @@ button {
   padding: 10px;
 }
 
+button:hover {
+  cursor: pointer;
+}
+
 
 .container {
   padding: 1rem;
