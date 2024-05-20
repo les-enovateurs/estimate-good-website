@@ -1,7 +1,8 @@
 :root {
   --primary-color: #00614f;
   --primary-light: #46a795;
-  --background-color: #212529 ;
+  --secondary-color: #30A8A7;
+  --background-color: #212529;
 }
 
 *{
@@ -153,6 +154,15 @@ button:hover {
   flex-direction: column;
   gap: 1rem;
   padding: 2rem;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  background: #292e33;
+  padding: 1rem;
+  border-radius: 0.5rem;
 }
 
 @media (width >= 1400px) {
