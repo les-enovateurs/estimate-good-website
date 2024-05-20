@@ -1,5 +1,6 @@
 :root {
   --primary-color: #00614f;
+  --primary-light: #46a795;
   --background-color: #212529 ;
 }
 
@@ -131,6 +132,11 @@ button:hover {
 
 .pagination-pages {
   display: flex;
+}
+
+
+.pagination-selected {
+  background: var(--primary-light);
 }
 
 .container-table {
