@@ -135,6 +135,10 @@ button:hover {
   display: flex;
 }
 
+.pagination-selected {
+  background: var(--primary-light);
+}
+
 .container-table {
   overflow: auto;
 }
