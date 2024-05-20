@@ -3,11 +3,12 @@ chrome.tabs.query({currentWindow: true, active: true})
     const url = tabs[0].url;
     const parsedData = await getResultFromUrl(url);
 
-    const { id, score, requests } = parsedData;
+    const { id, score, requests, grade } = parsedData;
     updateUrl(url);
     updateEcoIndexReportLink(id);
     updateScore(score);
     updateNumberOfRequests(requests);
+    updateBorderColor(grade);
 
     const sourceOfData = findById("source-of-data");
     sourceOfData.innerHTML = chrome.i18n.getMessage("sourceOfData");
@@ -50,13 +51,41 @@ function updateEcoIndexReportLink(id) {
     ecoIndexAnchor.href = `https://www.ecoindex.fr/resultat/?id=${id}`;
 }
 
+function updateBorderColor(grade) {
+    const cardDom = findById("card-with-score");
+    let gradeColor = "000000";
+    switch(grade) {
+        case "A":
+            gradeColor = "#2e9b43";
+            break;
+        case "B":
+            gradeColor = "#34bc6e";
+            break;
+        case "C":
+            gradeColor = "#cadd00";
+            break;
+        case "D":
+            gradeColor = "#f7ed00";
+            break;
+        case "E":
+            gradeColor = "#ffce00";
+            break;
+        case "F":
+            gradeColor = "#fb9929";
+            break;
+        case "G":
+            gradeColor = "#f01c16";
+            break;
+    }
+    cardDom.style.borderColor = gradeColor;
+}
+
 function getResultFromUrl(url) {
     return new Promise((resolve, reject) => {
         chrome.storage.local.get([url], function(item) {
             if(!item) {
                 return;
             }
-            console.log(item[url]);
             resolve(JSON.parse(item[url]));
         });
     });
