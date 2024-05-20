@@ -59,6 +59,8 @@ tfoot {
 th,
 td {
   padding: 8px 10px;
+  text-align: center;
+  vertical-align: middle;
 }
 
 td:last-of-type {
