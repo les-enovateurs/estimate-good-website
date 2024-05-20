@@ -15,7 +15,7 @@
   },
 
   "linkTable": {
-    "message": "link"
+    "message": "Link"
   },
   "gradeTable": {
     "message": "Grade"
@@ -40,6 +40,9 @@
   },
   "browserHistoryTitle": {
     "message": "Browser history"
+  },
+  "paginateBy": {
+    "message": "Pagination by"
   },
 
   "now": {
