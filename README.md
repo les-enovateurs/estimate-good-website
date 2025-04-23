@@ -1,38 +1,63 @@
-# EcoSurf Analyser
+# EcoSurf Analyser 🌱
 
-Description: Mozilla Extension to display on the navbar the ecoIndex score of the page.
+> **Measure the ecological impact of websites you visit in real-time**
 
-The extension call the ecoIndex Api to get the score displayed on the nav bar. 
+EcoSurf Analyser is a browser extension that displays the ecological score of any webpage directly in your browser's navigation bar. See at a glance whether a website is environmentally friendly or not!
 
-More information about the EcoIndex API [here](https://github.com/cnumr/ecoindex_api)
+![EcoSurf Analyser Demo](assets/demo.gif)
 
-## Installation 
+## 🌍 Why EcoSurf?
 
-### On your browser
+With the growing environmental impact of digital technologies, understanding the carbon footprint of the websites we visit is crucial. EcoSurf Analyser makes this information accessible with a simple grading system from A (eco-friendly) to G (high impact).
 
-- Firefox : [here](https://addons.mozilla.org/firefox/addon/ecosurf-analyser/)
+## ✨ Features
 
-- Chrome : [here](https://chromewebstore.google.com/detail/ecosurf-analyser/ikhjihalbdlnjacdnonecbddejboajkl)
+- Real-time ecological assessment of any website
+- Simple A-G grading system visible in your browser's toolbar
+- Automatic analysis of websites not yet in the database
+- Works across popular browsers
 
-### Install locally
+## 📥 Installation
 
-- download the repository
-- open your browser and go to `about:debugging#/runtime/this-firefox`
-- click on button : `load temporary extension firefox`
-- select the manifest.json located in the EcoSurfAnalyser folder
+### From Official Stores
 
-## How it works
+[![Firefox Add-on](https://img.shields.io/badge/Firefox-Add--on-FF7139?style=for-the-badge&logo=firefox-browser&logoColor=white)](https://addons.mozilla.org/firefox/addon/ecosurf-analyser/)
+[![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-4285F4?style=for-the-badge&logo=google-chrome&logoColor=white)](https://chromewebstore.google.com/detail/ecosurf-analyser/ikhjihalbdlnjacdnonecbddejboajkl)
 
-On each website the user goes. The extension get the url and ask ecoIndex API if an analysis has been made recently.
-- If so the extention return the score from `A` to `G` visible on the navbar. `A` meaning a small carbon foodprint impact and `G` a significant carbon foodprint.
-- If no data were collected, the extension ask EcoIndex API to measure the website. Following an heuristic strategy, EcoSurf Analyser will try again to contact the server to fetch data based on the original url. 
+### Manual Installation (Firefox)
 
-## Dependencies
+1. Download the repository
+2. Open Firefox and navigate to `about:debugging#/runtime/this-firefox`
+3. Click on "Load Temporary Add-on..."
+4. Select the `manifest.json` file located in the EcoSurfAnalyser folder
 
-As mention above, [the EcoIndex API](https://github.com/cnumr/ecoindex_api)
+## 🔍 How It Works
 
-## Contribute
+1. When you visit a website, EcoSurf contacts the EcoIndex API to check if that site has been analyzed
+2. If data exists, you'll see the ecological score (A-G) in your browser's toolbar
+3. If no data exists, EcoSurf requests a new analysis from the EcoIndex API
+4. Using a smart heuristic approach, the extension will periodically check for new results
 
-If you found a bug, please open a [issue](https://github.com/les-enovateurs/estimate-good-website/issues) (please search first if the bug is already mention on an existing issue).
+## 🧪 Technical Details
 
-Feel free to contribute by creating a [pull request](https://github.com/les-enovateurs/estimate-good-website/pulls)
+EcoSurf Analyser integrates with the [EcoIndex API](https://github.com/cnumr/ecoindex_api), which measures:
+- Page weight
+- DOM complexity
+- Server requests
+- And many other factors that impact a site's carbon footprint
+
+## 👥 About Us
+
+EcoSurf Analyser is developed by [Les E-novateurs](https://les-enovateurs.com/), a non-profit media organization dedicated to raising awareness about the environmental impact of digital technologies among both the general public and professionals. Our mission is to promote sustainable digital practices through education, tools, and community engagement.
+
+## 🤝 Contributing
+
+We welcome contributions from the community! Here's how you can help:
+
+- **Found a bug?** Open an [issue](https://github.com/les-enovateurs/estimate-good-website/issues) (please search first to avoid duplicates)
+- **Have an improvement?** Create a [pull request](https://github.com/les-enovateurs/estimate-good-website/pulls)
+- **Spread the word!** Share this tool with developers and environmentally-conscious web users
+
+---
+
+<p align="center">Made with ❤️ for a more sustainable web</p>
