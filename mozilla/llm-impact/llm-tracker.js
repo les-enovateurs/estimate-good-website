@@ -257,6 +257,45 @@ class LLMTracker {
   }
 
   /**
+   * Save interaction in progress
+   * This ensures data is saved even if completeInteraction is never called
+   */
+  saveInteractionInProgress() {
+    if (!this.currentInteraction) return;
+    
+    // Extract conversation ID from URL if possible
+    const conversationId = this.extractConversationId(this.currentInteraction.url);
+    this.currentInteraction.conversationId = conversationId;
+    
+    // Generate a unique hash for deduplication that includes the conversation ID
+    const interactionContent = `${conversationId}-${this.currentInteraction.inputTokens}-${this.currentInteraction.outputTokens}`;
+    const interactionHash = this.hashString(interactionContent);
+    this.currentInteraction.contentHash = interactionHash;
+    
+    // Check if we already have a similar interaction with the same content hash
+    const existingInteractions = Object.values(this.interactions);
+    const duplicate = existingInteractions.find(interaction => 
+      interaction.contentHash === interactionHash && 
+      interaction.conversationId === conversationId
+    );
+    
+    // Don't save if it's a duplicate of an existing interaction
+    if (duplicate) {
+      console.log("Detected duplicate interaction, not saving", this.currentInteraction);
+      return;
+    }
+    
+    // Store this interaction with a unique ID based on conversation
+    const interactionId = `${this.currentInteraction.service}-${conversationId}`;
+    this.interactions[interactionId] = {...this.currentInteraction};
+    
+    // Save to storage
+    this.saveInteractions();
+    
+    console.log("Saved in-progress interaction to history");
+  }
+
+  /**
    * Complete the current interaction and save it
    */
   completeInteraction() {
@@ -298,8 +337,8 @@ class LLMTracker {
       return null;
     }
     
-    // Store this interaction with a unique ID
-    const interactionId = `${this.currentInteraction.service}-${conversationId}-${Date.now()}`;
+    // Store this interaction with a unique ID based on conversation
+    const interactionId = `${this.currentInteraction.service}-${conversationId}`;
     this.interactions[interactionId] = {...this.currentInteraction};
     
     // Save to storage
@@ -368,12 +407,12 @@ class LLMTracker {
     // Instead of storing stringified data, store the raw interactions object
     if (typeof browser !== 'undefined') {
       browser.storage.local.set({
-        llmInteractions: this.interactions, // Store directly without JSON.stringify
+        llmInteractions: this.interactions,
         lastUpdated: new Date().toISOString()
       });
     } else if (typeof chrome !== 'undefined') {
       chrome.storage.local.set({
-        llmInteractions: this.interactions, // Store directly without JSON.stringify
+        llmInteractions: this.interactions,
         lastUpdated: new Date().toISOString()
       });
     }
@@ -557,23 +596,6 @@ class LLMTracker {
         resolve(this.currentInteraction);
       });
     });
-  }
-
-  /**
-   * Save interaction in progress
-   * This ensures data is saved even if completeInteraction is never called
-   */
-  saveInteractionInProgress() {
-    if (!this.currentInteraction) return;
-    
-    // Store this interaction
-    const interactionId = `${this.currentInteraction.service}-${Date.now()}`;
-    this.interactions[interactionId] = {...this.currentInteraction};
-    
-    // Save to storage
-    this.saveInteractions();
-    
-    console.log("Saved in-progress interaction to history");
   }
 }
 

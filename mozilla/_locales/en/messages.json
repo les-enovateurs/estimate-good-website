@@ -122,7 +122,7 @@
     "message": "Total emissions (gCO2eq)"
   },
   "llmInteractionsLabel": {
-    "message": "Interactions"
+    "message": "Conversations"
   },
   "llmTokensLabel": {
     "message": "Energy used (Wh)"

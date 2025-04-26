@@ -47,7 +47,8 @@ function setupServiceTracking(serviceName) {
     browser.runtime.sendMessage({
         action: "startLLMTracking",
         service: serviceName,
-        url: window.location.href
+        url: window.location.href,
+        conversationId: currentConversationId || extractConversationId()
     }).then(response => {
         console.log("🌱 Suivi démarré, réponse:", response);
     }).catch(err => {

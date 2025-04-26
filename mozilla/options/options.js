@@ -60,13 +60,6 @@ const EMISSIONS_FACTORS_RANGE_TOKEN = {
 };
 
 window.addEventListener('DOMContentLoaded', async (event) => {
-    // listener
-    const removeHistoryButton = findById("clearHistory");
-    removeHistoryButton.innerHTML = browser.i18n.getMessage("clearHistory");
-    removeHistoryButton.addEventListener('click', () => {
-        localStorage.clear();
-    });
-
     // header
     const header = findById('settings-header');
     header.innerHTML = browser.i18n.getMessage("settingsHeader");
@@ -93,13 +86,24 @@ window.addEventListener('DOMContentLoaded', async (event) => {
     // Set up LLM impact section
     setupLLMImpactSection();
     
-    // Add LLM history clear button handler
-    const clearLLMButton = findById("clearLLMHistory");
-    clearLLMButton.addEventListener('click', async () => {
+    // Add clear all data button handler
+    const clearButton = findById("clearLLMHistory");
+    clearButton.innerHTML = browser.i18n.getMessage("clearAllData") || "Clear All Data";
+    clearButton.addEventListener('click', async () => {
+        // Clear website history
+        await browser.storage.local.clear();
+        localStorage.clear();
+        
+        // Clear LLM data
         await browser.runtime.sendMessage({
             action: "clearLLMData"
         });
-        setupLLMImpactSection(); // Refresh the data display
+        
+        // Refresh both sections
+        const rowsSortedByVisitedAt = computeData();
+        renderTable(rowsSortedByVisitedAt, currentPage);
+        renderPagination(rowsSortedByVisitedAt.length, itemsPerPage, currentPage);
+        setupLLMImpactSection();
     });
 });
 
@@ -213,6 +217,8 @@ function createRow(link, otherData) {
 
 function renderPagination(numberOfItems, itemsPerPage, currentPage) {
     const paginationPages = findById("pagination-pages");
+    paginationPages.classList.add('pagination-nb-pages')
+
     // remove inner itemps
     paginationPages.innerHTML = "";
 
@@ -396,81 +402,56 @@ function findById(id) {
 }
 
 async function setupLLMImpactSection() {
-    // Set up internationalized text labels with improved formatting
+    // Set up internationalized text labels
     const llmImpactTitle = findById("llm-impact-title");
     llmImpactTitle.innerHTML = `
         <div class="section-header">
-            <i class="impact-icon pulse"></i>
+            <i class="impact-icon"></i>
             <h2>${browser.i18n.getMessage("llmImpactTitle") || "LLM Impact"}</h2>
         </div>
     `;
     
-    // Create a more structured stats display with visual indicators
-    const llmCarbonLabel = findById("llm-carbon-label");
-    llmCarbonLabel.innerHTML = `
-        <span class="label-icon carbon-icon pulse-slow"></span>
-        <span class="label-text">${browser.i18n.getMessage("llmCarbonLabel") || "Total Carbon (gCO2eq)"}</span>
-    `;
+    // Set up other labels
+    const labels = {
+        'llm-carbon-label': 'Total Carbon (gCO2eq)',
+        'llm-interactions-label': 'Interactions',
+        'llm-tokens-label': 'Total Tokens',
+        'llm-energy-label': 'Energy (Wh)',
+        'llm-equivalent-title': 'Environmental Equivalent',
+        'llm-energy-equivalent-title': 'Energy Equivalent'
+    };
     
-    const llmInteractionsLabel = findById("llm-interactions-label");
-    llmInteractionsLabel.innerHTML = `
-        <span class="label-icon interactions-icon pulse-slow"></span>
-        <span class="label-text">${browser.i18n.getMessage("llmInteractionsLabel") || "Interactions"}</span>
-    `;
+    Object.entries(labels).forEach(([id, defaultText]) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.innerHTML = `
+                <span class="label-icon ${id.replace('-label', '')}-icon"></span>
+                <span class="label-text">${browser.i18n.getMessage(id) || defaultText}</span>
+            `;
+        }
+    });
     
-    const llmTokensLabel = findById("llm-tokens-label");
-    llmTokensLabel.innerHTML = `
-        <span class="label-icon tokens-icon pulse-slow"></span>
-        <span class="label-text">${browser.i18n.getMessage("llmTokensLabel") || "Total Tokens"}</span>
-    `;
-    
-    const llmEnergyLabel = findById("llm-energy-label");
-    if (llmEnergyLabel) {
-        llmEnergyLabel.innerHTML = `
-            <span class="label-icon energy-icon pulse-slow"></span>
-            <span class="label-text">${browser.i18n.getMessage("llmEnergyLabel") || "Energy (Wh)"}</span>
-        `;
-    }
-    
-    // Improve section headers with icons and better hierarchy
-    const llmEquivalentTitle = findById("llm-equivalent-title");
-    llmEquivalentTitle.innerHTML = `
-        <div class="subsection-header">
-            <span class="section-icon equivalent-icon"></span>
-            <h3>${browser.i18n.getMessage("llmEquivalentTitle") || "Environmental Equivalent"}</h3>
-        </div>
-    `;
-    
-    const llmEnergyEquivalentTitle = findById("llm-energy-equivalent-title");
-    if (llmEnergyEquivalentTitle) {
-        llmEnergyEquivalentTitle.innerHTML = `
-            <div class="subsection-header">
-                <span class="section-icon energy-equivalent-icon"></span>
-                <h3>${browser.i18n.getMessage("llmEnergyEquivalentTitle") || "Energy Equivalent"}</h3>
-            </div>
-        `;
-    }
-    
-    // Make the button more visually appealing with an icon and hover effect
+    // Style clear button
     const clearLLMButton = findById("clearLLMHistory");
     clearLLMButton.innerHTML = `
         <span class="button-icon clear-icon"></span>
         <span class="button-text">${browser.i18n.getMessage("clearLLMHistory") || "Clear LLM History"}</span>
     `;
     
-    console.log("Requesting LLM statistics...");
     try {
-        // Directly access browser storage to get the LLM interactions data
+        console.log("Requesting LLM statistics...");
+        
+        // Get LLM data from storage
         const storage = await browser.storage.local.get(['llmInteractions']);
+        console.log("Retrieved storage data:", storage);
         
         if (!storage || !storage.llmInteractions || Object.keys(storage.llmInteractions).length === 0) {
             console.log("No LLM data found in storage");
-            // Display placeholders or empty state
             updateEmptyStats();
             return;
         }
         
-        // Calculate statistics directly from the raw data
+        // Process the interactions
         const interactions = Object.values(storage.llmInteractions);
         console.log(`Processing ${interactions.length} LLM interactions`);
         
@@ -480,49 +461,45 @@ async function setupLLMImpactSection() {
         let totalInputTokens = 0;
         let totalOutputTokens = 0;
         let serviceBreakdown = {};
+        let needsUpdate = false;
         
-        // Process each interaction and accumulate totals
+        // Process each interaction
         interactions.forEach(interaction => {
-            // Calculate impact values if they don't exist (using same approach as popup.js)
             const inputTokens = interaction.inputTokens || 0;
             const outputTokens = interaction.outputTokens || 0;
             
-            // If carbon/energy impact is missing, calculate it based on tokens
+            // Calculate impact if missing
             if (!interaction.carbonImpact || !interaction.energyImpact) {
                 const totalTokens = inputTokens + outputTokens;
-                // Get service type for different emission factors
-                let serviceType = "openai"; // Default
-                if (interaction.service && interaction.service.toLowerCase().includes("meta")) {
-                    serviceType = "meta";
-                }
+                const serviceType = interaction.service?.toLowerCase().includes("meta") ? "meta" : "openai";
                 
-                // Find the appropriate emission factor based on token count
+                // Find appropriate emission factor
                 let emissionFactor = null;
                 for (const tokenThreshold of [15000, 5000, 400, 250, 170, 50]) {
                     if (totalTokens <= tokenThreshold) {
                         emissionFactor = EMISSIONS_FACTORS_RANGE_TOKEN[serviceType][tokenThreshold];
+                        break;
                     }
                 }
                 
-                // If no match found (very unlikely), use the highest threshold
+                // Use highest threshold if no match
                 if (!emissionFactor) {
                     emissionFactor = EMISSIONS_FACTORS_RANGE_TOKEN[serviceType][15000];
                 }
                 
-                // Scale the impact based on actual token count
+                // Calculate impacts
                 interaction.carbonImpact = (totalTokens / 1000) * emissionFactor.gCO2eq;
                 interaction.energyImpact = (totalTokens / 1000) * emissionFactor.energy;
+                needsUpdate = true;
             }
             
-            // Accumulate tokens
+            // Accumulate totals
             totalInputTokens += inputTokens;
             totalOutputTokens += outputTokens;
-            
-            // Add carbon and energy impact
             totalCarbonImpact += (interaction.carbonImpact || 0);
             totalEnergyImpact += (interaction.energyImpact || 0);
             
-            // Track service usage for breakdown chart
+            // Track service breakdown
             const service = interaction.service || 'Unknown LLM';
             if (!serviceBreakdown[service]) {
                 serviceBreakdown[service] = {
@@ -537,14 +514,20 @@ async function setupLLMImpactSection() {
             serviceBreakdown[service].energyImpact += (interaction.energyImpact || 0);
         });
         
-        // Update the UI with the calculated statistics
+        // Update storage if needed
+        if (needsUpdate) {
+            await browser.storage.local.set({ llmInteractions: storage.llmInteractions });
+        }
+        
+        // Update UI with calculated statistics
         updateStats(
-            totalCarbonImpact, 
-            totalEnergyImpact, 
-            interactions.length, 
+            totalCarbonImpact,
+            totalEnergyImpact,
+            interactions.length,
             totalInputTokens + totalOutputTokens,
             serviceBreakdown
         );
+        
     } catch (error) {
         console.error("Error calculating LLM statistics:", error);
         updateEmptyStats();
@@ -695,29 +678,33 @@ function renderLLMServiceChart(serviceData) {
     const chartContainer = findById('llm-chart-container');
     chartContainer.innerHTML = ''; // Clear previous chart
     
+    // Check if we have valid data
     if (!serviceData || Object.keys(serviceData).length === 0) {
-        // No data to display
-        chartContainer.innerHTML = `<p class="no-data-message">${browser.i18n.getMessage("noLLMDataAvailable") || 'No LLM usage data available yet.'}</p>`;
+        chartContainer.innerHTML = `
+            <div class="no-data-message">
+                <p>${browser.i18n.getMessage("noLLMDataAvailable") || 'No LLM usage data available yet.'}</p>
+                <small style="color: #666; margin-top: 8px; display: block;">Start using AI services to see your impact.</small>
+            </div>`;
         return;
     }
     
-    // Create a single chart container that will hold both types of impacts
+    // Create chart section
     const chartSection = document.createElement('div');
     chartSection.className = 'llm-chart-section';
     
-    // Add chart title with improved styling
+    // Add chart title
     const chartTitle = document.createElement('div');
-    chartTitle.className = 'chart-title animated fadeIn';
+    chartTitle.className = 'chart-title';
     chartTitle.innerHTML = `
         <h4>
             <span class="chart-icon carbon-icon"></span>
-            ${browser.i18n.getMessage("llmServiceBreakdownTitle") || "Service Impact Breakdown"}
+            ${browser.i18n.getMessage("llmServiceBreakdownTitle") || "Service Carbon Impact Breakdown"}
         </h4>
         <p class="chart-subtitle">${browser.i18n.getMessage("basedOnEcologits") || "Based on Ecologits emission factors"}</p>
     `;
     chartSection.appendChild(chartTitle);
     
-    // Create the legend
+    // Create legend
     const legend = document.createElement('div');
     legend.className = 'chart-legend';
     legend.innerHTML = `
@@ -732,161 +719,56 @@ function renderLLMServiceChart(serviceData) {
     `;
     chartSection.appendChild(legend);
     
-    // Create bar chart container
+    // Create chart container
     const chart = document.createElement('div');
     chart.className = 'llm-dual-bar-chart';
     
-    // Find the max values for scaling - Ajout d'une valeur minimale pour éviter une division par zéro
-    let maxCarbonImpact = 0.01;
-    let maxEnergyImpact = 0.01;
+    // Calculate max values for scaling
+    const maxCarbonImpact = Math.max(0.01, ...Object.values(serviceData).map(service => service.carbonImpact || 0));
+    const maxEnergyImpact = Math.max(0.01, ...Object.values(serviceData).map(service => service.energyImpact || 0));
     
-    for (const service in serviceData) {
-        maxCarbonImpact = Math.max(maxCarbonImpact, serviceData[service].carbonImpact || 0);
-        maxEnergyImpact = Math.max(maxEnergyImpact, serviceData[service].energyImpact || 0);
-    }
+    // Sort services by carbon impact
+    const sortedServices = Object.entries(serviceData)
+        .sort(([, a], [, b]) => (b.carbonImpact || 0) - (a.carbonImpact || 0));
     
-    // Ajouter un log pour debugging
-    console.log("Max Carbon Impact:", maxCarbonImpact);
-    console.log("Max Energy Impact:", maxEnergyImpact);
-    
-    // Sort services by carbon impact for consistent ordering
-    const sortedServices = Object.keys(serviceData).sort((a, b) => {
-        return (serviceData[b].carbonImpact || 0) - (serviceData[a].carbonImpact || 0);
-    });
-    
-    // Créer une section pour le débogage
-    const debugInfo = document.createElement('div');
-    debugInfo.style.display = 'none'; // Masqué par défaut, à activer si besoin
-    debugInfo.innerHTML = `<p>Données de service: ${JSON.stringify(serviceData)}</p>`;
-    chartSection.appendChild(debugInfo);
-    
-    // Create service rows with both impact types
-    sortedServices.forEach((service, index) => {
-        const serviceInfo = serviceData[service];
+    // Create service rows
+    sortedServices.forEach(([service, info], index) => {
+        const carbonImpact = info.carbonImpact || 0;
+        const energyImpact = info.energyImpact || 0;
         
-        // Ajouter des logs pour debugging
-        console.log(`Service: ${service}`, serviceInfo);
+        // Calculate percentage widths with minimum visibility
+        const carbonWidth = Math.max(5, (carbonImpact / maxCarbonImpact) * 100);
+        const energyWidth = Math.max(5, (energyImpact / maxEnergyImpact) * 100);
         
-        // Skip if no data
-        if ((!serviceInfo.carbonImpact && serviceInfo.carbonImpact !== 0) && 
-            (!serviceInfo.energyImpact && serviceInfo.energyImpact !== 0)) {
-            console.log(`Skipping service with no impact data: ${service}`);
-            return;
-        }
-        
-        // Calculate percentage widths with minimum to ensure visibility
-        const carbonImpact = serviceInfo.carbonImpact || 0;
-        const energyImpact = serviceInfo.energyImpact || 0;
-        
-        // Assurer un minimum de 1% pour la visibilité des barres même pour des valeurs très petites
-        const carbonPercentWidth = Math.max(1, (carbonImpact / maxCarbonImpact) * 100);
-        const energyPercentWidth = Math.max(1, (energyImpact / maxEnergyImpact) * 100);
-        
-        console.log(`${service} - Carbon Width: ${carbonPercentWidth}%, Energy Width: ${energyPercentWidth}%`);
-        
-        // Service row container
         const serviceRow = document.createElement('div');
-        serviceRow.className = 'service-row animated fadeInUp';
+        serviceRow.className = 'service-row';
         serviceRow.style.animationDelay = `${index * 0.1}s`;
         
-        // Service label
-        const label = document.createElement('div');
-        label.className = 'service-label';
-        
-        // Add service icon if available
+        // Service label with icon
         const serviceIconClass = getServiceIconClass(service);
-        label.innerHTML = `
-            <span class="service-icon ${serviceIconClass}"></span>
-            <span class="service-name">${service}</span>
-            <span class="service-count">(${serviceInfo.count} ${browser.i18n.getMessage("interactions") || "interactions"})</span>
+        serviceRow.innerHTML = `
+            <div class="service-label">
+                <span class="service-icon ${serviceIconClass}"></span>
+                <span class="service-name">${service}</span>
+                <span class="service-count">(${info.count} ${browser.i18n.getMessage("interactions") || "interactions"})</span>
+            </div>
+            <div class="impact-bars-container">
+                <div class="bar-wrapper">
+                    <div class="bar carbon-bar" style="width: ${carbonWidth}%; height:30px;"></div>
+                    <div class="bar-value">${carbonImpact.toFixed(2)} gCO2eq</div>
+                </div>
+                <div class="bar-wrapper">
+                    <div class="bar energy-bar" style="width: ${energyWidth}%; height:30px;"></div>
+                    <div class="bar-value">${energyImpact.toFixed(2)} Wh</div>
+                </div>
+            </div>
         `;
         
-        // Bars container
-        const barsContainer = document.createElement('div');
-        barsContainer.className = 'impact-bars-container';
-        
-        // Carbon impact bar
-        const carbonBarWrapper = document.createElement('div');
-        carbonBarWrapper.className = 'bar-wrapper carbon-wrapper';
-        
-        const carbonBar = document.createElement('div');
-        carbonBar.className = 'bar carbon-bar';
-        carbonBar.style.width = `${carbonPercentWidth}%`;
-        carbonBar.style.animationDelay = `${index * 0.1 + 0.1}s`;
-        
-        const carbonValue = document.createElement('div');
-        carbonValue.className = 'bar-value';
-        carbonValue.textContent = `${carbonImpact.toFixed(2)} gCO2eq`;
-        
-        carbonBarWrapper.appendChild(carbonBar);
-        carbonBarWrapper.appendChild(carbonValue);
-        
-        // Energy impact bar
-        const energyBarWrapper = document.createElement('div');
-        energyBarWrapper.className = 'bar-wrapper energy-wrapper';
-        
-        const energyBar = document.createElement('div');
-        energyBar.className = 'bar energy-bar';
-        energyBar.style.width = `${energyPercentWidth}%`;
-        energyBar.style.animationDelay = `${index * 0.1 + 0.2}s`;
-        
-        const energyValue = document.createElement('div');
-        energyValue.className = 'bar-value';
-        energyValue.textContent = `${energyImpact.toFixed(2)} Wh`;
-        
-        energyBarWrapper.appendChild(energyBar);
-        energyBarWrapper.appendChild(energyValue);
-        
-        // Add bars to container
-        barsContainer.appendChild(carbonBarWrapper);
-        barsContainer.appendChild(energyBarWrapper);
-        
-        // Assemble row
-        serviceRow.appendChild(label);
-        serviceRow.appendChild(barsContainer);
-        
-        // Add to chart
         chart.appendChild(serviceRow);
     });
     
     chartSection.appendChild(chart);
     chartContainer.appendChild(chartSection);
-    
-    // Add emission factors explanation
-    const emissionFactorsInfo = document.createElement('div');
-    emissionFactorsInfo.className = 'emission-factors-info';
-    emissionFactorsInfo.innerHTML = `
-        <details>
-            <summary>${browser.i18n.getMessage("emissionFactorsDetails") || "Emission Factors Details"}</summary>
-            <div class="factors-grid">
-                <div class="factor-item">
-                    <strong>OpenAI/Claude/Gemini:</strong> 
-                    <ul>
-                        <li>&lt;50 tokens: 2.68 gCO2eq / 4.39 Wh</li>
-                        <li>&lt;170 tokens: 9.11 gCO2eq / 14.9 Wh</li>
-                        <li>&lt;250 tokens: 13.4 gCO2eq / 21.9 Wh</li>
-                        <li>&lt;400 tokens: 21.4 gCO2eq / 35.1 Wh</li>
-                        <li>&lt;5000 tokens: 268 gCO2eq / 439 Wh</li>
-                        <li>&lt;15000 tokens: 803 gCO2eq / 1320 Wh</li>
-                    </ul>
-                </div>
-                <div class="factor-item">
-                    <strong>Meta:</strong>
-                    <ul>
-                        <li>&lt;50 tokens: 2.68 gCO2eq / 4.39 Wh</li>
-                        <li>&lt;170 tokens: 9.11 gCO2eq / 14.9 Wh</li>
-                        <li>&lt;250 tokens: 13.4 gCO2eq / 21.9 Wh</li>
-                        <li>&lt;400 tokens: 21.4 gCO2eq / 35.1 Wh</li>
-                        <li>&lt;5000 tokens: 727 gCO2eq / 1190 Wh</li>
-                        <li>&lt;15000 tokens: 2180 gCO2eq / 3580 Wh</li>
-                    </ul>
-                </div>
-            </div>
-            <p><small>${browser.i18n.getMessage("basedOnStudy") || "Based on the Ecologits research study"}</small></p>
-        </details>
-    `;
-    
-    chartContainer.appendChild(emissionFactorsInfo);
 }
 
 // Nouvelle fonction pour créer les graphiques
