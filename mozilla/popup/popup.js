@@ -251,8 +251,9 @@ async function displayLLMImpact(url) {
     
     // Update link to EcoLLM info and make it go to dashboard/settings
     const ecoIndexAnchor = findById("ecoindex-result");
+    const messageDashboard = browser.i18n.getMessage("viewImpactDashboard") || "View Impact Dashboard"
     ecoIndexAnchor.innerHTML = `    
-        <span class="button-text">View Impact Dashboard</span>
+        <span class="button-text">${messageDashboard}</span>
     `;
     ecoIndexAnchor.href = "/options/options.html#llm-impact";
 

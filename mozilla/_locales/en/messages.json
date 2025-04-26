@@ -127,6 +127,9 @@
   "llmTokensLabel": {
     "message": "Energy used (Wh)"
   },
+  "viewImpactDashboard": {
+    "message":"View Impact Dashboard"
+    },
   "llmEquivalentTitle": {
     "message": "Equivalent"
   },

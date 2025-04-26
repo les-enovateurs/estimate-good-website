@@ -14,14 +14,29 @@
   "visitedAtTable": {
     "message": "Visité à"
   },
-  "clearHistory": {
+  "clearAllData": {
     "message": "Supprimer l'historique"
+  },
+  "llm-equivalent-title": {
+    "message": "Equivalent environnemental"
+  },
+  "llm-energy-equivalent-title": {
+    "message": "Equivalent en électricité"
+  },
+  "llm-carbon-label": {
+    "message": "Total carbone (gCO2eq)"
+  },
+  "llm-interactions-label": {
+    "message": "Conversations"
+  },
+  "llm-tokens-label": {
+    "message": "Electricité (Wh)"
   },
   "settingsHeader": {
     "message": "Statistiques"
   },
   "averageMonthTitle": {
-    "message": "La moyenne des notes ce mois-ci"
+    "message": "La moyenne des notes des sites web ce mois-ci"
   },
   "browserHistoryTitle": {
     "message": "Historique"
@@ -116,7 +131,7 @@
     "message": "Aucune donnée d'utilisation des LLM disponible pour l'instant."
   },
   "llmImpactTitle": {
-  "message": "Impact Carbone des IA"
+  "message": "Impact carbone"
 },
 "llmCarbonLabel": {
   "message": "Emission total (gCO2eq)"
@@ -125,7 +140,7 @@
   "message": "Conversations"
 },
 "llmTokensLabel": {
-  "message": "Total des Tokens"
+  "message": "Electricité utilisé (Wh)"
 },
 "llmEquivalentTitle": {
   "message": "Équivalent"
@@ -143,7 +158,7 @@
   "message": "Basé sur les facteurs d'émission Ecologits"
 },
 "interactions": {
-  "message": "interactions"
+  "message": "Conversations"
 },
 "emissionFactorsDetails": {
   "message": "Détails des facteurs d'émission"
