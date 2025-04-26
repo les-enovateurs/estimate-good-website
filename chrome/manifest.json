@@ -2,13 +2,16 @@
   "description": "Display EcoIndex Score",
   "manifest_version": 3,
   "name": "EcoSurf Analyser",
-  "version": "1.4",
+  "version": "1.7",
   "homepage_url": "https://github.com/les-enovateurs/estimate-good-website",
   "default_locale": "fr",
   "background": {
     "service_worker": "analysis.js"
   },
-  "options_page": "options/options.html",
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tab": true
+  },
   "action": {
     "default_icon": {
       "16": "icons/16/A.jpg",
@@ -20,6 +23,37 @@
   "permissions": [
     "activeTab",
     "tabs",
-    "storage"
-  ]
+    "storage",
+    "scripting",
+    "webNavigation"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["llm-impact/llm-tracker.js"]
+    },
+    {
+      "matches": [
+        "*://*.openai.com/*",
+        "*://*.chatgpt.com/*",
+        "*://*.claude.ai/*",
+        "*://*.anthropic.com/*",
+        "*://*.gemini.google.com/*",
+        "*://*.bing.com/chat*"
+      ],
+      "js": ["llm-impact/content-script.js"]
+    }
+  ],
+  "host_permissions": [
+    "*://*.openai.com/*",
+    "*://*.chatgpt.com/*",
+    "*://*.claude.ai/*",
+    "*://*.anthropic.com/*",
+    "*://*.gemini.google.com/*",
+    "*://*.bing.com/chat*"
+  ],
+  "web_accessible_resources": [{
+    "resources": ["llm-impact/*"],
+    "matches": ["<all_urls>"]
+  }]
 }

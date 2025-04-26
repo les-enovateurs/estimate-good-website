@@ -1,3 +1,10 @@
+// Initialize LLM tracker state
+let llmTrackerState = {
+    isInitialized: false,
+    currentUrl: null,
+    currentService: null
+};
+
 function updateIcon(tabId, grade) {
     chrome.action.setIcon(
         {
@@ -111,113 +118,113 @@ function isValidUrl(url) {
     return url.startsWith('http://') || url.startsWith('https://');
 }
 
-// Update your injectContentScript function with better error handling
-
-async function injectContentScript(tabId, scriptPath) {
-    try {
-        if (typeof chrome.scripting !== 'undefined') {
-            await chrome.scripting.executeScript({
-                target: {tabId: tabId},
-                files: [scriptPath]
-            });
-        } else {
-            await chrome.tabs.executeScript(tabId, {
-                file: scriptPath
-            });
-        }
-        return true;
-    } catch (error) {
-        console.error(`Failed to inject script ${scriptPath}:`, error);
-        return false;
-    }
-}
-
-/*
-Each time a tab is updated, reset the page action for that tab.
-*/
-chrome.tabs.onUpdated.addListener(async (id, changeInfo, tab) => {
-    if (tab.status == "complete" && tab.active) {
-        // Check if this is an LLM service
-        const llmService = window.llmTracker.detectLLMService(tab.url);
-        if (llmService) {
-            // Try to inject the content script
-            const scriptInjected = await injectContentScript(tab.id, "/llm-impact/content-script.js");
-            
-            if (scriptInjected) {
-                chrome.tabs.sendMessage(tab.id, {
-                    action: "trackLLM",
-                    service: llmService
-                });
-                
-                // Update icon to show LLM tracking
-                updateIcon(tab.id, "LLM");
-                chrome.action.enable(tab.id);
-            } else {
-                // Fallback - we still show the LLM icon but we can't track interactions
-                console.warn(`Can't track LLM usage on ${tab.url} - insufficient permissions`);
-                updateIcon(tab.id, "LLM");
-                chrome.action.enable(tab.id);
-            }
-            return;
-        }
-
-        if(!isValidUrl(tab.url)){
-            return;
-        }
-        // try to get results cached in the ecoindex server
-        callEcoIndex(tab.id, tab.url, false);
-    }
-});
-
 // Message handler for communication between scripts
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    // Handle ecoindex result messages
+    if (message.type === 'ecoindex_result') {
+        const { tabId, data } = message;
+        renderResult(tabId, parseData(data));
+        sendResponse({ status: 'success' });
+        return true;
+    }
+
+    // Handle messages that don't require tab information
+    if (message.action === "getLLMStatistics") {
+        // Get statistics from storage
+        chrome.storage.local.get(['llmStatistics'], function(result) {
+            if (result.llmStatistics) {
+                sendResponse(result.llmStatistics);
+            } else {
+                sendResponse({
+                    totalInteractions: 0,
+                    totalInputTokens: 0,
+                    totalOutputTokens: 0,
+                    totalCarbonImpact: 0,
+                    serviceBreakdown: {},
+                    comparisons: {
+                        carKilometers: 0,
+                        smartphoneCharges: 0,
+                        coffeeCups: 0
+                    }
+                });
+            }
+        });
+        return true;
+    }
+
+    // Handle messages that require tab information
+    if (!sender || !sender.tab || !sender.tab.id) {
+        console.warn("Message received without tab information:", message);
+        sendResponse({ status: 'error', message: 'This operation requires tab information' });
+        return true;
+    }
+
+    const tabId = sender.tab.id;
+    
     if (message.action === "isLLMService") {
-        const llmService = window.llmTracker.detectLLMService(message.url);
-        return Promise.resolve(llmService !== null);
+        // Check if URL is an LLM service
+        const isLLM = isLLMService(message.url);
+        sendResponse(isLLM);
+        return true;
     }
     
     if (message.action === "getLLMData") {
-        const data = window.llmTracker.getCurrentInteraction(message.url);
-        return Promise.resolve(data);
+        chrome.storage.local.get([`llmData_${message.url}`], function(result) {
+            sendResponse(result[`llmData_${message.url}`] || null);
+        });
+        return true;
     }
     
     if (message.action === "startLLMTracking") {
-        window.llmTracker.startTracking(message.url, message.service);
-        return Promise.resolve({status: "started"});
+        const llmData = {
+            url: message.url,
+            service: message.service,
+            startTime: Date.now(),
+            inputTokens: 0,
+            outputTokens: 0
+        };
+        chrome.storage.local.set({ [`llmData_${message.url}`]: llmData }, function() {
+            sendResponse({status: "started"});
+        });
+        return true;
     }
     
     if (message.action === "updateLLMInput") {
-        window.llmTracker.updateInputTokens(message.text);
-        return Promise.resolve({status: "updated"});
+        chrome.storage.local.get([`llmData_${message.url}`], function(result) {
+            const llmData = result[`llmData_${message.url}`] || {};
+            llmData.inputTokens = (llmData.inputTokens || 0) + estimateTokens(message.text);
+            chrome.storage.local.set({ [`llmData_${message.url}`]: llmData }, function() {
+                sendResponse({status: "updated"});
+            });
+        });
+        return true;
     }
     
     if (message.action === "updateLLMOutput") {
-        window.llmTracker.updateOutputTokens(message.text);
-        return Promise.resolve({status: "updated"});
+        chrome.storage.local.get([`llmData_${message.url}`], function(result) {
+            const llmData = result[`llmData_${message.url}`] || {};
+            llmData.outputTokens = (llmData.outputTokens || 0) + estimateTokens(message.text);
+            chrome.storage.local.set({ [`llmData_${message.url}`]: llmData }, function() {
+                sendResponse({status: "updated"});
+            });
+        });
+        return true;
     }
     
     if (message.action === "completeLLMTracking") {
-        if (message.inputText) {
-            window.llmTracker.updateInputTokens(message.inputText);
-        }
-        if (message.outputText) {
-            window.llmTracker.updateOutputTokens(message.outputText);
-        }
-        window.llmTracker.completeInteraction();
-        return Promise.resolve({status: "completed"});
-    }
-    
-    // Handle getting statistics
-    if (message.action === "getLLMStatistics") {
-        console.log("🌱 Récupération des statistiques LLM");
-        return window.llmTracker.getStatistics()
-            .then(stats => {
-                console.log("🌱 Statistiques récupérées:", stats);
-                return stats;
-            })
-            .catch(error => {
-                console.error("🌱 Erreur lors de la récupération des statistiques:", error);
-                return {
+        chrome.storage.local.get([`llmData_${message.url}`], function(result) {
+            const llmData = result[`llmData_${message.url}`] || {};
+            if (message.inputText) {
+                llmData.inputTokens = (llmData.inputTokens || 0) + estimateTokens(message.inputText);
+            }
+            if (message.outputText) {
+                llmData.outputTokens = (llmData.outputTokens || 0) + estimateTokens(message.outputText);
+            }
+            llmData.endTime = Date.now();
+            
+            // Update statistics
+            chrome.storage.local.get(['llmStatistics'], function(statsResult) {
+                const statistics = statsResult.llmStatistics || {
                     totalInteractions: 0,
                     totalInputTokens: 0,
                     totalOutputTokens: 0,
@@ -229,88 +236,94 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                         coffeeCups: 0
                     }
                 };
-            });
-    }
-    
-    // Handle clearing data
-    if (message.action === "clearLLMData") {
-        console.log("🌱 Effacement des données LLM");
-        window.llmTracker.clearInteractions();
-        return Promise.resolve({status: "cleared"});
-    }
-    
-    // Handle ensuring icon stays visible for SPAs
-    if (message.action === "ensureIconVisible") {
-        console.log("🌱 Ensuring icon is visible for:", message.url);
-        
-        // Only proceed if we have a valid sender tab
-        if (!sender || !sender.tab || !sender.tab.id) {
-            console.log("🌱 No valid tab in sender:", sender);
-            return Promise.resolve({status: "no valid tab"});
-        }
-        
-        const llmService = window.llmTracker.detectLLMService(message.url);
-        if (llmService) {
-            // Re-show the icon
-            updateIcon(sender.tab.id, "LLM");
-            chrome.action.enable(sender.tab.id);
-            return Promise.resolve({status: "icon refreshed"});
-        }
-        return Promise.resolve({status: "not an LLM site"});
-    }
-
-    // Add this to your chrome.runtime.onMessage handler
-
-    if (message.action === "refreshLLMData") {
-        console.log("🌱 Refreshing LLM data for:", message.url);
-        
-        // Find the tab that contains this URL
-        return chrome.tabs.query({url: message.url}).then(async (tabs) => {
-            if (tabs.length > 0) {
-                // Re-inject the content script to ensure data is current
-                try {
-                    await injectContentScript(tabs[0].id, "/llm-impact/content-script.js");
-                    return {status: "refreshed"};
-                } catch (err) {
-                    console.error("Failed to refresh LLM data:", err);
-                    return {status: "error", message: err.message};
+                
+                statistics.totalInteractions++;
+                statistics.totalInputTokens += llmData.inputTokens || 0;
+                statistics.totalOutputTokens += llmData.outputTokens || 0;
+                
+                // Update service breakdown
+                if (!statistics.serviceBreakdown[llmData.service]) {
+                    statistics.serviceBreakdown[llmData.service] = {
+                        interactions: 0,
+                        inputTokens: 0,
+                        outputTokens: 0
+                    };
                 }
-            }
-            return {status: "no matching tab"};
+                statistics.serviceBreakdown[llmData.service].interactions++;
+                statistics.serviceBreakdown[llmData.service].inputTokens += llmData.inputTokens || 0;
+                statistics.serviceBreakdown[llmData.service].outputTokens += llmData.outputTokens || 0;
+                
+                // Calculate carbon impact and comparisons
+                const carbonImpact = calculateCarbonImpact(llmData);
+                statistics.totalCarbonImpact += carbonImpact;
+                statistics.comparisons = calculateComparisons(statistics.totalCarbonImpact);
+                
+                chrome.storage.local.set({ llmStatistics: statistics }, function() {
+                    sendResponse({status: "completed"});
+                });
+            });
         });
-    }
-
-    console.log("🌱 Action non reconnue:", message.action);
-    return false;
-});
-
-chrome.runtime.onMessage.addListener((message, sender) => {
-  if (message.action === "ensureIconVisible") {
-    // Mettre à jour l'icône basée sur l'URL
-    const url = message.url;
-    const tabId = sender.tab.id;
-    
-    // Vérifier si c'est un service LLM
-    if (isLLMService(url)) {
-      chrome.action.enable(tabId);
-      // Ou si vous utilisez chromeAction:
-      // chrome.chromeAction.setIcon({
-      //   tabId: tabId,
-      //   path: "/icons/llm-icon.png" 
-      // });
+        return true;
     }
     
-    return Promise.resolve({success: true});
-  }
-  // Autres gestionnaires...
+    if (message.action === "clearLLMData") {
+        chrome.storage.local.clear(function() {
+            sendResponse({status: "cleared"});
+        });
+        return true;
+    }
+    
+    return true;
 });
 
-// Fonction pour détecter les services LLM
+// Helper function to estimate tokens
+function estimateTokens(text) {
+    // Rough estimation: 1 token ≈ 4 characters
+    return Math.ceil((text || '').length / 4);
+}
+
+// Helper function to calculate carbon impact
+function calculateCarbonImpact(llmData) {
+    // Rough estimation: 1 token ≈ 0.000001 kg CO2
+    const totalTokens = (llmData.inputTokens || 0) + (llmData.outputTokens || 0);
+    return totalTokens * 0.000001;
+}
+
+// Helper function to calculate comparisons
+function calculateComparisons(carbonImpact) {
+    // Rough estimations:
+    // - Car: 0.2 kg CO2 per km
+    // - Smartphone: 0.01 kg CO2 per charge
+    // - Coffee: 0.1 kg CO2 per cup
+    return {
+        carKilometers: carbonImpact / 0.2,
+        smartphoneCharges: carbonImpact / 0.01,
+        coffeeCups: carbonImpact / 0.1
+    };
+}
+
+// Tab update listener
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    if (changeInfo.status === 'complete' && tab.url) {
+        if (isLLMService(tab.url)) {
+            updateIcon(tabId, "LLM");
+            chrome.action.enable(tabId);
+        } else if (isValidUrl(tab.url)) {
+            getEcoIndexCachetResult(tabId, tab.url);
+        }
+    }
+});
+
+// Function to detect LLM services
 function isLLMService(url) {
-  for (const service in LLM_SERVICES) {
-    if (LLM_SERVICES[service].urlPattern.test(url)) {
-      return true;
-    }
-  }
-  return false;
+    const llmServices = [
+        'openai.com',
+        'chatgpt.com',
+        'claude.ai',
+        'anthropic.com',
+        'gemini.google.com',
+        'bing.com/chat'
+    ];
+    
+    return llmServices.some(service => url.includes(service));
 }
