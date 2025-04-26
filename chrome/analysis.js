@@ -1,5 +1,5 @@
 function updateIcon(tabId, grade) {
-    browser.pageAction.setIcon(
+    chrome.action.setIcon(
         {
             tabId,
             path: getImagesPathFromScore(grade)
@@ -36,7 +36,7 @@ function renderResult(tabId, parsedData) {
         updateIcon(tabId, grade);
     }
 
-    browser.pageAction.show(tabId);
+    chrome.action.enable(tabId);
 }
 
 function storeResult(url, parsedData) {
@@ -115,13 +115,13 @@ function isValidUrl(url) {
 
 async function injectContentScript(tabId, scriptPath) {
     try {
-        if (typeof browser.scripting !== 'undefined') {
-            await browser.scripting.executeScript({
+        if (typeof chrome.scripting !== 'undefined') {
+            await chrome.scripting.executeScript({
                 target: {tabId: tabId},
                 files: [scriptPath]
             });
         } else {
-            await browser.tabs.executeScript(tabId, {
+            await chrome.tabs.executeScript(tabId, {
                 file: scriptPath
             });
         }
@@ -135,7 +135,7 @@ async function injectContentScript(tabId, scriptPath) {
 /*
 Each time a tab is updated, reset the page action for that tab.
 */
-browser.tabs.onUpdated.addListener(async (id, changeInfo, tab) => {
+chrome.tabs.onUpdated.addListener(async (id, changeInfo, tab) => {
     if (tab.status == "complete" && tab.active) {
         // Check if this is an LLM service
         const llmService = window.llmTracker.detectLLMService(tab.url);
@@ -144,19 +144,19 @@ browser.tabs.onUpdated.addListener(async (id, changeInfo, tab) => {
             const scriptInjected = await injectContentScript(tab.id, "/llm-impact/content-script.js");
             
             if (scriptInjected) {
-                browser.tabs.sendMessage(tab.id, {
+                chrome.tabs.sendMessage(tab.id, {
                     action: "trackLLM",
                     service: llmService
                 });
                 
                 // Update icon to show LLM tracking
                 updateIcon(tab.id, "LLM");
-                browser.pageAction.show(tab.id);
+                chrome.action.enable(tab.id);
             } else {
                 // Fallback - we still show the LLM icon but we can't track interactions
                 console.warn(`Can't track LLM usage on ${tab.url} - insufficient permissions`);
                 updateIcon(tab.id, "LLM");
-                browser.pageAction.show(tab.id);
+                chrome.action.enable(tab.id);
             }
             return;
         }
@@ -170,7 +170,7 @@ browser.tabs.onUpdated.addListener(async (id, changeInfo, tab) => {
 });
 
 // Message handler for communication between scripts
-browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === "isLLMService") {
         const llmService = window.llmTracker.detectLLMService(message.url);
         return Promise.resolve(llmService !== null);
@@ -253,19 +253,19 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (llmService) {
             // Re-show the icon
             updateIcon(sender.tab.id, "LLM");
-            browser.pageAction.show(sender.tab.id);
+            chrome.action.enable(sender.tab.id);
             return Promise.resolve({status: "icon refreshed"});
         }
         return Promise.resolve({status: "not an LLM site"});
     }
 
-    // Add this to your browser.runtime.onMessage handler
+    // Add this to your chrome.runtime.onMessage handler
 
     if (message.action === "refreshLLMData") {
         console.log("🌱 Refreshing LLM data for:", message.url);
         
         // Find the tab that contains this URL
-        return browser.tabs.query({url: message.url}).then(async (tabs) => {
+        return chrome.tabs.query({url: message.url}).then(async (tabs) => {
             if (tabs.length > 0) {
                 // Re-inject the content script to ensure data is current
                 try {
@@ -284,7 +284,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return false;
 });
 
-browser.runtime.onMessage.addListener((message, sender) => {
+chrome.runtime.onMessage.addListener((message, sender) => {
   if (message.action === "ensureIconVisible") {
     // Mettre à jour l'icône basée sur l'URL
     const url = message.url;
@@ -292,9 +292,9 @@ browser.runtime.onMessage.addListener((message, sender) => {
     
     // Vérifier si c'est un service LLM
     if (isLLMService(url)) {
-      browser.pageAction.show(tabId);
-      // Ou si vous utilisez browserAction:
-      // browser.browserAction.setIcon({
+      chrome.action.enable(tabId);
+      // Ou si vous utilisez chromeAction:
+      // chrome.chromeAction.setIcon({
       //   tabId: tabId,
       //   path: "/icons/llm-icon.png" 
       // });

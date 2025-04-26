@@ -17,19 +17,19 @@
   "clearAllData": {
     "message": "Supprimer l'historique"
   },
-  "llm-equivalent-title": {
+  "llmEquivalentTitle": {
     "message": "Equivalent environnemental"
   },
-  "llm-energy-equivalent-title": {
+  "llmEnergyEquivalentTitle": {
     "message": "Equivalent en électricité"
   },
-  "llm-carbon-label": {
+  "llmCarbonLabel": {
     "message": "Total carbone (gCO2eq)"
   },
-  "llm-interactions-label": {
+  "llmInteractionsLabel": {
     "message": "Conversations"
   },
-  "llm-tokens-label": {
+  "llmTokensLabel": {
     "message": "Electricité (Wh)"
   },
   "settingsHeader": {

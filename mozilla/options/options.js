@@ -413,12 +413,12 @@ async function setupLLMImpactSection() {
     
     // Set up other labels
     const labels = {
-        'llm-carbon-label': 'Total Carbon (gCO2eq)',
-        'llm-interactions-label': 'Interactions',
-        'llm-tokens-label': 'Total Tokens',
+        'llmCarbonLabel': 'Total Carbon (gCO2eq)',
+        'llmInteractionsLabel': 'Interactions',
+        'llmTokensLabel': 'Total Tokens',
         'llm-energy-label': 'Energy (Wh)',
-        'llm-equivalent-title': 'Environmental Equivalent',
-        'llm-energy-equivalent-title': 'Energy Equivalent'
+        'llmEquivalentTitle': 'Environmental Equivalent',
+        'llmEnergyEquivalentTitle': 'Energy Equivalent'
     };
     
     Object.entries(labels).forEach(([id, defaultText]) => {

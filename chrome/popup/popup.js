@@ -57,20 +57,20 @@ const EMISSIONS_FACTORS_RANGE_TOKEN = {
   
 
 // Modify the tab query event handler
-browser.tabs.query({currentWindow: true, active: true})
+chrome.tabs.query({currentWindow: true, active: true})
 .then(async (tabs) => {
     const url = tabs[0].url;
     
     try {
         // Check if this is an LLM service
-        const isLLMService = await browser.runtime.sendMessage({
+        const isLLMService = await chrome.runtime.sendMessage({
             action: "isLLMService",
             url: url
         });
         
         if (isLLMService) {
             // Force a refresh of LLM data before displaying
-            await browser.runtime.sendMessage({
+            await chrome.runtime.sendMessage({
                 action: "refreshLLMData",
                 url: url
             });
@@ -103,7 +103,7 @@ browser.tabs.query({currentWindow: true, active: true})
     });   
         // Update source with link to EcoIndex
         const sourceOfData = findById("source-of-data");
-        sourceOfData.innerHTML = `${browser.i18n.getMessage("sourceOfData")} <a class="team-link" href="https://www.ecoindex.fr/resultat/?id=${id}" target="_blank">EcoIndex</a>`;
+        sourceOfData.innerHTML = `${chrome.i18n.getMessage("sourceOfData")} <a class="team-link" href="https://www.ecoindex.fr/resultat/?id=${id}" target="_blank">EcoIndex</a>`;
         
         
     } catch (error) {
@@ -119,7 +119,7 @@ async function displayLLMImpact(url) {
     try {
         // Get data directly from storage
         const storageData = await new Promise(resolve => {
-            browser.storage.local.get(['llmInteractions', 'lastUpdated'], result => {
+            chrome.storage.local.get(['llmInteractions', 'lastUpdated'], result => {
                 resolve(result);
             });
         });
@@ -140,7 +140,7 @@ async function displayLLMImpact(url) {
     
     // If we couldn't get data from storage, fall back to messaging
     if (!llmData) {
-        llmData = await browser.runtime.sendMessage({
+        llmData = await chrome.runtime.sendMessage({
             action: "getLLMData",
             url: url
         });
@@ -154,7 +154,7 @@ async function displayLLMImpact(url) {
     
     // Update title to show LLM tracking
     const scoreTitle = findById("score-title");
-    scoreTitle.innerHTML = browser.i18n.getMessage("llmImpactTitle") || "LLM Carbon Impact:";
+    scoreTitle.innerHTML = chrome.i18n.getMessage("llmImpactTitle") || "LLM Carbon Impact:";
     
     // Get the current interaction or most recent one
     const interaction = llmData.currentInteraction || (llmData.lastInteraction || null);
@@ -204,7 +204,7 @@ async function displayLLMImpact(url) {
     
     // Show token count instead of requests
     const requestsTitle = findById("number-of-requests-title");
-    requestsTitle.innerHTML = browser.i18n.getMessage("llmTokensLabel") || "Tokens & Energy:";
+    requestsTitle.innerHTML = chrome.i18n.getMessage("llmTokensLabel") || "Tokens & Energy:";
 
     const requestsDom = findById("number-of-requests");
     if (interaction) {
@@ -251,7 +251,7 @@ async function displayLLMImpact(url) {
     
     // Update link to EcoLLM info and make it go to dashboard/settings
     const ecoIndexAnchor = findById("ecoindex-result");
-    const messageDashboard = browser.i18n.getMessage("viewImpactDashboard") || "View Impact Dashboard"
+    const messageDashboard = chrome.i18n.getMessage("viewImpactDashboard") || "View Impact Dashboard"
     ecoIndexAnchor.innerHTML = `    
         <span class="button-text">${messageDashboard}</span>
     `;
@@ -327,10 +327,10 @@ function getImpactSeverity(carbonImpact) {
 // Enhance the existing updateScore function
 function updateScore(score) {
     scoreTitle = findById("score-title");
-    scoreTitle.innerHTML = browser.i18n.getMessage("scoreTitle");
+    scoreTitle.innerHTML = chrome.i18n.getMessage("scoreTitle");
 
     scoreDom = findById("score");
-    scoreDom.innerHTML = browser.i18n.getMessage("scoreResult", [score]);
+    scoreDom.innerHTML = chrome.i18n.getMessage("scoreResult", [score]);
     
     // Add visual indicators based on score
     if (score >= 75) {
@@ -346,7 +346,7 @@ function updateScore(score) {
 
 function updateNumberOfRequests(requests) {
     requestsTitle = findById("number-of-requests-title");
-    requestsTitle.innerHTML = browser.i18n.getMessage("numberOfRequestsTitle");
+    requestsTitle.innerHTML = chrome.i18n.getMessage("numberOfRequestsTitle");
 
     requestsDom = findById("number-of-requests");
     requestsDom.innerHTML = requests;

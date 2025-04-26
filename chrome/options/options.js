@@ -62,14 +62,14 @@ const EMISSIONS_FACTORS_RANGE_TOKEN = {
 window.addEventListener('DOMContentLoaded', async (event) => {
     // header
     const header = findById('settings-header');
-    header.innerHTML = browser.i18n.getMessage("settingsHeader");
+    header.innerHTML = chrome.i18n.getMessage("settingsHeader");
 
     // header settings
     const averageMonthTitle = findById("average-month-title");
-    averageMonthTitle.innerHTML = browser.i18n.getMessage("averageMonthTitle");
+    averageMonthTitle.innerHTML = chrome.i18n.getMessage("averageMonthTitle");
 
-    const browserHistoryTitle = findById("browser-history-title");
-    browserHistoryTitle.innerHTML = browser.i18n.getMessage("browserHistoryTitle");
+    const chromeHistoryTitle = findById("chrome-history-title");
+    chromeHistoryTitle.innerHTML = chrome.i18n.getMessage("chromeHistoryTitle");
 
     // progress bar
     const gradeIconProgressBar = findById("grade-average-icon-progress-bar");
@@ -88,14 +88,14 @@ window.addEventListener('DOMContentLoaded', async (event) => {
     
     // Add clear all data button handler
     const clearButton = findById("clearLLMHistory");
-    clearButton.innerHTML = browser.i18n.getMessage("clearAllData") || "Clear All Data";
+    clearButton.innerHTML = chrome.i18n.getMessage("clearAllData") || "Clear All Data";
     clearButton.addEventListener('click', async () => {
         // Clear website history
-        await browser.storage.local.clear();
+        await chrome.storage.local.clear();
         localStorage.clear();
         
         // Clear LLM data
-        await browser.runtime.sendMessage({
+        await chrome.runtime.sendMessage({
             action: "clearLLMData"
         });
         
@@ -136,7 +136,7 @@ function renderTable(rows, currentPage) {
 
     //pagination (items per page)
     const paginationLabel = findById("paginate-by-label");
-    paginationLabel.innerHTML = browser.i18n.getMessage("paginateBy");
+    paginationLabel.innerHTML = chrome.i18n.getMessage("paginateBy");
 
     const paginationSelect = findById("select-paginate-by");
     paginationSelect.addEventListener('change', (event) => {
@@ -157,23 +157,23 @@ function createHead() {
 
     const thLink = document.createElement("th");
     thLink.setAttribute("scope", "col");
-    thLink.innerHTML = browser.i18n.getMessage("linkTable");
+    thLink.innerHTML = chrome.i18n.getMessage("linkTable");
 
     const thGrade = document.createElement("th");
     thGrade.setAttribute("scope", "col");
-    thGrade.innerHTML = browser.i18n.getMessage("gradeTable");
+    thGrade.innerHTML = chrome.i18n.getMessage("gradeTable");
 
     const thScore = document.createElement("th");
     thScore.setAttribute("scope", "col");
-    thScore.innerHTML = browser.i18n.getMessage("scoreTable");
+    thScore.innerHTML = chrome.i18n.getMessage("scoreTable");
 
     const thRequests = document.createElement("th");
     thRequests.setAttribute("scope", "col");
-    thRequests.innerHTML = browser.i18n.getMessage("nbRequestsTable");
+    thRequests.innerHTML = chrome.i18n.getMessage("nbRequestsTable");
 
     const thVisitedAt = document.createElement("th");
     thVisitedAt.setAttribute("scope", "col");
-    thVisitedAt.innerHTML = browser.i18n.getMessage("visitedAtTable");
+    thVisitedAt.innerHTML = chrome.i18n.getMessage("visitedAtTable");
 
     tr.appendChild(thGrade);
     tr.appendChild(thLink);
@@ -284,13 +284,13 @@ function prettyDate(time) {
     if (isNaN(day_diff) || day_diff < 0 || day_diff >= 31) return;
 
     return day_diff == 0 && (
-    diff < 60 && browser.i18n.getMessage("now") 
-    || diff < 120 && browser.i18n.getMessage("minute")
-    || diff < 3600 && browser.i18n.getMessage("minutes", [Math.floor(diff / 60)])
-    || diff < 7200 &&  browser.i18n.getMessage("hour")
-    || diff < 86400 && browser.i18n.getMessage("hours", [Math.floor(diff / 3600)])) 
-    || day_diff == 1 && browser.i18n.getMessage("yesterday") || day_diff < 7 && browser.i18n.getMessage("days", [day_diff]) 
-    || day_diff < 31 && browser.i18n.getMessage("weeks", [Math.ceil(day_diff / 7)]);
+    diff < 60 && chrome.i18n.getMessage("now") 
+    || diff < 120 && chrome.i18n.getMessage("minute")
+    || diff < 3600 && chrome.i18n.getMessage("minutes", [Math.floor(diff / 60)])
+    || diff < 7200 &&  chrome.i18n.getMessage("hour")
+    || diff < 86400 && chrome.i18n.getMessage("hours", [Math.floor(diff / 3600)])) 
+    || day_diff == 1 && chrome.i18n.getMessage("yesterday") || day_diff < 7 && chrome.i18n.getMessage("days", [day_diff]) 
+    || day_diff < 31 && chrome.i18n.getMessage("weeks", [Math.ceil(day_diff / 7)]);
 }
 
 function computeAverageNote(rowsSortedByVisitedAt, fromDate, toDate) {
@@ -407,18 +407,18 @@ async function setupLLMImpactSection() {
     llmImpactTitle.innerHTML = `
         <div class="section-header">
             <i class="impact-icon"></i>
-            <h2>${browser.i18n.getMessage("llmImpactTitle") || "LLM Impact"}</h2>
+            <h2>${chrome.i18n.getMessage("llmImpactTitle") || "LLM Impact"}</h2>
         </div>
     `;
     
     // Set up other labels
     const labels = {
-        'llm-carbon-label': 'Total Carbon (gCO2eq)',
-        'llm-interactions-label': 'Interactions',
-        'llm-tokens-label': 'Total Tokens',
+        'llmCarbonLabel': 'Total Carbon (gCO2eq)',
+        'llmInteractionsLabel': 'Interactions',
+        'llmTokensLabel': 'Total Tokens',
         'llm-energy-label': 'Energy (Wh)',
-        'llm-equivalent-title': 'Environmental Equivalent',
-        'llm-energy-equivalent-title': 'Energy Equivalent'
+        'llmEquivalentTitle': 'Environmental Equivalent',
+        'llmEnergyEquivalentTitle': 'Energy Equivalent'
     };
     
     Object.entries(labels).forEach(([id, defaultText]) => {
@@ -426,7 +426,7 @@ async function setupLLMImpactSection() {
         if (element) {
             element.innerHTML = `
                 <span class="label-icon ${id.replace('-label', '')}-icon"></span>
-                <span class="label-text">${browser.i18n.getMessage(id) || defaultText}</span>
+                <span class="label-text">${chrome.i18n.getMessage(id) || defaultText}</span>
             `;
         }
     });
@@ -435,14 +435,14 @@ async function setupLLMImpactSection() {
     const clearLLMButton = findById("clearLLMHistory");
     clearLLMButton.innerHTML = `
         <span class="button-icon clear-icon"></span>
-        <span class="button-text">${browser.i18n.getMessage("clearLLMHistory") || "Clear LLM History"}</span>
+        <span class="button-text">${chrome.i18n.getMessage("clearLLMHistory") || "Clear LLM History"}</span>
     `;
     
     try {
         console.log("Requesting LLM statistics...");
         
         // Get LLM data from storage
-        const storage = await browser.storage.local.get(['llmInteractions']);
+        const storage = await chrome.storage.local.get(['llmInteractions']);
         console.log("Retrieved storage data:", storage);
         
         if (!storage || !storage.llmInteractions || Object.keys(storage.llmInteractions).length === 0) {
@@ -516,7 +516,7 @@ async function setupLLMImpactSection() {
         
         // Update storage if needed
         if (needsUpdate) {
-            await browser.storage.local.set({ llmInteractions: storage.llmInteractions });
+            await chrome.storage.local.set({ llmInteractions: storage.llmInteractions });
         }
         
         // Update UI with calculated statistics
@@ -568,12 +568,12 @@ function updateStats(carbonImpact, energyImpact, interactionsCount, totalTokens,
     comparisonsElement.innerHTML = ''; // Clear existing content
     
     addComparisonItem(comparisonsElement, 
-        browser.i18n.getMessage("carTravelLabel") || 'Car Travel', 
+        chrome.i18n.getMessage("carTravelLabel") || 'Car Travel', 
         `${comparisons.carKilometers.toFixed(4)} km`, 
         'car-icon.svg');
     
     addComparisonItem(comparisonsElement, 
-        browser.i18n.getMessage("coffeeCupsLabel") || 'Liter of Coffee', 
+        chrome.i18n.getMessage("coffeeCupsLabel") || 'Liter of Coffee', 
         `${comparisons.coffeeCups.toFixed(4)}`, 
         'coffee-icon.svg');
     
@@ -583,12 +583,12 @@ function updateStats(carbonImpact, energyImpact, interactionsCount, totalTokens,
         energyComparisonsElement.innerHTML = ''; // Clear existing content
         
         addComparisonItem(energyComparisonsElement, 
-            browser.i18n.getMessage("smartphoneChargesEnergyLabel") || 'Smartphone Charges', 
+            chrome.i18n.getMessage("smartphoneChargesEnergyLabel") || 'Smartphone Charges', 
             `${energyComparisons.smartphoneCharges.toFixed(4)}`, 
             'smartphone-icon.svg');
         
         addComparisonItem(energyComparisonsElement, 
-            browser.i18n.getMessage("ledBulbHoursLabel") || 'LED Bulb Hours', 
+            chrome.i18n.getMessage("ledBulbHoursLabel") || 'LED Bulb Hours', 
             `${energyComparisons.ledBulbHours.toFixed(4)}`, 
             'bulb-solid.svg');
     }
@@ -618,12 +618,12 @@ function updateEmptyStats() {
     comparisonsElement.innerHTML = ''; // Clear existing content
     
     addComparisonItem(comparisonsElement, 
-        browser.i18n.getMessage("carTravelLabel") || 'Car Travel', 
+        chrome.i18n.getMessage("carTravelLabel") || 'Car Travel', 
         "0.0000 km", 
         'car-icon.svg');
     
     addComparisonItem(comparisonsElement, 
-        browser.i18n.getMessage("coffeeCupsLabel") || 'Cups of Coffee', 
+        chrome.i18n.getMessage("coffeeCupsLabel") || 'Cups of Coffee', 
         "0.0000", 
         'coffee-icon.svg');
     
@@ -633,19 +633,19 @@ function updateEmptyStats() {
         energyComparisonsElement.innerHTML = ''; // Clear existing content
         
         addComparisonItem(energyComparisonsElement, 
-            browser.i18n.getMessage("smartphoneChargesEnergyLabel") || 'Smartphone Charges', 
+            chrome.i18n.getMessage("smartphoneChargesEnergyLabel") || 'Smartphone Charges', 
             "0.0000", 
             'smartphone-icon.svg');
         
         addComparisonItem(energyComparisonsElement, 
-            browser.i18n.getMessage("ledBulbHoursLabel") || 'LED Bulb Hours', 
+            chrome.i18n.getMessage("ledBulbHoursLabel") || 'LED Bulb Hours', 
             "0.0000", 
             'bulb-solid.svg');
     }
     
     // Display empty chart message
     const chartContainer = findById('llm-chart-container');
-    chartContainer.innerHTML = `<p class="no-data-message">${browser.i18n.getMessage("noLLMDataAvailable") || 'No LLM usage data available yet.'}</p>`;
+    chartContainer.innerHTML = `<p class="no-data-message">${chrome.i18n.getMessage("noLLMDataAvailable") || 'No LLM usage data available yet.'}</p>`;
 }
 
 function addComparisonItem(container, label, value, iconSrc) {
@@ -682,7 +682,7 @@ function renderLLMServiceChart(serviceData) {
     if (!serviceData || Object.keys(serviceData).length === 0) {
         chartContainer.innerHTML = `
             <div class="no-data-message">
-                <p>${browser.i18n.getMessage("noLLMDataAvailable") || 'No LLM usage data available yet.'}</p>
+                <p>${chrome.i18n.getMessage("noLLMDataAvailable") || 'No LLM usage data available yet.'}</p>
                 <small style="color: #666; margin-top: 8px; display: block;">Start using AI services to see your impact.</small>
             </div>`;
         return;
@@ -698,9 +698,9 @@ function renderLLMServiceChart(serviceData) {
     chartTitle.innerHTML = `
         <h4>
             <span class="chart-icon carbon-icon"></span>
-            ${browser.i18n.getMessage("llmServiceBreakdownTitle") || "Service Carbon Impact Breakdown"}
+            ${chrome.i18n.getMessage("llmServiceBreakdownTitle") || "Service Carbon Impact Breakdown"}
         </h4>
-        <p class="chart-subtitle">${browser.i18n.getMessage("basedOnEcologits") || "Based on Ecologits emission factors"}</p>
+        <p class="chart-subtitle">${chrome.i18n.getMessage("basedOnEcologits") || "Based on Ecologits emission factors"}</p>
     `;
     chartSection.appendChild(chartTitle);
     
@@ -710,11 +710,11 @@ function renderLLMServiceChart(serviceData) {
     legend.innerHTML = `
         <div class="legend-item">
             <span class="legend-color carbon-color"></span>
-            <span class="legend-label">${browser.i18n.getMessage("carbonImpact") || "Carbon Impact"} (gCO2eq)</span>
+            <span class="legend-label">${chrome.i18n.getMessage("carbonImpact") || "Carbon Impact"} (gCO2eq)</span>
         </div>
         <div class="legend-item">
             <span class="legend-color energy-color"></span>
-            <span class="legend-label">${browser.i18n.getMessage("energyImpact") || "Energy Impact"} (Wh)</span>
+            <span class="legend-label">${chrome.i18n.getMessage("energyImpact") || "Energy Impact"} (Wh)</span>
         </div>
     `;
     chartSection.appendChild(legend);
@@ -750,7 +750,7 @@ function renderLLMServiceChart(serviceData) {
             <div class="service-label">
                 <span class="service-icon ${serviceIconClass}"></span>
                 <span class="service-name">${service}</span>
-                <span class="service-count">(${info.count} ${browser.i18n.getMessage("interactions") || "interactions"})</span>
+                <span class="service-count">(${info.count} ${chrome.i18n.getMessage("interactions") || "interactions"})</span>
             </div>
             <div class="impact-bars-container">
                 <div class="bar-wrapper">
@@ -782,15 +782,15 @@ function createServiceChart(container, serviceData, impactType, unit) {
     chartTitle.className = 'chart-title animated fadeIn';
     
     const titleText = impactType === 'carbonImpact' 
-        ? (browser.i18n.getMessage("llmServiceBreakdownTitle") || "Service Carbon Impact Breakdown")
-        : (browser.i18n.getMessage("llmServiceEnergyBreakdownTitle") || "Service Energy Impact Breakdown");
+        ? (chrome.i18n.getMessage("llmServiceBreakdownTitle") || "Service Carbon Impact Breakdown")
+        : (chrome.i18n.getMessage("llmServiceEnergyBreakdownTitle") || "Service Energy Impact Breakdown");
     
     chartTitle.innerHTML = `
         <h4>
             <span class="chart-icon ${impactType === 'carbonImpact' ? 'carbon-icon' : 'energy-icon'}"></span>
             ${titleText}
         </h4>
-        <p class="chart-subtitle">${browser.i18n.getMessage("basedOnEcologits") || "Based on Ecologits emission factors"}</p>
+        <p class="chart-subtitle">${chrome.i18n.getMessage("basedOnEcologits") || "Based on Ecologits emission factors"}</p>
     `;
     container.appendChild(chartTitle);
     
@@ -845,7 +845,7 @@ function createServiceChart(container, serviceData, impactType, unit) {
         value.className = 'bar-value';
         value.innerHTML = `
             <span class="impact-value">${serviceInfo[impactType].toFixed(2)} ${unit}</span>
-            <small>(${serviceInfo.count} ${browser.i18n.getMessage("interactions") || "interactions"})</small>
+            <small>(${serviceInfo.count} ${chrome.i18n.getMessage("interactions") || "interactions"})</small>
         `;
         
         barWrapper.appendChild(bar);
