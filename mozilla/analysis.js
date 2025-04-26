@@ -313,11 +313,31 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return Promise.resolve({status: "not an LLM site"});
     }
 
+    // Add this to your browser.runtime.onMessage handler
+
+    if (message.action === "refreshLLMData") {
+        console.log("🌱 Refreshing LLM data for:", message.url);
+        
+        // Find the tab that contains this URL
+        return browser.tabs.query({url: message.url}).then(async (tabs) => {
+            if (tabs.length > 0) {
+                // Re-inject the content script to ensure data is current
+                try {
+                    await injectContentScript(tabs[0].id, "/llm-impact/content-script.js");
+                    return {status: "refreshed"};
+                } catch (err) {
+                    console.error("Failed to refresh LLM data:", err);
+                    return {status: "error", message: err.message};
+                }
+            }
+            return {status: "no matching tab"};
+        });
+    }
+
     console.log("🌱 Action non reconnue:", message.action);
     return false;
 });
 
-// Dans background.js
 browser.runtime.onMessage.addListener((message, sender) => {
   if (message.action === "ensureIconVisible") {
     // Mettre à jour l'icône basée sur l'URL

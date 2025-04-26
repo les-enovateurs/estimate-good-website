@@ -98,7 +98,7 @@
     "message": "Nombre de requêtes: "
   },
   "sourceOfData": {
-    "message": "source: Ecoindex"
+    "message": "source:"
   },
   "settings": {
     "message": "Options"
@@ -110,7 +110,7 @@
     "message": "Charges de smartphone"
   },
   "coffeeCupsLabel": {
-    "message": "Tasses de café"
+    "message": "Litres de café"
   },
   "noLLMDataAvailable": {
     "message": "Aucune donnée d'utilisation des LLM disponible pour l'instant."

@@ -1,6 +1,64 @@
 // variables
 let itemsPerPage = 10;
 
+// Add the constants from popup.js at the top of the file
+const EMISSIONS_FACTORS_RANGE_TOKEN = {
+    "openai": {
+        //openai/claude/gemini/default
+        50: {
+            "energy": 4.39,
+            "gCO2eq": 2.68
+        },
+        170: {
+            "energy": 14.9,
+            "gCO2eq": 9.11
+        },
+        250: {
+            "energy": 21.9,
+            "gCO2eq": 13.4
+        },
+        400: {
+            "energy": 35.1,
+            "gCO2eq": 21.4
+        },
+        5000: {
+            "energy": 439,
+            "gCO2eq": 268
+        },
+        15000: {
+            "energy": 1320,
+            "gCO2eq": 803
+        }
+    },
+    "meta": {
+        //meta/llama3...
+        50: {
+            "energy": 4.39,
+            "gCO2eq": 2.68
+        },
+        170: {
+            "energy": 14.9,
+            "gCO2eq": 9.11
+        },
+        250: {
+            "energy": 21.9,
+            "gCO2eq": 13.4
+        },
+        400: {
+            "energy": 35.1,
+            "gCO2eq": 21.4
+        },
+        5000: {
+            "energy": 1190,
+            "gCO2eq": 727
+        },
+        15000: {
+            "energy": 3580,
+            "gCO2eq": 2180
+        }
+    }
+};
+
 window.addEventListener('DOMContentLoaded', async (event) => {
     // listener
     const removeHistoryButton = findById("clearHistory");
@@ -340,150 +398,295 @@ function findById(id) {
 async function setupLLMImpactSection() {
     // Set up internationalized text labels with improved formatting
     const llmImpactTitle = findById("llm-impact-title");
-    llmImpactTitle.innerHTML = `<i class="impact-icon"></i>${browser.i18n.getMessage("llmImpactTitle") || "LLM Impact"}`;
+    llmImpactTitle.innerHTML = `
+        <div class="section-header">
+            <i class="impact-icon pulse"></i>
+            <h2>${browser.i18n.getMessage("llmImpactTitle") || "LLM Impact"}</h2>
+        </div>
+    `;
     
     // Create a more structured stats display with visual indicators
     const llmCarbonLabel = findById("llm-carbon-label");
     llmCarbonLabel.innerHTML = `
-        <span class="label-icon carbon-icon"></span>
+        <span class="label-icon carbon-icon pulse-slow"></span>
         <span class="label-text">${browser.i18n.getMessage("llmCarbonLabel") || "Total Carbon (gCO2eq)"}</span>
     `;
     
     const llmInteractionsLabel = findById("llm-interactions-label");
     llmInteractionsLabel.innerHTML = `
-        <span class="label-icon interactions-icon"></span>
+        <span class="label-icon interactions-icon pulse-slow"></span>
         <span class="label-text">${browser.i18n.getMessage("llmInteractionsLabel") || "Interactions"}</span>
     `;
     
     const llmTokensLabel = findById("llm-tokens-label");
     llmTokensLabel.innerHTML = `
-        <span class="label-icon tokens-icon"></span>
+        <span class="label-icon tokens-icon pulse-slow"></span>
         <span class="label-text">${browser.i18n.getMessage("llmTokensLabel") || "Total Tokens"}</span>
     `;
     
     const llmEnergyLabel = findById("llm-energy-label");
     if (llmEnergyLabel) {
         llmEnergyLabel.innerHTML = `
-            <span class="label-icon energy-icon"></span>
+            <span class="label-icon energy-icon pulse-slow"></span>
             <span class="label-text">${browser.i18n.getMessage("llmEnergyLabel") || "Energy (Wh)"}</span>
         `;
     }
     
-    // Improve section headers with icons
+    // Improve section headers with icons and better hierarchy
     const llmEquivalentTitle = findById("llm-equivalent-title");
     llmEquivalentTitle.innerHTML = `
-        <span class="section-icon equivalent-icon"></span>
-        ${browser.i18n.getMessage("llmEquivalentTitle") || "Environmental Equivalent"}
+        <div class="subsection-header">
+            <span class="section-icon equivalent-icon"></span>
+            <h3>${browser.i18n.getMessage("llmEquivalentTitle") || "Environmental Equivalent"}</h3>
+        </div>
     `;
     
     const llmEnergyEquivalentTitle = findById("llm-energy-equivalent-title");
     if (llmEnergyEquivalentTitle) {
         llmEnergyEquivalentTitle.innerHTML = `
-            <span class="section-icon energy-equivalent-icon"></span>
-            ${browser.i18n.getMessage("llmEnergyEquivalentTitle") || "Energy Equivalent"}
+            <div class="subsection-header">
+                <span class="section-icon energy-equivalent-icon"></span>
+                <h3>${browser.i18n.getMessage("llmEnergyEquivalentTitle") || "Energy Equivalent"}</h3>
+            </div>
         `;
     }
     
-    // Make the button more visually appealing with an icon
+    // Make the button more visually appealing with an icon and hover effect
     const clearLLMButton = findById("clearLLMHistory");
     clearLLMButton.innerHTML = `
         <span class="button-icon clear-icon"></span>
-        ${browser.i18n.getMessage("clearLLMHistory") || "Clear LLM History"}
+        <span class="button-text">${browser.i18n.getMessage("clearLLMHistory") || "Clear LLM History"}</span>
     `;
     
     console.log("Requesting LLM statistics...");
     try {
-        const llmStats = await browser.runtime.sendMessage({
-            action: "getLLMStatistics"
+        // Directly access browser storage to get the LLM interactions data
+        const storage = await browser.storage.local.get(['llmInteractions']);
+        
+        if (!storage || !storage.llmInteractions || Object.keys(storage.llmInteractions).length === 0) {
+            console.log("No LLM data found in storage");
+            // Display placeholders or empty state
+            updateEmptyStats();
+            return;
+        }
+        
+        // Calculate statistics directly from the raw data
+        const interactions = Object.values(storage.llmInteractions);
+        console.log(`Processing ${interactions.length} LLM interactions`);
+        
+        // Initialize accumulators
+        let totalCarbonImpact = 0;
+        let totalEnergyImpact = 0;
+        let totalInputTokens = 0;
+        let totalOutputTokens = 0;
+        let serviceBreakdown = {};
+        
+        // Process each interaction and accumulate totals
+        interactions.forEach(interaction => {
+            // Calculate impact values if they don't exist (using same approach as popup.js)
+            const inputTokens = interaction.inputTokens || 0;
+            const outputTokens = interaction.outputTokens || 0;
+            
+            // If carbon/energy impact is missing, calculate it based on tokens
+            if (!interaction.carbonImpact || !interaction.energyImpact) {
+                const totalTokens = inputTokens + outputTokens;
+                // Get service type for different emission factors
+                let serviceType = "openai"; // Default
+                if (interaction.service && interaction.service.toLowerCase().includes("meta")) {
+                    serviceType = "meta";
+                }
+                
+                // Find the appropriate emission factor based on token count
+                let emissionFactor = null;
+                for (const tokenThreshold of [15000, 5000, 400, 250, 170, 50]) {
+                    if (totalTokens <= tokenThreshold) {
+                        emissionFactor = EMISSIONS_FACTORS_RANGE_TOKEN[serviceType][tokenThreshold];
+                    }
+                }
+                
+                // If no match found (very unlikely), use the highest threshold
+                if (!emissionFactor) {
+                    emissionFactor = EMISSIONS_FACTORS_RANGE_TOKEN[serviceType][15000];
+                }
+                
+                // Scale the impact based on actual token count
+                interaction.carbonImpact = (totalTokens / 1000) * emissionFactor.gCO2eq;
+                interaction.energyImpact = (totalTokens / 1000) * emissionFactor.energy;
+            }
+            
+            // Accumulate tokens
+            totalInputTokens += inputTokens;
+            totalOutputTokens += outputTokens;
+            
+            // Add carbon and energy impact
+            totalCarbonImpact += (interaction.carbonImpact || 0);
+            totalEnergyImpact += (interaction.energyImpact || 0);
+            
+            // Track service usage for breakdown chart
+            const service = interaction.service || 'Unknown LLM';
+            if (!serviceBreakdown[service]) {
+                serviceBreakdown[service] = {
+                    count: 0,
+                    carbonImpact: 0,
+                    energyImpact: 0
+                };
+            }
+            
+            serviceBreakdown[service].count += 1;
+            serviceBreakdown[service].carbonImpact += (interaction.carbonImpact || 0);
+            serviceBreakdown[service].energyImpact += (interaction.energyImpact || 0);
         });
         
-        console.log("Received LLM statistics:", llmStats);
-        
-        if (!llmStats) return;
-        
-        // Update the statistics values
-        const totalCarbonElement = findById("llm-total-carbon");
-        
-        // Add this null check and default value:
-        const carbonImpact = llmStats.totalCarbonImpact || 0;
-        totalCarbonElement.textContent = carbonImpact.toFixed(6);
-        
-        // Afficher la consommation d'énergie
-        const totalEnergyElement = findById("llm-total-energy");
-        if (totalEnergyElement) {
-            const energyImpact = llmStats.totalEnergyImpact || 0;
-            totalEnergyElement.textContent = energyImpact.toFixed(6);
-        }
-        
-        const interactionsElement = findById("llm-interactions");
-        interactionsElement.textContent = llmStats.totalInteractions || 0;
-        
-        const tokensElement = findById("llm-tokens");
-        const totalTokens = (llmStats.totalInputTokens || 0) + (llmStats.totalOutputTokens || 0);
-        tokensElement.textContent = totalTokens.toLocaleString();
-        
-        // Update comparisons with null checks
-        const comparisonsElement = findById("llm-comparisons-list");
-        comparisonsElement.innerHTML = ''; // Clear existing content
-        
-        if (llmStats.comparisons) {
-            addComparisonItem(comparisonsElement, 
-                browser.i18n.getMessage("carTravelLabel") || 'Car Travel', 
-                `${(llmStats.comparisons.carKilometers || 0).toFixed(4)} km`, 
-                'car-icon.svg');
-            
-            addComparisonItem(comparisonsElement, 
-                browser.i18n.getMessage("smartphoneChargesLabel") || 'Smartphone Charges', 
-                `${(llmStats.comparisons.smartphoneCharges || 0).toFixed(4)}`, 
-                'smartphone-icon.svg');
-            
-            addComparisonItem(comparisonsElement, 
-                browser.i18n.getMessage("coffeeCupsLabel") || 'Cups of Coffee', 
-                `${(llmStats.comparisons.coffeeCups || 0).toFixed(4)}`, 
-                'coffee-icon.svg');
-        }
-        
-        // Afficher les comparaisons d'énergie
-        const energyComparisonsElement = findById("llm-energy-comparisons-list");
-        if (energyComparisonsElement && llmStats.energyComparisons) {
-            energyComparisonsElement.innerHTML = ''; // Clear existing content
-            
-            addComparisonItem(energyComparisonsElement, 
-                browser.i18n.getMessage("smartphoneChargesEnergyLabel") || 'Smartphone Charges', 
-                `${(llmStats.energyComparisons.smartphoneCharges || 0).toFixed(4)}`, 
-                'smartphone-icon.svg');
-            
-            addComparisonItem(energyComparisonsElement, 
-                browser.i18n.getMessage("ledBulbHoursLabel") || 'LED Bulb Hours', 
-                `${(llmStats.energyComparisons.ledBulbHours || 0).toFixed(4)}`, 
-                'bulb-icon.svg');
-            
-            addComparisonItem(energyComparisonsElement, 
-                browser.i18n.getMessage("laptopMinutesLabel") || 'Laptop Minutes', 
-                `${(llmStats.energyComparisons.laptopMinutes || 0).toFixed(4)}`, 
-                'laptop-icon.svg');
-        }
-        
-        // Generate chart of service breakdown
-        renderLLMServiceChart(llmStats.serviceBreakdown || {});
+        // Update the UI with the calculated statistics
+        updateStats(
+            totalCarbonImpact, 
+            totalEnergyImpact, 
+            interactions.length, 
+            totalInputTokens + totalOutputTokens,
+            serviceBreakdown
+        );
     } catch (error) {
-        console.error("Error fetching LLM statistics:", error);
+        console.error("Error calculating LLM statistics:", error);
+        updateEmptyStats();
     }
+}
+
+// Helper function to update UI with calculated stats
+function updateStats(carbonImpact, energyImpact, interactionsCount, totalTokens, serviceBreakdown) {
+    // Update the basic stats
+    const totalCarbonElement = findById("llm-total-carbon");
+    totalCarbonElement.textContent = carbonImpact.toFixed(2);
+    
+    const totalEnergyElement = findById("llm-total-energy");
+    if (totalEnergyElement) {
+        totalEnergyElement.textContent = energyImpact.toFixed(2);
+    }
+    
+    const interactionsElement = findById("llm-interactions");
+    interactionsElement.textContent = interactionsCount;
+    
+    const tokensElement = findById("llm-tokens");
+    tokensElement.textContent = totalTokens.toLocaleString();
+    
+    // Calculate environmental equivalents
+    const comparisons = {
+        carKilometers: carbonImpact / 110, // 110 CO2 per km average car - https://impactco2.fr/outils/transport
+        coffeeCups: carbonImpact / 635      // 635g CO2 per liter of coffee - https://impactco2.fr/outils/boisson/cafe
+    };
+    
+    // Calculate energy equivalents
+    const energyComparisons = {
+        smartphoneCharges: energyImpact / 10, // 10Wh per smartphone charge - https://www.edf.fr/groupe-edf/comprendre/electricite-au-quotidien/usages/que-peut-on-faire-avec-1-kwh
+        ledBulbHours: energyImpact / 7        // 7Wh per hour of LED bulb usage - https://particuliers.engie.fr/economies-energie/conseils-economies-energie/conseils-calcul-consommation/consommation-ampoule.html#paraun
+    };
+    
+    // Update comparisons section
+    const comparisonsElement = findById("llm-comparisons-list");
+    comparisonsElement.innerHTML = ''; // Clear existing content
+    
+    addComparisonItem(comparisonsElement, 
+        browser.i18n.getMessage("carTravelLabel") || 'Car Travel', 
+        `${comparisons.carKilometers.toFixed(4)} km`, 
+        'car-icon.svg');
+    
+    addComparisonItem(comparisonsElement, 
+        browser.i18n.getMessage("coffeeCupsLabel") || 'Liter of Coffee', 
+        `${comparisons.coffeeCups.toFixed(4)}`, 
+        'coffee-icon.svg');
+    
+    // Update energy comparisons section if it exists
+    const energyComparisonsElement = findById("llm-energy-comparisons-list");
+    if (energyComparisonsElement) {
+        energyComparisonsElement.innerHTML = ''; // Clear existing content
+        
+        addComparisonItem(energyComparisonsElement, 
+            browser.i18n.getMessage("smartphoneChargesEnergyLabel") || 'Smartphone Charges', 
+            `${energyComparisons.smartphoneCharges.toFixed(4)}`, 
+            'smartphone-icon.svg');
+        
+        addComparisonItem(energyComparisonsElement, 
+            browser.i18n.getMessage("ledBulbHoursLabel") || 'LED Bulb Hours', 
+            `${energyComparisons.ledBulbHours.toFixed(4)}`, 
+            'bulb-solid.svg');
+    }
+    
+    // Generate service breakdown chart
+    renderLLMServiceChart(serviceBreakdown);
+}
+
+// Helper function to display empty state
+function updateEmptyStats() {
+    const totalCarbonElement = findById("llm-total-carbon");
+    totalCarbonElement.textContent = "0.00";
+    
+    const totalEnergyElement = findById("llm-total-energy");
+    if (totalEnergyElement) {
+        totalEnergyElement.textContent = "0.00";
+    }
+    
+    const interactionsElement = findById("llm-interactions");
+    interactionsElement.textContent = "0";
+    
+    const tokensElement = findById("llm-tokens");
+    tokensElement.textContent = "0";
+    
+    // Update comparisons with zeros
+    const comparisonsElement = findById("llm-comparisons-list");
+    comparisonsElement.innerHTML = ''; // Clear existing content
+    
+    addComparisonItem(comparisonsElement, 
+        browser.i18n.getMessage("carTravelLabel") || 'Car Travel', 
+        "0.0000 km", 
+        'car-icon.svg');
+    
+    addComparisonItem(comparisonsElement, 
+        browser.i18n.getMessage("coffeeCupsLabel") || 'Cups of Coffee', 
+        "0.0000", 
+        'coffee-icon.svg');
+    
+    // Update energy comparisons
+    const energyComparisonsElement = findById("llm-energy-comparisons-list");
+    if (energyComparisonsElement) {
+        energyComparisonsElement.innerHTML = ''; // Clear existing content
+        
+        addComparisonItem(energyComparisonsElement, 
+            browser.i18n.getMessage("smartphoneChargesEnergyLabel") || 'Smartphone Charges', 
+            "0.0000", 
+            'smartphone-icon.svg');
+        
+        addComparisonItem(energyComparisonsElement, 
+            browser.i18n.getMessage("ledBulbHoursLabel") || 'LED Bulb Hours', 
+            "0.0000", 
+            'bulb-solid.svg');
+    }
+    
+    // Display empty chart message
+    const chartContainer = findById('llm-chart-container');
+    chartContainer.innerHTML = `<p class="no-data-message">${browser.i18n.getMessage("noLLMDataAvailable") || 'No LLM usage data available yet.'}</p>`;
 }
 
 function addComparisonItem(container, label, value, iconSrc) {
     const item = document.createElement('div');
-    item.className = 'comparison-item';
+    item.className = 'comparison-item fade-in';
     
     item.innerHTML = `
-        <div class="comparison-icon">
-            <img src="../icons/${iconSrc}" alt="${label}" />
+        <div class="comparison-icon-wrapper">
+            <img src="../icons/${iconSrc}" alt="${label}" class="comparison-icon icon-background" />
         </div>
         <div class="comparison-info">
             <div class="comparison-label">${label}</div>
-            <div class="comparison-value">${value}</div>
+            <div class="comparison-value highlight">${value}</div>
         </div>
     `;
+    
+    // Add hover effect
+    item.addEventListener('mouseenter', () => {
+        item.classList.add('comparison-hover');
+    });
+    
+    item.addEventListener('mouseleave', () => {
+        item.classList.remove('comparison-hover');
+    });
     
     container.appendChild(item);
 }
@@ -498,66 +701,156 @@ function renderLLMServiceChart(serviceData) {
         return;
     }
     
-    // Créer le conteneur d'onglets
-    const tabsContainer = document.createElement('div');
-    tabsContainer.className = 'tabs-container';
+    // Create a single chart container that will hold both types of impacts
+    const chartSection = document.createElement('div');
+    chartSection.className = 'llm-chart-section';
     
-    // Créer les onglets
-    const tabBar = document.createElement('div');
-    tabBar.className = 'tab-bar';
+    // Add chart title with improved styling
+    const chartTitle = document.createElement('div');
+    chartTitle.className = 'chart-title animated fadeIn';
+    chartTitle.innerHTML = `
+        <h4>
+            <span class="chart-icon carbon-icon"></span>
+            ${browser.i18n.getMessage("llmServiceBreakdownTitle") || "Service Impact Breakdown"}
+        </h4>
+        <p class="chart-subtitle">${browser.i18n.getMessage("basedOnEcologits") || "Based on Ecologits emission factors"}</p>
+    `;
+    chartSection.appendChild(chartTitle);
     
-    const carbonTab = document.createElement('div');
-    carbonTab.className = 'tab active';
-    carbonTab.textContent = browser.i18n.getMessage("carbonTabLabel") || 'Carbon Impact';
-    carbonTab.dataset.tab = 'carbon';
+    // Create the legend
+    const legend = document.createElement('div');
+    legend.className = 'chart-legend';
+    legend.innerHTML = `
+        <div class="legend-item">
+            <span class="legend-color carbon-color"></span>
+            <span class="legend-label">${browser.i18n.getMessage("carbonImpact") || "Carbon Impact"} (gCO2eq)</span>
+        </div>
+        <div class="legend-item">
+            <span class="legend-color energy-color"></span>
+            <span class="legend-label">${browser.i18n.getMessage("energyImpact") || "Energy Impact"} (Wh)</span>
+        </div>
+    `;
+    chartSection.appendChild(legend);
     
-    const energyTab = document.createElement('div');
-    energyTab.className = 'tab';
-    energyTab.textContent = browser.i18n.getMessage("energyTabLabel") || 'Energy Impact';
-    energyTab.dataset.tab = 'energy';
+    // Create bar chart container
+    const chart = document.createElement('div');
+    chart.className = 'llm-dual-bar-chart';
     
-    tabBar.appendChild(carbonTab);
-    tabBar.appendChild(energyTab);
-    tabsContainer.appendChild(tabBar);
+    // Find the max values for scaling - Ajout d'une valeur minimale pour éviter une division par zéro
+    let maxCarbonImpact = 0.01;
+    let maxEnergyImpact = 0.01;
     
-    // Créer les contenus des onglets
-    const tabContents = document.createElement('div');
-    tabContents.className = 'tab-contents';
+    for (const service in serviceData) {
+        maxCarbonImpact = Math.max(maxCarbonImpact, serviceData[service].carbonImpact || 0);
+        maxEnergyImpact = Math.max(maxEnergyImpact, serviceData[service].energyImpact || 0);
+    }
     
-    // Contenu de l'onglet Carbon
-    const carbonContent = document.createElement('div');
-    carbonContent.className = 'tab-content active';
-    carbonContent.dataset.tab = 'carbon';
+    // Ajouter un log pour debugging
+    console.log("Max Carbon Impact:", maxCarbonImpact);
+    console.log("Max Energy Impact:", maxEnergyImpact);
     
-    // Contenu de l'onglet Energy
-    const energyContent = document.createElement('div');
-    energyContent.className = 'tab-content';
-    energyContent.dataset.tab = 'energy';
-    
-    tabContents.appendChild(carbonContent);
-    tabContents.appendChild(energyContent);
-    tabsContainer.appendChild(tabContents);
-    
-    chartContainer.appendChild(tabsContainer);
-    
-    // Event listeners for tabs
-    carbonTab.addEventListener('click', () => {
-        document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-        carbonTab.classList.add('active');
-        carbonContent.classList.add('active');
+    // Sort services by carbon impact for consistent ordering
+    const sortedServices = Object.keys(serviceData).sort((a, b) => {
+        return (serviceData[b].carbonImpact || 0) - (serviceData[a].carbonImpact || 0);
     });
     
-    energyTab.addEventListener('click', () => {
-        document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-        energyTab.classList.add('active');
-        energyContent.classList.add('active');
+    // Créer une section pour le débogage
+    const debugInfo = document.createElement('div');
+    debugInfo.style.display = 'none'; // Masqué par défaut, à activer si besoin
+    debugInfo.innerHTML = `<p>Données de service: ${JSON.stringify(serviceData)}</p>`;
+    chartSection.appendChild(debugInfo);
+    
+    // Create service rows with both impact types
+    sortedServices.forEach((service, index) => {
+        const serviceInfo = serviceData[service];
+        
+        // Ajouter des logs pour debugging
+        console.log(`Service: ${service}`, serviceInfo);
+        
+        // Skip if no data
+        if ((!serviceInfo.carbonImpact && serviceInfo.carbonImpact !== 0) && 
+            (!serviceInfo.energyImpact && serviceInfo.energyImpact !== 0)) {
+            console.log(`Skipping service with no impact data: ${service}`);
+            return;
+        }
+        
+        // Calculate percentage widths with minimum to ensure visibility
+        const carbonImpact = serviceInfo.carbonImpact || 0;
+        const energyImpact = serviceInfo.energyImpact || 0;
+        
+        // Assurer un minimum de 1% pour la visibilité des barres même pour des valeurs très petites
+        const carbonPercentWidth = Math.max(1, (carbonImpact / maxCarbonImpact) * 100);
+        const energyPercentWidth = Math.max(1, (energyImpact / maxEnergyImpact) * 100);
+        
+        console.log(`${service} - Carbon Width: ${carbonPercentWidth}%, Energy Width: ${energyPercentWidth}%`);
+        
+        // Service row container
+        const serviceRow = document.createElement('div');
+        serviceRow.className = 'service-row animated fadeInUp';
+        serviceRow.style.animationDelay = `${index * 0.1}s`;
+        
+        // Service label
+        const label = document.createElement('div');
+        label.className = 'service-label';
+        
+        // Add service icon if available
+        const serviceIconClass = getServiceIconClass(service);
+        label.innerHTML = `
+            <span class="service-icon ${serviceIconClass}"></span>
+            <span class="service-name">${service}</span>
+            <span class="service-count">(${serviceInfo.count} ${browser.i18n.getMessage("interactions") || "interactions"})</span>
+        `;
+        
+        // Bars container
+        const barsContainer = document.createElement('div');
+        barsContainer.className = 'impact-bars-container';
+        
+        // Carbon impact bar
+        const carbonBarWrapper = document.createElement('div');
+        carbonBarWrapper.className = 'bar-wrapper carbon-wrapper';
+        
+        const carbonBar = document.createElement('div');
+        carbonBar.className = 'bar carbon-bar';
+        carbonBar.style.width = `${carbonPercentWidth}%`;
+        carbonBar.style.animationDelay = `${index * 0.1 + 0.1}s`;
+        
+        const carbonValue = document.createElement('div');
+        carbonValue.className = 'bar-value';
+        carbonValue.textContent = `${carbonImpact.toFixed(2)} gCO2eq`;
+        
+        carbonBarWrapper.appendChild(carbonBar);
+        carbonBarWrapper.appendChild(carbonValue);
+        
+        // Energy impact bar
+        const energyBarWrapper = document.createElement('div');
+        energyBarWrapper.className = 'bar-wrapper energy-wrapper';
+        
+        const energyBar = document.createElement('div');
+        energyBar.className = 'bar energy-bar';
+        energyBar.style.width = `${energyPercentWidth}%`;
+        energyBar.style.animationDelay = `${index * 0.1 + 0.2}s`;
+        
+        const energyValue = document.createElement('div');
+        energyValue.className = 'bar-value';
+        energyValue.textContent = `${energyImpact.toFixed(2)} Wh`;
+        
+        energyBarWrapper.appendChild(energyBar);
+        energyBarWrapper.appendChild(energyValue);
+        
+        // Add bars to container
+        barsContainer.appendChild(carbonBarWrapper);
+        barsContainer.appendChild(energyBarWrapper);
+        
+        // Assemble row
+        serviceRow.appendChild(label);
+        serviceRow.appendChild(barsContainer);
+        
+        // Add to chart
+        chart.appendChild(serviceRow);
     });
     
-    // Créer les graphiques
-    createServiceChart(carbonContent, serviceData, 'carbonImpact', 'gCO2eq');
-    createServiceChart(energyContent, serviceData, 'energyImpact', 'Wh');
+    chartSection.appendChild(chart);
+    chartContainer.appendChild(chartSection);
     
     // Add emission factors explanation
     const emissionFactorsInfo = document.createElement('div');
@@ -669,7 +962,7 @@ function createServiceChart(container, serviceData, impactType, unit) {
         const value = document.createElement('div');
         value.className = 'bar-value';
         value.innerHTML = `
-            <span class="impact-value">${serviceInfo[impactType].toFixed(6)} ${unit}</span>
+            <span class="impact-value">${serviceInfo[impactType].toFixed(2)} ${unit}</span>
             <small>(${serviceInfo.count} ${browser.i18n.getMessage("interactions") || "interactions"})</small>
         `;
         

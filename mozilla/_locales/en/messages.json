@@ -98,7 +98,7 @@
     "message": "Number of requests: "
   },
   "sourceOfData": {
-    "message": "source: Ecoindex"
+    "message": "source:"
   },
   "settings": {
     "message": "Settings"
@@ -110,7 +110,7 @@
     "message": "Smartphone charges"
   },
   "coffeeCupsLabel": {
-    "message": "Cups of coffee"
+    "message": "Liter of coffee"
   },
   "noLLMDataAvailable": {
     "message": "No AI usage data available at the moment."
@@ -125,7 +125,7 @@
     "message": "Interactions"
   },
   "llmTokensLabel": {
-    "message": "Total Tokens"
+    "message": "Energy used (Wh)"
   },
   "llmEquivalentTitle": {
     "message": "Equivalent"

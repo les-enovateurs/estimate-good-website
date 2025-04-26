@@ -27,7 +27,7 @@ const EMISSIONS_FACTORS_RANGE_TOKEN = {
         "gCO2eq":803 
       }
     },
-    "meta": {//openai/claude/gemini/default
+    "meta": {//meta/llama3...
       50: {
           "energy":4.39,//Wh consumption
           "gCO2eq":2.68 // gCO2eq effect
@@ -56,50 +56,98 @@ const EMISSIONS_FACTORS_RANGE_TOKEN = {
   };
   
 
+// Modify the tab query event handler
 browser.tabs.query({currentWindow: true, active: true})
 .then(async (tabs) => {
     const url = tabs[0].url;
     
-    // Check if this is an LLM service
-    const isLLMService = await browser.runtime.sendMessage({
-        action: "isLLMService",
-        url: url
-    });
-    
-    if (isLLMService) {
-        // Display LLM impact information
-        displayLLMImpact(url);
-        return;
-    }
-    
-    // Continue with normal EcoIndex display
-    const parsedData = getResultFromUrl(url);
-    const { id, score, requests, grade } = parsedData;
-
-    updateUrl(url);
-    updateEcoIndexReportLink(id);
-    updateScore(score);
-    updateNumberOfRequests(requests);
-    updateBorderColor(grade);
-
-    const sourceOfData = findById("source-of-data");
-    sourceOfData.innerHTML = browser.i18n.getMessage("sourceOfData");
-
-    const settings = findById("settings");
-    settings.addEventListener('click', () => {
+    try {
+        // Check if this is an LLM service
+        const isLLMService = await browser.runtime.sendMessage({
+            action: "isLLMService",
+            url: url
+        });
+        
+        if (isLLMService) {
+            // Force a refresh of LLM data before displaying
+            await browser.runtime.sendMessage({
+                action: "refreshLLMData",
+                url: url
+            });
+            
+            // Now display LLM impact information with refreshed data
+            displayLLMImpact(url);
+            return;
+        }
+        
+        // Continue with normal EcoIndex display
+        const localStorage = window.localStorage;
+        const parsedData = getResultFromUrl(url);
+        
+        if (!parsedData) {
+            // No data available yet
+            updateUrl(url);
+            return;
+        }
+        
+        const { id, score, requests, grade } = parsedData;
+        
+        updateUrl(url);
+        updateScore(score);
+        updateNumberOfRequests(requests);
+        updateBorderColor(grade);
+        
+      const ecoIndexAnchor = findById("ecoindex-result");
+      ecoIndexAnchor.addEventListener('click', () => {
         window.open("/options/options.html", '_blank');
-    })
-
-    const settingsText = findById("settings-text")
-    settingsText.innerHTML = chrome.i18n.getMessage("settings");
+    });   
+        // Update source with link to EcoIndex
+        const sourceOfData = findById("source-of-data");
+        sourceOfData.innerHTML = `${browser.i18n.getMessage("sourceOfData")} <a class="team-link" href="https://www.ecoindex.fr/resultat/?id=${id}" target="_blank">EcoIndex</a>`;
+        
+        
+    } catch (error) {
+        console.error("Error in popup initialization:", error);
+    }
 });
 
+// Enhanced function for LLM impact display
 async function displayLLMImpact(url) {
-    // Get the current LLM tracking data
-    const llmData = await browser.runtime.sendMessage({
-        action: "getLLMData",
-        url: url
-    });
+    // Try to get data directly from storage first
+    let llmData = null;
+    
+    try {
+        // Get data directly from storage
+        const storageData = await new Promise(resolve => {
+            browser.storage.local.get(['llmInteractions', 'lastUpdated'], result => {
+                resolve(result);
+            });
+        });
+        
+        if (storageData && storageData.llmInteractions) {
+            // Find the interaction for this URL
+            for (const id in storageData.llmInteractions) {
+                const interaction = storageData.llmInteractions[id];
+                if (interaction.url === url) {
+                    llmData = { lastInteraction: interaction };
+                    break;
+                }
+            }
+        }
+    } catch (error) {
+        console.error("Error loading data from storage", error);
+    }
+    
+    // If we couldn't get data from storage, fall back to messaging
+    if (!llmData) {
+        llmData = await browser.runtime.sendMessage({
+            action: "getLLMData",
+            url: url
+        });
+    }
+    
+    // Add LLM mode class to body
+    document.body.classList.add('llm-mode');
     
     // Update UI with LLM info
     updateUrl(url);
@@ -113,9 +161,29 @@ async function displayLLMImpact(url) {
     
     // Show carbon impact
     const scoreDom = findById("score");
+    
+    if (!interaction || typeof interaction.carbonImpact === 'undefined') {
+        // No data available yet
+        scoreDom.innerHTML = "Waiting for data... <span class='unit'>gCO₂eq</span>";
+        
+        // Set a timer to retry in 2 seconds
+        setTimeout(() => {
+            displayLLMImpact(url);
+        }, 2000);
+        return;
+    }
+    
+    // Continue with the rest of your displayLLMImpact function...
+    // (existing code that handles the interaction data)
+    
     if (interaction) {
-        const carbonImpact = interaction.carbonImpact.toFixed(6);
-        scoreDom.innerHTML = carbonImpact + " gCO2eq";
+        const carbonImpact = interaction.carbonImpact.toFixed(2);
+        scoreDom.innerHTML = carbonImpact + " <span class='unit'>gCO₂eq</span>";
+        
+        // Add a visual indicator based on impact severity
+        const impactSeverity = getImpactSeverity(carbonImpact);
+        updateImpactBadge(impactSeverity);
+        updateBorderColor(impactSeverity);
         
         // Ajouter des infos sur le service et le modèle utilisé
         if (interaction.service) {
@@ -128,29 +196,29 @@ async function displayLLMImpact(url) {
             // Afficher le service et la capacité d'émission
             const totalTokens = (interaction.inputTokens || 0) + (interaction.outputTokens || 0);
             const serviceInfo = `${interaction.service} (${serviceType})`;
-            scoreDom.innerHTML += `<br><small>${serviceInfo}</small>`;
+            scoreDom.innerHTML += `<div class="service-info">${serviceInfo}</div>`;
         }
     } else {
-        scoreDom.innerHTML = "0.000000 gCO2eq";
+        scoreDom.innerHTML = "0.000000 <span class='unit'>gCO₂eq</span>";
     }
     
     // Show token count instead of requests
     const requestsTitle = findById("number-of-requests-title");
-    requestsTitle.innerHTML = browser.i18n.getMessage("llmTokensLabel") || "Tokens (input + output):";
-    
+    requestsTitle.innerHTML = browser.i18n.getMessage("llmTokensLabel") || "Tokens & Energy:";
+
     const requestsDom = findById("number-of-requests");
     if (interaction) {
         const inputTokens = interaction.inputTokens || 0;
         const outputTokens = interaction.outputTokens || 0;
         const totalTokens = inputTokens + outputTokens;
         
-        // Ajouter des infos sur le seuil utilisé
-        let serviceType = "openai"; // par défaut
+        // Determine service type
+        let serviceType = "openai"; // default
         if (interaction.service && interaction.service.toLowerCase().includes("meta")) {
             serviceType = "meta";
         }
         
-        // Trouver le seuil correspondant
+        // Find the corresponding threshold
         const thresholds = Object.keys(EMISSIONS_FACTORS_RANGE_TOKEN[serviceType])
             .map(Number)
             .sort((a, b) => a - b);
@@ -163,33 +231,116 @@ async function displayLLMImpact(url) {
             }
         }
         
-        requestsDom.innerHTML = `${inputTokens} + ${outputTokens}`;
-        requestsDom.innerHTML += `<br><small>Seuil: ${selectedThreshold} tokens</small>`;
+        // Get energy data for this threshold
+        const energyConsumption = EMISSIONS_FACTORS_RANGE_TOKEN[serviceType][selectedThreshold].energy;
+
+        // Si aucun token n'a été généré, utiliser une proportion basée sur les tokens d'entrée
+        const energyValue = (totalTokens > 0) 
+            ? (energyConsumption * (totalTokens / 50)) // Calculer en fonction des tokens d'entrée
+            : (outputTokens > 0 ? energyConsumption : 0); // Utiliser la valeur standard ou 0
+        
+        // Display tokens and energy consumption
+        requestsDom.innerHTML = `<div class="energy-info">${energyValue.toFixed(2)} <span class="unit">Wh</span></div>`;
     } else {
-        requestsDom.innerHTML = "0 + 0";
+        requestsDom.innerHTML = `<div class="energy-info">0.00 <span class="unit">Wh</span></div>`;
     }
     
-    // Update source
+    // Update source and make it clickable
     const sourceOfData = findById("source-of-data");
-    sourceOfData.innerHTML = "source: Ecologits";
+    sourceOfData.innerHTML = `source: <a class="team-link" href="https://github.com/genai-impact/ecologits" target="_blank">Ecologits</a>`;
     
-    // Update link to EcoLLM info
+    // Update link to EcoLLM info and make it go to dashboard/settings
     const ecoIndexAnchor = findById("ecoindex-result");
-    ecoIndexAnchor.innerHTML = "Learn more about LLM impact";
-    ecoIndexAnchor.href = "https://github.com/genai-impact/ecologits";
+    ecoIndexAnchor.innerHTML = `    
+        <span class="button-text">View Impact Dashboard</span>
+    `;
+    ecoIndexAnchor.href = "/options/options.html#llm-impact";
+
     
-    // Update border color for LLM services
-    const cardDom = findById("card-with-score");
-    cardDom.style.borderColor = "#30A8A7"; // Use secondary color
-    
-    // Add settings button handler
+    // Remove settings button handler since it's redundant now
     const settings = findById("settings");
-    settings.addEventListener('click', () => {
-        window.open("/options/options.html#llm-impact", '_blank');
-    });
+    settings.style.display = "none";
     
     const settingsText = findById("settings-text");
-    settingsText.innerHTML = browser.i18n.getMessage("settings") || "Settings";
+    if (settingsText) {
+        settingsText.style.display = "none";
+    }
+}
+
+// Update the impact badge based on grade
+function updateImpactBadge(grade) {
+    const impactBadge = findById("impact-badge");
+    if (!impactBadge) return;
+    
+    impactBadge.textContent = grade || 'A';
+    
+    // Set badge color based on grade
+    let badgeColor = "#2e9b43"; // Default to A (green)
+    switch(grade) {
+        case "A": badgeColor = "#2e9b43"; break;
+        case "B": badgeColor = "#34bc6e"; break;
+        case "C": badgeColor = "#cadd00"; break;
+        case "D": badgeColor = "#f7ed00"; break;
+        case "E": badgeColor = "#ffce00"; break;
+        case "F": badgeColor = "#fb9929"; break;
+        case "G": badgeColor = "#f01c16"; break;
+    }
+    impactBadge.style.backgroundColor = badgeColor;
+}
+
+// Enhance the border color update to also update the badge
+function updateBorderColor(grade) {
+    const cardDom = findById("card-with-score");
+    let gradeColor = "#2e9b43"; // Default to A (green)
+    
+    switch(grade) {
+        case "A": gradeColor = "#2e9b43"; break;
+        case "B": gradeColor = "#34bc6e"; break;
+        case "C": gradeColor = "#cadd00"; break;
+        case "D": gradeColor = "#f7ed00"; break;
+        case "E": gradeColor = "#ffce00"; break;
+        case "F": gradeColor = "#fb9929"; break;
+        case "G": gradeColor = "#f01c16"; break;
+    }
+    
+    cardDom.style.borderColor = gradeColor;
+    
+    // Also update the badge
+    updateImpactBadge(grade);
+}
+
+// Helper function to determine impact severity
+function getImpactSeverity(carbonImpact) {
+    // Convert to number to be safe
+    const impact = parseFloat(carbonImpact);
+    
+    if (impact < 5) return "A";
+    if (impact < 15) return "B";
+    if (impact < 30) return "C";
+    if (impact < 60) return "D";
+    if (impact < 100) return "E";
+    if (impact < 200) return "F";
+    return "G";
+}
+
+// Enhance the existing updateScore function
+function updateScore(score) {
+    scoreTitle = findById("score-title");
+    scoreTitle.innerHTML = browser.i18n.getMessage("scoreTitle");
+
+    scoreDom = findById("score");
+    scoreDom.innerHTML = browser.i18n.getMessage("scoreResult", [score]);
+    
+    // Add visual indicators based on score
+    if (score >= 75) {
+        scoreDom.classList.add('excellent-score');
+    } else if (score >= 50) {
+        scoreDom.classList.add('good-score');
+    } else if (score >= 30) {
+        scoreDom.classList.add('medium-score');
+    } else {
+        scoreDom.classList.add('poor-score');
+    }
 }
 
 function updateNumberOfRequests(requests) {
@@ -200,52 +351,9 @@ function updateNumberOfRequests(requests) {
     requestsDom.innerHTML = requests;
 }
 
-function updateScore(score) {
-    scoreTitle = findById("score-title");
-    scoreTitle.innerHTML = browser.i18n.getMessage("scoreTitle");
-
-    scoreDom = findById("score");
-    scoreDom.innerHTML = browser.i18n.getMessage("scoreResult", [score]);
-}
-
 function updateUrl(url) {
     const urlDom = findById("url");
     urlDom.innerHTML = url;
-}
-
-function updateEcoIndexReportLink(id) {
-    const ecoIndexAnchor = findById("ecoindex-result")
-    ecoIndexAnchor.innerHTML = browser.i18n.getMessage("detailedReport");
-    ecoIndexAnchor.href = `https://www.ecoindex.fr/resultat/?id=${id}`;
-}
-
-function updateBorderColor(grade) {
-    const cardDom = findById("card-with-score");
-    let gradeColor = "000000";
-    switch(grade) {
-        case "A":
-            gradeColor = "#2e9b43";
-            break;
-        case "B":
-            gradeColor = "#34bc6e";
-            break;
-        case "C":
-            gradeColor = "#cadd00";
-            break;
-        case "D":
-            gradeColor = "#f7ed00";
-            break;
-        case "E":
-            gradeColor = "#ffce00";
-            break;
-        case "F":
-            gradeColor = "#fb9929";
-            break;
-        case "G":
-            gradeColor = "#f01c16";
-            break;
-    }
-    cardDom.style.borderColor = gradeColor;
 }
 
 function getResultFromUrl(url) {

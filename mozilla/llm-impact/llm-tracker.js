@@ -1,8 +1,3 @@
-/**
- * LLM Impact Tracker Module
- * Based on the Ecologits project: https://github.com/genai-impact/ecologits/
- */
-
 // LLM services to track and their detection patterns
 const LLM_SERVICES = {
   'ChatGPT': {
@@ -48,7 +43,7 @@ const EMISSIONS_FACTORS_RANGE_TOKEN = {
       "gCO2eq":803 
     }
   },
-  "meta": {//openai/claude/gemini/default
+  "meta": {//meta/llama
     50: {
         "energy":4.39,//Wh consumption
         "gCO2eq":2.68 // gCO2eq effect
@@ -76,16 +71,6 @@ const EMISSIONS_FACTORS_RANGE_TOKEN = {
   },
 };
 
-
-const EMISSIONS_FACTORS = {
-  // gCO2eq per token
-  inference: {
-    small: 0.00000121,   // Small models like GPT-3
-    medium: 0.00000382,  // Medium models like GPT-3.5
-    large: 0.00000922    // Large models like GPT-4, Claude
-  }
-};
-
 // Approximate tokens per character for various languages
 const TOKENS_PER_CHAR = {
   english: 0.25,         // ~4 characters per token
@@ -100,8 +85,6 @@ class LLMTracker {
     this.tokensPerChar = TOKENS_PER_CHAR.english; // Default to English
     console.log("LLM Tracker initialized");
   }
-
-  // Ajoutez cette méthode au logger de débogage
 
   /**
    * Journalise les événements de suivi
@@ -192,8 +175,8 @@ class LLMTracker {
     this.currentInteraction.carbonImpact = carbonImpact;
     this.currentInteraction.energyImpact = energyImpact;
     
-    this.logEvent(`Calculated carbon impact: ${carbonImpact.toFixed(6)} gCO2eq for ${totalTokens} tokens (${inputTokens}+${outputTokens})`);
-    this.logEvent(`Calculated energy impact: ${energyImpact.toFixed(6)} Wh for ${totalTokens} tokens (${inputTokens}+${outputTokens})`);
+    this.logEvent(`Calculated carbon impact: ${carbonImpact.toFixed(2)} gCO2eq for ${totalTokens} tokens (${inputTokens}+${outputTokens})`);
+    this.logEvent(`Calculated energy impact: ${energyImpact.toFixed(2)} Wh for ${totalTokens} tokens (${inputTokens}+${outputTokens})`);
     this.logEvent(`Used ${serviceType} threshold: ${selectedThreshold} tokens with factor: ${thresholdData.gCO2eq} gCO2eq / ${thresholdData.energy} Wh`);
     
     return {
@@ -291,8 +274,32 @@ class LLMTracker {
     // Calculate final carbon impact
     this.calculateCarbonImpact();
     
-    // Store this interaction
-    const interactionId = `${this.currentInteraction.service}-${Date.now()}`;
+    // Extract conversation ID from URL if possible
+    const conversationId = this.extractConversationId(this.currentInteraction.url);
+    this.currentInteraction.conversationId = conversationId;
+    
+    // Generate a unique hash for deduplication that includes the conversation ID
+    const interactionContent = `${conversationId}-${this.currentInteraction.inputTokens}-${this.currentInteraction.outputTokens}`;
+    const interactionHash = this.hashString(interactionContent);
+    this.currentInteraction.contentHash = interactionHash;
+    
+    // Check if we already have a similar interaction with the same content hash
+    const existingInteractions = Object.values(this.interactions);
+    const duplicate = existingInteractions.find(interaction => 
+      interaction.contentHash === interactionHash && 
+      interaction.conversationId === conversationId
+    );
+    
+    // Don't save if it's a duplicate of an existing interaction
+    if (duplicate) {
+      console.log("Detected duplicate interaction, not saving", this.currentInteraction);
+      this.isTracking = false;
+      this.currentInteraction = null;
+      return null;
+    }
+    
+    // Store this interaction with a unique ID
+    const interactionId = `${this.currentInteraction.service}-${conversationId}-${Date.now()}`;
     this.interactions[interactionId] = {...this.currentInteraction};
     
     // Save to storage
@@ -303,6 +310,55 @@ class LLMTracker {
     this.currentInteraction = null;
     
     return completed;
+  }
+
+  /**
+   * Extract conversation ID from URL
+   * @param {string} url - URL to extract ID from
+   * @returns {string} - Conversation ID or fallback ID
+   */
+  extractConversationId(url) {
+    try {
+      // Extract ID patterns from various LLM services
+      
+      // ChatGPT pattern: https://chat.openai.com/c/12345-67890
+      if (url.includes('chat.openai.com')) {
+        const match = url.match(/\/c\/([a-zA-Z0-9-]+)/);
+        if (match && match[1]) return `chatgpt-${match[1]}`;
+      }
+      
+      // Claude pattern: https://claude.ai/chat/12345-67890
+      if (url.includes('claude.ai')) {
+        const match = url.match(/\/chat\/([a-zA-Z0-9-]+)/);
+        if (match && match[1]) return `claude-${match[1]}`;
+      }
+      
+      // Generic fallback: use domain + path
+      const urlObj = new URL(url);
+      const pathParts = urlObj.pathname.split('/').filter(p => p);
+      const lastPathPart = pathParts[pathParts.length - 1];
+      
+      return `${urlObj.hostname}-${lastPathPart || 'home'}`;
+    } catch (e) {
+      console.error("Error extracting conversation ID:", e);
+      // Fallback to a timestamp-based ID
+      return `unknown-${Date.now()}`;
+    }
+  }
+
+  /**
+   * Create a simple hash of a string for deduplication
+   * @param {string} str - String to hash
+   * @returns {string} - Hash value
+   */
+  hashString(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32bit integer
+    }
+    return hash.toString();
   }
 
   /**

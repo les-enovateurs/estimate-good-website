@@ -210,6 +210,9 @@ button:active {
   position: relative;
   overflow: hidden;
   transition: transform 0.2s ease, background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
 }
 
 .llm-stat-box:hover {
@@ -218,10 +221,10 @@ button:active {
 }
 
 .llm-stat-value {
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: bold;
-  margin-bottom: 0.5rem;
-  color: var(--secondary-color);
+  margin-bottom: 5px;
+  color: #30A8A7;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: color 0.2s ease;
 }
@@ -232,12 +235,25 @@ button:active {
 
 .llm-stat-label {
   font-size: 0.9rem;
-  color: #fff;
+  color: #777;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   font-size: 0.95rem;
+}
+
+.icon-container {
+  width: 60px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .label-icon {
@@ -348,19 +364,27 @@ button:active {
 }
 
 .bar-wrapper {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  height: 32px;
+  height: 22px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  position: relative;
+  overflow: visible; /* Changé de 'hidden' à 'visible' pour voir les valeurs */
+  margin-bottom: 5px;
 }
 
 .bar {
-  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
   height: 100%;
   border-radius: 4px;
-  min-width: 2px; /* Ensure very small values still show */
-  animation: barGrow 1s ease-out forwards;
-  transform-origin: left;
+  transition: width 0.8s ease-in-out;
+  min-width: 2px; /* Assure une largeur minimale */
+}
+
+.bar-value {
+  position: relative;
+  padding-left: 8px;
+  font-weight: 500;
+  display: inline-block;
+  margin-left: 5px;
 }
 
 @keyframes barGrow {
@@ -678,4 +702,526 @@ button:active {
         padding: 0.5rem 1rem;
         font-size: 0.9rem;
     }
+}
+
+/* Enhanced LLM Impact Section Styles */
+
+/* Section headers */
+.section-header {
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid var(--accent-color, #3bbcbb);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.section-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--primary-text, #f8f8f8);
+}
+
+.subsection-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.subsection-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--secondary-text, #e0e0e0);
+}
+
+/* Pulsing animations for icons */
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+.pulse-slow {
+    animation: pulse 3s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Enhanced stat boxes */
+.llm-stat-box {
+    background: rgba(59, 188, 187, 0.1);
+    border-radius: 8px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(59, 188, 187, 0.2);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.llm-stat-box:hover {
+    transform: translateY(-5px);
+    background: rgba(59, 188, 187, 0.15);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.llm-stat-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--accent-color, #3bbcbb);
+    margin: 0.5rem 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.label-icon {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* Comparison items */
+.comparison-item {
+    display: flex;
+    align-items: center;
+    background: rgba(40, 44, 52, 0.5);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.comparison-hover {
+    transform: translateY(-5px);
+    background: rgba(59, 188, 187, 0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.comparison-icon-wrapper {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    margin-right: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.comparison-icon {
+    width: 32px;
+    height: 32px;
+    z-index: 2;
+}
+
+.icon-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(59, 188, 187, 0.2);
+    border-radius: 50%;
+    z-index: 1;
+    padding:8px;
+}
+
+.comparison-info {
+    flex: 1;
+}
+
+.comparison-label {
+    font-size: 1rem;
+    color: var(--secondary-text, #e0e0e0);
+    margin-bottom: 4px;
+}
+
+.comparison-value {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--accent-color, #3bbcbb);
+}
+
+.highlight {
+    position: relative;
+    display: inline-block;
+}
+
+.highlight::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--accent-color, #3bbcbb);
+    border-radius: 2px;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+.comparison-hover .highlight::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+/* Bar chart improvements */
+.llm-bar-chart {
+    margin-top: 1.5rem;
+}
+
+.chart-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.chart-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--secondary-text, #e0e0e0);
+}
+
+.chart-subtitle {
+    font-size: 0.85rem;
+    color: var(--tertiary-text, #999);
+    margin: 0 0 1rem 0;
+}
+
+.bar-container {
+    display: flex;
+    margin-bottom: 1rem;
+    align-items: center;
+}
+
+.service-icon-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: rgba(59, 188, 187, 0.1);
+    border-radius: 4px;
+    margin-right: 8px;
+}
+
+.service-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.service-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.bar-label {
+    width: 120px;
+    display: flex;
+    align-items: center;
+    padding-right: 1rem;
+}
+
+.bar-wrapper {
+    flex: 1;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+}
+
+.bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease, filter 0.3s ease;
+}
+
+.bar-hover {
+    filter: brightness(1.2);
+    box-shadow: 0 0 10px rgba(59, 188, 187, 0.5);
+}
+
+.bar-value {
+    position: absolute;
+    top: 0;
+    right: 10px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.impact-value {
+    font-weight: bold;
+    font-size: 0.85rem;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.interactions-count {
+    font-size: 0.7rem;
+    opacity: 0.8;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Clear button styling */
+#clearLLMHistory {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 80, 80, 0.15);
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 80, 80, 0.3);
+}
+
+#clearLLMHistory:hover {
+    background: rgba(255, 80, 80, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 80, 80, 0.2);
+}
+
+#clearLLMHistory:active {
+    transform: translateY(0);
+}
+
+.button-icon {
+    margin-right: 8px;
+}
+
+/* Tab styling improvements */
+.tabs-container {
+    margin-top: 1.5rem;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.tab-bar {
+    display: flex;
+    background: rgba(40, 44, 52, 0.7);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab {
+    padding: 0.75rem 1.25rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    position: relative;
+    text-align: center;
+    flex: 1;
+}
+
+.tab.active {
+    background: rgba(59, 188, 187, 0.1);
+    color: var(--accent-color, #3bbcbb);
+}
+
+.tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--accent-color, #3bbcbb);
+    animation: slideIn 0.3s ease-out;
+}
+
+.tab-content {
+    display: none;
+    padding: 1.5rem;
+    background: rgba(40, 44, 52, 0.5);
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slide-in {
+    from { transform: translateX(-20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+.slide-in {
+    animation: slide-in 0.5s ease-out forwards;
+}
+
+.grow-bar {
+    transform-origin: left;
+    animation: growBar 1s ease-out forwards;
+}
+
+@keyframes growBar {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .llm-stat-box {
+        padding: 0.75rem;
+    }
+    
+    .llm-stat-value {
+        font-size: 1.4rem;
+    }
+    
+    .comparison-item {
+        padding: 0.75rem;
+    }
+    
+    .comparison-icon-wrapper {
+        width: 32px;
+        height: 32px;
+        margin-right: 12px;
+    }
+    
+    .comparison-icon {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .bar-label {
+        width: 100px;
+    }
+    
+    .service-name {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .section-header h2 {
+        font-size: 1.3rem;
+    }
+    
+    .subsection-header h3 {
+        font-size: 1.1rem;
+    }
+    
+    .comparison-value {
+        font-size: 1.2rem;
+    }
+    
+    .tab {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .bar-label {
+        width: 80px;
+    }
+}
+
+.chart-legend {
+    display: flex;
+    margin-bottom: 15px;
+    justify-content: center;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin: 0 10px;
+}
+
+.legend-color {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+    border-radius: 3px;
+}
+
+.carbon-color {
+    background: linear-gradient(90deg, #3e8dc1, #5ba9db);
+}
+
+.energy-color {
+    background: linear-gradient(90deg, #d17a29, #e7933c);
+}
+
+.llm-dual-bar-chart {
+    margin-top: 20px;
+}
+
+.service-row {
+    margin-bottom: 25px;
+}
+
+.service-label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.service-name {
+    font-weight: 600;
+    margin-right: 5px;
+}
+
+.service-count {
+    font-size: 0.85em;
+    color: #777;
+}
+
+.impact-bars-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.bar-wrapper {
+    height: 22px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+    position: relative;
+    overflow: visible; /* Changé de 'hidden' à 'visible' pour voir les valeurs */
+    margin-bottom: 5px;
+}
+
+.carbon-wrapper .bar-value {
+    color: #2a617e;
+}
+
+.energy-wrapper .bar-value {
+    color: #a75e1e;
+}
+
+.carbon-bar {
+    background: linear-gradient(90deg, #3e8dc1, #5ba9db);
+}
+
+.energy-bar {
+    background: linear-gradient(90deg, #d17a29, #e7933c);
 }
