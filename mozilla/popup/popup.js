@@ -1,3 +1,61 @@
+// Constants based on the Ecologits research
+const EMISSIONS_FACTORS_RANGE_TOKEN = {
+    "openai": 
+    {//openai/claude/gemini/default
+      50: {
+          "energy":4.39,
+          "gCO2eq":2.68 
+      },
+      170: {
+        "energy":14.9,
+        "gCO2eq":9.11 
+      },  
+      250: {
+        "energy":21.9,
+        "gCO2eq":13.4 
+      },
+      400: {
+        "energy":35.1,
+        "gCO2eq":21.4 
+      },
+      5000: {
+        "energy":439,
+        "gCO2eq":268 
+      },
+      15000: {
+        "energy":1320,
+        "gCO2eq":803 
+      }
+    },
+    "meta": {//openai/claude/gemini/default
+      50: {
+          "energy":4.39,//Wh consumption
+          "gCO2eq":2.68 // gCO2eq effect
+      },
+      170: {
+        "energy":14.9,
+        "gCO2eq":9.11 
+      },
+      250: {
+        "energy":21.9,
+        "gCO2eq":13.4 
+      },
+      400: {
+        "energy":35.1,
+        "gCO2eq":21.4 
+      },
+      5000: {
+        "energy":1190,
+        "gCO2eq":727 
+      },
+      15000: {
+        "energy":3580,
+        "gCO2eq":2180 
+      },
+    },
+  };
+  
+
 browser.tabs.query({currentWindow: true, active: true})
 .then(async (tabs) => {
     const url = tabs[0].url;

@@ -29,6 +29,11 @@
           </div>
           
           <div class="llm-stat-box">
+            <div class="llm-stat-value" id="llm-total-energy">0.00</div>
+            <div class="llm-stat-label" id="llm-energy-label"></div>
+          </div>
+          
+          <div class="llm-stat-box">
             <div class="llm-stat-value" id="llm-interactions">0</div>
             <div class="llm-stat-label" id="llm-interactions-label"></div>
           </div>
@@ -42,6 +47,13 @@
         <div class="llm-comparisons">
           <h4 id="llm-equivalent-title"></h4>
           <div class="llm-comparison-items" id="llm-comparisons-list">
+            <!-- Will be populated by JavaScript -->
+          </div>
+        </div>
+        
+        <div class="llm-comparisons">
+          <h4 id="llm-energy-equivalent-title"></h4>
+          <div class="llm-comparison-items" id="llm-energy-comparisons-list">
             <!-- Will be populated by JavaScript -->
           </div>
         </div>

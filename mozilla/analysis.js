@@ -316,3 +316,35 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log("🌱 Action non reconnue:", message.action);
     return false;
 });
+
+// Dans background.js
+browser.runtime.onMessage.addListener((message, sender) => {
+  if (message.action === "ensureIconVisible") {
+    // Mettre à jour l'icône basée sur l'URL
+    const url = message.url;
+    const tabId = sender.tab.id;
+    
+    // Vérifier si c'est un service LLM
+    if (isLLMService(url)) {
+      browser.pageAction.show(tabId);
+      // Ou si vous utilisez browserAction:
+      // browser.browserAction.setIcon({
+      //   tabId: tabId,
+      //   path: "/icons/llm-icon.png" 
+      // });
+    }
+    
+    return Promise.resolve({success: true});
+  }
+  // Autres gestionnaires...
+});
+
+// Fonction pour détecter les services LLM
+function isLLMService(url) {
+  for (const service in LLM_SERVICES) {
+    if (LLM_SERVICES[service].urlPattern.test(url)) {
+      return true;
+    }
+  }
+  return false;
+}

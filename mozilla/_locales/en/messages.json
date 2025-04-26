@@ -150,5 +150,29 @@
   },
   "basedOnStudy": {
     "message": "Based on the Ecologits research study"
+  },
+  "llmEnergyLabel": {
+    "message": "Energy (Wh)"
+  },
+  "llmEnergyEquivalentTitle": {
+    "message": "Energy Equivalent"
+  },
+  "smartphoneChargesEnergyLabel": {
+    "message": "Smartphone Charges"
+  },
+  "ledBulbHoursLabel": {
+    "message": "LED Bulb Hours"
+  },
+  "laptopMinutesLabel": {
+    "message": "Laptop Minutes"
+  },
+  "carbonTabLabel": {
+    "message": "Carbon Impact"
+  },
+  "energyTabLabel": {
+    "message": "Energy Impact"
+  },
+  "llmServiceEnergyBreakdownTitle": {
+    "message": "Service Energy Impact Breakdown"
   }
 }
