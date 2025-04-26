@@ -98,10 +98,36 @@ button {
   color: white;
   border-radius: 6px;
   padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 button:hover {
   cursor: pointer;
+  background-color: #007d66;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.button-icon {
+  width: 16px;
+  height: 16px;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.clear-icon {
+  background-image: url('../icons/clear-icon.svg');
 }
 
 
@@ -123,23 +149,39 @@ button:hover {
 
 .pagination-container {
   display: flex;
-  justify-content: space-between;
-  gap: 4px;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
 .number-items-pagination {
   display: flex;
-  gap: 4px;
   align-items: center;
+  gap: 0.5rem;
+}
+
+.pagination-nb-pages{
+  width: 80%;
+  display: flex;
+  margin-left: 10px;
 }
 
 .pagination-pages {
   display: flex;
 }
 
+.pagination-pages button {
+  min-width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
 .pagination-selected {
   background: var(--primary-light);
+  color: white;
 }
 
 .container-table {
@@ -165,6 +207,339 @@ button:hover {
   background: #292e33;
   padding: 1rem;
   border-radius: 0.5rem;
+}
+
+/* LLM Impact Styles */
+.llm-stats-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.llm-stat-box {
+  background-color: var(--background-color);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.llm-stat-box:hover {
+  transform: translateY(-4px);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.llm-stat-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #30A8A7;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: color 0.2s ease;
+}
+
+.llm-stat-box:hover .llm-stat-value {
+  color: #3bbcbb; /* Slightly brighter on hover */
+}
+
+.llm-stat-label {
+  font-size: 0.9rem;
+  color: #777;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.icon-container {
+  width: 60px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.label-icon {
+  width: 18px;
+  height: 18px;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.carbon-icon {
+  background-image: url('../icons/carbon-icon.svg');
+}
+
+.energy-icon {
+  background-image: url('../icons/energy-icon.svg');
+}
+
+.interactions-icon {
+  background-image: url('../icons/interactions-icon.svg');
+}
+
+.tokens-icon {
+  background-image: url('../icons/tokens-icon.svg');
+}
+
+.llm-comparisons {
+  margin: 1.5rem 0;
+}
+
+.llm-comparisons h4 {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.llm-comparison-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.comparison-item {
+  display: flex;
+  align-items: center;
+  background-color: var(--background-color);
+  border-radius: 8px;
+  padding: 0.75rem;
+  flex: 1;
+  min-width: 200px;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.comparison-item:hover {
+  transform: translateY(-4px);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+.comparison-icon {
+  width: 32px;
+  height: 32px;
+  margin-right: 0.75rem;
+}
+
+.comparison-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.comparison-label {
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.comparison-value {
+  font-weight: bold;
+  color: var(--secondary-color);
+}
+
+/* LLM Chart Styles */
+#llm-chart-container {
+  margin: 2rem 0 1rem;
+  min-height: 200px;
+}
+
+.no-data-message {
+  text-align: center;
+  color: #888;
+  padding: 2rem;
+}
+
+.llm-bar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.bar-container {
+  display: flex;
+  align-items: center;
+}
+
+.bar-label {
+  width: 100px;
+  text-align: right;
+  padding-right: 1rem;
+  font-weight: bold;
+}
+
+.bar-wrapper {
+  height: 22px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  position: relative;
+  overflow: visible; /* Changé de 'hidden' à 'visible' pour voir les valeurs */
+  margin-bottom: 5px;
+}
+
+.bar {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.8s ease-in-out;
+  min-width: 2px; /* Assure une largeur minimale */
+}
+
+.bar-value {
+  position: relative;
+  padding-left: 8px;
+  font-weight: 500;
+  display: inline-block;
+  margin-left: 5px;
+}
+
+@keyframes barGrow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.bar-value {
+  margin-left: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+/* Nouveaux styles pour les détails d'émission */
+.chart-title {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.chart-subtitle {
+  font-size: 0.9rem;
+  color: #ccc;
+  margin-top: 0.25rem;
+}
+
+.emission-factors-info {
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 0.5rem;
+}
+
+.emission-factors-info summary {
+  cursor: pointer;
+  padding: 0.5rem 0;
+  font-weight: bold;
+  color: var(--secondary-color);
+}
+
+.emission-factors-info details[open] summary {
+  margin-bottom: 1rem;
+}
+
+.factors-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.factor-item ul {
+  margin-top: 0.5rem;
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.factor-item li {
+  padding: 0.2rem 0;
+  font-size: 0.9rem;
+}
+
+/* Style pour les petites notes dans la popup */
+#score small, #number-of-requests small {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: normal;
+  color: #aaa;
+  margin-top: 0.25rem;
+}
+
+.bar-value small {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin-top: 0.2rem;
+}
+
+/* Styles pour les onglets */
+.tabs-container {
+  width: 100%;
+  margin: 0 auto 2rem;
+}
+
+.tab-bar {
+  display: flex;
+  border-bottom: 2px solid var(--primary-color);
+  margin-bottom: 1rem;
+}
+
+.tab {
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.tab:hover {
+  opacity: 0.8;
+}
+
+.tab.active {
+  opacity: 1;
+  font-weight: bold;
+  border-bottom: 3px solid var(--secondary-color);
+  margin-bottom: -2px;
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background-color: var(--secondary-color);
+  animation: tabActivate 0.3s ease-in-out forwards;
+}
+
+@keyframes tabActivate {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.tab-contents {
+  position: relative;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
 }
 
 @media (width >= 1400px) {
@@ -201,4 +576,717 @@ button:hover {
   .container {
     width: 100%;
   }
+}
+
+/* Improved styles for LLM Impact Section */
+#llm-impact {
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+#llm-impact:hover {
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.settings-category {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.impact-icon, .section-icon {
+    width: 24px;
+    height: 24px;
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.impact-icon {
+    background-image: url('../icons/impact-icon.svg');
+}
+
+.equivalent-icon {
+    background-image: url('../icons/equivalent-icon.svg');
+}
+
+.energy-equivalent-icon {
+    background-image: url('../icons/energy-icon.svg');
+}
+
+/* Animation classes */
+.animated {
+    animation-duration: 0.6s;
+    animation-fill-mode: both;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.fadeIn {
+    animation-name: fadeIn;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fadeInUp {
+    animation-name: fadeInUp;
+}
+
+/* Service icons */
+.service-icon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    vertical-align: middle;
+}
+
+.openai-icon { background-image: url('../icons/openai-icon.svg'); }
+.claude-icon { background-image: url('../icons/claude-icon.svg'); }
+.gemini-icon { background-image: url('../icons/gemini-icon.svg'); }
+.meta-icon { background-image: url('../icons/meta-icon.svg'); }
+.mistral-icon { background-image: url('../icons/mistral-icon.svg'); }
+.default-llm-icon { background-image: url('../icons/default-llm-icon.svg'); }
+
+/* Chart icon */
+.chart-icon {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    vertical-align: middle;
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .llm-stats-container {
+        flex-wrap: wrap;
+    }
+    
+    .llm-stat-box {
+        min-width: calc(50% - 1rem);
+        margin-bottom: 1rem;
+    }
+    
+    .llm-comparison-items {
+        justify-content: center;
+    }
+    
+    .comparison-item {
+        min-width: calc(50% - 1rem);
+    }
+    
+    .bar-label {
+        width: 80px;
+        font-size: 0.85rem;
+    }
+    
+    .bar-value {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .llm-stat-box, .comparison-item {
+        min-width: 100%;
+    }
+    
+    .factors-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .tab {
+        padding: 0.5rem 1rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Enhanced LLM Impact Section Styles */
+
+/* Section headers */
+.section-header {
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid var(--accent-color, #3bbcbb);
+    padding-bottom: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.section-header h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--primary-text, #f8f8f8);
+}
+
+.subsection-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.subsection-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: var(--secondary-text, #e0e0e0);
+}
+
+/* Pulsing animations for icons */
+.pulse {
+    animation: pulse 2s infinite;
+}
+
+.pulse-slow {
+    animation: pulse 3s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Enhanced stat boxes */
+.llm-stat-box {
+    background: rgba(59, 188, 187, 0.1);
+    border-radius: 8px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(59, 188, 187, 0.2);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.llm-stat-box:hover {
+    transform: translateY(-5px);
+    background: rgba(59, 188, 187, 0.15);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.llm-stat-value {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: var(--accent-color, #3bbcbb);
+    margin: 0.5rem 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.label-icon {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+/* Comparison items */
+.comparison-item {
+    display: flex;
+    align-items: center;
+    background: rgba(40, 44, 52, 0.5);
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.comparison-hover {
+    transform: translateY(-5px);
+    background: rgba(59, 188, 187, 0.1);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.comparison-icon-wrapper {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    margin-right: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.comparison-icon {
+    width: 32px;
+    height: 32px;
+    z-index: 2;
+}
+
+.icon-background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(59, 188, 187, 0.2);
+    border-radius: 50%;
+    z-index: 1;
+    padding:8px;
+}
+
+.comparison-info {
+    flex: 1;
+}
+
+.comparison-label {
+    font-size: 1rem;
+    color: var(--secondary-text, #e0e0e0);
+    margin-bottom: 4px;
+}
+
+.comparison-value {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: var(--accent-color, #3bbcbb);
+}
+
+.highlight {
+    position: relative;
+    display: inline-block;
+}
+
+.highlight::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--accent-color, #3bbcbb);
+    border-radius: 2px;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+.comparison-hover .highlight::after {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+/* Bar chart improvements */
+.llm-bar-chart {
+    margin-top: 1.5rem;
+}
+
+.chart-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.chart-header h4 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--secondary-text, #e0e0e0);
+}
+
+.chart-subtitle {
+    font-size: 0.85rem;
+    color: var(--tertiary-text, #999);
+    margin: 0 0 1rem 0;
+}
+
+.bar-container {
+    display: flex;
+    margin-bottom: 1rem;
+    align-items: center;
+}
+
+.service-icon-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    background: rgba(59, 188, 187, 0.1);
+    border-radius: 4px;
+    margin-right: 8px;
+}
+
+.service-icon {
+    width: 16px;
+    height: 16px;
+}
+
+.service-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.bar-label {
+    width: 120px;
+    display: flex;
+    align-items: center;
+    padding-right: 1rem;
+}
+
+.bar-wrapper {
+    flex: 1;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    position: relative;
+    overflow: hidden;
+}
+
+.bar {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease, filter 0.3s ease;
+}
+
+.bar-hover {
+    filter: brightness(1.2);
+    box-shadow: 0 0 10px rgba(59, 188, 187, 0.5);
+}
+
+.bar-value {
+    position: absolute;
+    top: 0;
+    right: 10px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.impact-value {
+    font-weight: bold;
+    font-size: 0.85rem;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.interactions-count {
+    font-size: 0.7rem;
+    opacity: 0.8;
+    color: white;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Clear button styling */
+#clearLLMHistory {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 80, 80, 0.15);
+    color: #fff;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 6px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 80, 80, 0.3);
+}
+
+#clearLLMHistory:hover {
+    background: rgba(255, 80, 80, 0.25);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 80, 80, 0.2);
+}
+
+#clearLLMHistory:active {
+    transform: translateY(0);
+}
+
+.button-icon {
+    margin-right: 8px;
+}
+
+/* Tab styling improvements */
+.tabs-container {
+    margin-top: 1.5rem;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.tab-bar {
+    display: flex;
+    background: rgba(40, 44, 52, 0.7);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab {
+    padding: 0.75rem 1.25rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    position: relative;
+    text-align: center;
+    flex: 1;
+}
+
+.tab.active {
+    background: rgba(59, 188, 187, 0.1);
+    color: var(--accent-color, #3bbcbb);
+}
+
+.tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: var(--accent-color, #3bbcbb);
+    animation: slideIn 0.3s ease-out;
+}
+
+.tab-content {
+    display: none;
+    padding: 1.5rem;
+    background: rgba(40, 44, 52, 0.5);
+}
+
+.tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slide-in {
+    from { transform: translateX(-20px); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+}
+
+.slide-in {
+    animation: slide-in 0.5s ease-out forwards;
+}
+
+.grow-bar {
+    transform-origin: left;
+    animation: growBar 1s ease-out forwards;
+}
+
+@keyframes growBar {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+}
+
+/* Responsive improvements */
+@media (max-width: 768px) {
+    .llm-stat-box {
+        padding: 0.75rem;
+    }
+    
+    .llm-stat-value {
+        font-size: 1.4rem;
+    }
+    
+    .comparison-item {
+        padding: 0.75rem;
+    }
+    
+    .comparison-icon-wrapper {
+        width: 32px;
+        height: 32px;
+        margin-right: 12px;
+    }
+    
+    .comparison-icon {
+        width: 24px;
+        height: 24px;
+    }
+    
+    .bar-label {
+        width: 100px;
+    }
+    
+    .service-name {
+        font-size: 0.8rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .section-header h2 {
+        font-size: 1.3rem;
+    }
+    
+    .subsection-header h3 {
+        font-size: 1.1rem;
+    }
+    
+    .comparison-value {
+        font-size: 1.2rem;
+    }
+    
+    .tab {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .bar-label {
+        width: 80px;
+    }
+}
+
+.chart-legend {
+    display: flex;
+    margin-bottom: 15px;
+    justify-content: center;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin: 0 10px;
+}
+
+.legend-color {
+    display: inline-block;
+    width: 15px;
+    height: 15px;
+    margin-right: 5px;
+    border-radius: 3px;
+}
+
+.carbon-color {
+    background: linear-gradient(90deg, #3e8dc1, #5ba9db);
+}
+
+.energy-color {
+    background: linear-gradient(90deg, #d17a29, #e7933c);
+}
+
+.llm-dual-bar-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1rem 0;
+    width: 100%;
+}
+
+.service-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+}
+
+.service-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: bold;
+    color: #30A8A7;
+}
+
+.service-name {
+    flex: 1;
+}
+
+.service-count {
+    font-size: 0.8rem;
+    color: #777;
+}
+
+.impact-bars-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.bar-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.bar {
+    height: 100%;
+    min-width: 5%;
+    transition: width 0.3s ease;
+    animation: growBar 0.5s ease-out;
+}
+
+.carbon-bar {
+    background: linear-gradient(90deg, #30A8A7, #3bbcbb);
+}
+
+.energy-bar {
+    background: linear-gradient(90deg, #46a795, #5ac7b5);
+}
+
+.bar-value {
+    padding: 0 0.5rem;
+    font-size: 0.9rem;
+    color: #fff;
+    white-space: nowrap;
+}
+
+@keyframes growBar {
+    from { width: 0; }
+    to { width: var(--target-width); }
+}
+
+.chart-legend {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+    padding: 0.5rem;
+    border-radius: 8px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+}
+
+.carbon-color {
+    background: #30A8A7;
+}
+
+.energy-color {
+    background: #46a795;
 }

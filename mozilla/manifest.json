@@ -6,7 +6,7 @@
   "homepage_url": "https://github.com/les-enovateurs/estimate-good-website",
   "default_locale": "fr",
   "background": {
-    "scripts": ["analysis.js"]
+    "scripts": ["llm-impact/llm-tracker.js", "analysis.js"]
   },
   "options_ui": {
     "page": "options/options.html"
@@ -21,8 +21,31 @@
   },
   "permissions": [
     "activeTab",
-    "tabs"
+    "tabs",
+    "storage",
+    "scripting"
   ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.openai.com/*",
+        "*://*.chatgpt.com/*",
+        "*://*.claude.ai/*",
+        "*://*.anthropic.com/*",
+        "*://*.gemini.google.com/*",
+        "*://*.bing.com/chat*"
+      ],
+      "js": ["llm-impact/content-script.js"]
+    }
+  ],
+  "host_permissions": [
+    "*://*.openai.com/*",
+    "*://*.chatgpt.com/*",
+    "*://*.claude.ai/*",
+    "*://*.anthropic.com/*",
+    "*://*.gemini.google.com/*",
+    "*://*.bing.com/chat*"
+    ],
   "browser_specific_settings": {
     "gecko": {
       "id": "bbe1cfbd-4983-4c8a-b4eb-5a460f1f9da8@les-enovateurs"
