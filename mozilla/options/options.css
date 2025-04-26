@@ -167,6 +167,198 @@ button:hover {
   border-radius: 0.5rem;
 }
 
+/* LLM Impact Styles */
+.llm-stats-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.llm-stat-box {
+  background-color: var(--background-color);
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  flex: 1;
+}
+
+.llm-stat-value {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: var(--secondary-color);
+}
+
+.llm-stat-label {
+  font-size: 0.9rem;
+  color: #fff;
+}
+
+.llm-comparisons {
+  margin: 1.5rem 0;
+}
+
+.llm-comparisons h4 {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.llm-comparison-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.comparison-item {
+  display: flex;
+  align-items: center;
+  background-color: var(--background-color);
+  border-radius: 8px;
+  padding: 0.75rem;
+  flex: 1;
+  min-width: 200px;
+}
+
+.comparison-icon {
+  width: 32px;
+  height: 32px;
+  margin-right: 0.75rem;
+}
+
+.comparison-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.comparison-label {
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+}
+
+.comparison-value {
+  font-weight: bold;
+  color: var(--secondary-color);
+}
+
+/* LLM Chart Styles */
+#llm-chart-container {
+  margin: 2rem 0 1rem;
+  min-height: 200px;
+}
+
+.no-data-message {
+  text-align: center;
+  color: #888;
+  padding: 2rem;
+}
+
+.llm-bar-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.bar-container {
+  display: flex;
+  align-items: center;
+}
+
+.bar-label {
+  width: 100px;
+  text-align: right;
+  padding-right: 1rem;
+  font-weight: bold;
+}
+
+.bar-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  height: 32px;
+}
+
+.bar {
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  height: 100%;
+  border-radius: 4px;
+  min-width: 2px; /* Ensure very small values still show */
+}
+
+.bar-value {
+  margin-left: 0.75rem;
+  font-size: 0.9rem;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+/* Nouveaux styles pour les détails d'émission */
+.chart-title {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.chart-subtitle {
+  font-size: 0.9rem;
+  color: #ccc;
+  margin-top: 0.25rem;
+}
+
+.emission-factors-info {
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 0.5rem;
+}
+
+.emission-factors-info summary {
+  cursor: pointer;
+  padding: 0.5rem 0;
+  font-weight: bold;
+  color: var(--secondary-color);
+}
+
+.emission-factors-info details[open] summary {
+  margin-bottom: 1rem;
+}
+
+.factors-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.factor-item ul {
+  margin-top: 0.5rem;
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.factor-item li {
+  padding: 0.2rem 0;
+  font-size: 0.9rem;
+}
+
+/* Style pour les petites notes dans la popup */
+#score small, #number-of-requests small {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: normal;
+  color: #aaa;
+  margin-top: 0.25rem;
+}
+
+.bar-value small {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.7;
+  margin-top: 0.2rem;
+}
+
 @media (width >= 1400px) {
   .container {
     max-width: 1320px;

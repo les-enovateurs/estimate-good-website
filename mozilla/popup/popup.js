@@ -1,6 +1,20 @@
 browser.tabs.query({currentWindow: true, active: true})
-.then((tabs) => {
+.then(async (tabs) => {
     const url = tabs[0].url;
+    
+    // Check if this is an LLM service
+    const isLLMService = await browser.runtime.sendMessage({
+        action: "isLLMService",
+        url: url
+    });
+    
+    if (isLLMService) {
+        // Display LLM impact information
+        displayLLMImpact(url);
+        return;
+    }
+    
+    // Continue with normal EcoIndex display
     const parsedData = getResultFromUrl(url);
     const { id, score, requests, grade } = parsedData;
 
@@ -20,9 +34,105 @@ browser.tabs.query({currentWindow: true, active: true})
 
     const settingsText = findById("settings-text")
     settingsText.innerHTML = chrome.i18n.getMessage("settings");
-
-
 });
+
+async function displayLLMImpact(url) {
+    // Get the current LLM tracking data
+    const llmData = await browser.runtime.sendMessage({
+        action: "getLLMData",
+        url: url
+    });
+    
+    // Update UI with LLM info
+    updateUrl(url);
+    
+    // Update title to show LLM tracking
+    const scoreTitle = findById("score-title");
+    scoreTitle.innerHTML = browser.i18n.getMessage("llmImpactTitle") || "LLM Carbon Impact:";
+    
+    // Get the current interaction or most recent one
+    const interaction = llmData.currentInteraction || (llmData.lastInteraction || null);
+    
+    // Show carbon impact
+    const scoreDom = findById("score");
+    if (interaction) {
+        const carbonImpact = interaction.carbonImpact.toFixed(6);
+        scoreDom.innerHTML = carbonImpact + " gCO2eq";
+        
+        // Ajouter des infos sur le service et le modèle utilisé
+        if (interaction.service) {
+            // Déterminer le type de service (meta/openai)
+            let serviceType = "openai"; // par défaut
+            if (interaction.service.toLowerCase().includes("meta")) {
+                serviceType = "meta";
+            }
+            
+            // Afficher le service et la capacité d'émission
+            const totalTokens = (interaction.inputTokens || 0) + (interaction.outputTokens || 0);
+            const serviceInfo = `${interaction.service} (${serviceType})`;
+            scoreDom.innerHTML += `<br><small>${serviceInfo}</small>`;
+        }
+    } else {
+        scoreDom.innerHTML = "0.000000 gCO2eq";
+    }
+    
+    // Show token count instead of requests
+    const requestsTitle = findById("number-of-requests-title");
+    requestsTitle.innerHTML = browser.i18n.getMessage("llmTokensLabel") || "Tokens (input + output):";
+    
+    const requestsDom = findById("number-of-requests");
+    if (interaction) {
+        const inputTokens = interaction.inputTokens || 0;
+        const outputTokens = interaction.outputTokens || 0;
+        const totalTokens = inputTokens + outputTokens;
+        
+        // Ajouter des infos sur le seuil utilisé
+        let serviceType = "openai"; // par défaut
+        if (interaction.service && interaction.service.toLowerCase().includes("meta")) {
+            serviceType = "meta";
+        }
+        
+        // Trouver le seuil correspondant
+        const thresholds = Object.keys(EMISSIONS_FACTORS_RANGE_TOKEN[serviceType])
+            .map(Number)
+            .sort((a, b) => a - b);
+        
+        let selectedThreshold = thresholds[thresholds.length - 1];
+        for (const threshold of thresholds) {
+            if (totalTokens <= threshold) {
+                selectedThreshold = threshold;
+                break;
+            }
+        }
+        
+        requestsDom.innerHTML = `${inputTokens} + ${outputTokens}`;
+        requestsDom.innerHTML += `<br><small>Seuil: ${selectedThreshold} tokens</small>`;
+    } else {
+        requestsDom.innerHTML = "0 + 0";
+    }
+    
+    // Update source
+    const sourceOfData = findById("source-of-data");
+    sourceOfData.innerHTML = "source: Ecologits";
+    
+    // Update link to EcoLLM info
+    const ecoIndexAnchor = findById("ecoindex-result");
+    ecoIndexAnchor.innerHTML = "Learn more about LLM impact";
+    ecoIndexAnchor.href = "https://github.com/genai-impact/ecologits";
+    
+    // Update border color for LLM services
+    const cardDom = findById("card-with-score");
+    cardDom.style.borderColor = "#30A8A7"; // Use secondary color
+    
+    // Add settings button handler
+    const settings = findById("settings");
+    settings.addEventListener('click', () => {
+        window.open("/options/options.html#llm-impact", '_blank');
+    });
+    
+    const settingsText = findById("settings-text");
+    settingsText.innerHTML = browser.i18n.getMessage("settings") || "Settings";
+}
 
 function updateNumberOfRequests(requests) {
     requestsTitle = findById("number-of-requests-title");

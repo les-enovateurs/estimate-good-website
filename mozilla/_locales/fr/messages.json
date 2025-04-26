@@ -18,7 +18,7 @@
     "message": "Supprimer l'historique"
   },
   "settingsHeader": {
-    "message": "Parametres"
+    "message": "Statistiques"
   },
   "averageMonthTitle": {
     "message": "La moyenne des notes ce mois-ci"
@@ -102,6 +102,53 @@
   },
   "settings": {
     "message": "Options"
-  }
-
+  },
+  "carTravelLabel": {
+    "message": "Trajet en voiture"
+  },
+  "smartphoneChargesLabel": {
+    "message": "Charges de smartphone"
+  },
+  "coffeeCupsLabel": {
+    "message": "Tasses de café"
+  },
+  "noLLMDataAvailable": {
+    "message": "Aucune donnée d'utilisation des LLM disponible pour l'instant."
+  },
+  "llmImpactTitle": {
+  "message": "Impact Carbone des IA"
+},
+"llmCarbonLabel": {
+  "message": "Emission total (gCO2eq)"
+},
+"llmInteractionsLabel": {
+  "message": "Interactions"
+},
+"llmTokensLabel": {
+  "message": "Total des Tokens"
+},
+"llmEquivalentTitle": {
+  "message": "Équivalent"
+},
+"clearLLMHistory": {
+  "message": "Effacer historique IA"
+},
+"learnMoreLLMImpact": {
+  "message": "En savoir plus sur l'impact des IA"
+},
+"llmServiceBreakdownTitle": {
+  "message": "Répartition de l'impact carbone par service"
+},
+"basedOnEcologits": {
+  "message": "Basé sur les facteurs d'émission Ecologits"
+},
+"interactions": {
+  "message": "interactions"
+},
+"emissionFactorsDetails": {
+  "message": "Détails des facteurs d'émission"
+},
+"basedOnStudy": {
+  "message": "Basé sur l'étude de recherche Ecologits"
+}
 }

@@ -9,12 +9,49 @@
     <div class="container">
       <h1>EcoSurf Analyser</h1>
       <h2 id="settings-header">Settings</h2>
+      
+      <!-- Website eco-impact section -->
       <div class="card">
         <h3 class="settings-category" id="average-month-title"></h3>
         <div id="progress-bar">
           <img id="grade-average-icon-progress-bar" src="/icons/A.jpg"/>
         </div>
       </div>
+      
+      <!-- NEW: LLM impact section -->
+      <div class="card" id="llm-impact">
+        <h3 class="settings-category" id="llm-impact-title"></h3>
+        
+        <div class="llm-stats-container">
+          <div class="llm-stat-box">
+            <div class="llm-stat-value" id="llm-total-carbon">0.00</div>
+            <div class="llm-stat-label" id="llm-carbon-label"></div>
+          </div>
+          
+          <div class="llm-stat-box">
+            <div class="llm-stat-value" id="llm-interactions">0</div>
+            <div class="llm-stat-label" id="llm-interactions-label"></div>
+          </div>
+          
+          <div class="llm-stat-box">
+            <div class="llm-stat-value" id="llm-tokens">0</div>
+            <div class="llm-stat-label" id="llm-tokens-label"></div>
+          </div>
+        </div>
+        
+        <div class="llm-comparisons">
+          <h4 id="llm-equivalent-title"></h4>
+          <div class="llm-comparison-items" id="llm-comparisons-list">
+            <!-- Will be populated by JavaScript -->
+          </div>
+        </div>
+        
+        <div id="llm-chart-container">
+          <!-- Chart will be rendered here -->
+        </div>
+      </div>
+      
+      <!-- Website history section -->
       <form class="card">
         <h3 class="settings-category" id="browser-history-title"></h3>
         <div class="container-table">
@@ -34,8 +71,11 @@
           </div>
         </div>
       </form>
-      <div>
-        <button type="submit" id="clearHistory">Clear History</button>
+      
+      <!-- Clear data buttons -->
+      <div class="action-buttons">
+        <button type="submit" id="clearHistory">Clear Website History</button>
+        <button type="submit" id="clearLLMHistory">Clear LLM History</button>
       </div>
     </div>
 

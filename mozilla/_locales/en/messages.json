@@ -1,19 +1,4 @@
 {
-  "popUpScoreResult": {
-    "message": "Score: $SCORE$/100.\n\n$REQUESTS$ requests (source EcoIndex).",
-    "description": "Tells the user more data about the website.",
-    "placeholders": {
-      "score" : {
-        "content" : "$1",
-        "example" : "58"
-      },
-      "requests": {
-        "content" : "$2",
-        "example" : "123"
-      }
-    }
-  },
-
   "linkTable": {
     "message": "Link"
   },
@@ -30,19 +15,19 @@
     "message": "Visited at"
   },
   "clearHistory": {
-    "message": "Clear History"
+    "message": "Clear history"
   },
   "settingsHeader": {
-    "message": "Settings"
+    "message": "Statistics"
   },
   "averageMonthTitle": {
-    "message": "Average rating for the month"
+    "message": "Average grades this month"
   },
   "browserHistoryTitle": {
-    "message": "Browser history"
+    "message": "History"
   },
   "paginateBy": {
-    "message": "Pagination by"
+    "message": "Paginate by"
   },
 
   "now": {
@@ -54,9 +39,9 @@
   "minutes": {
     "message": "$MINUTES$ minutes ago",
     "placeholders": {
-      "minutes" : {
-        "content" : "$1",
-        "example" : "3"
+      "minutes": {
+        "content": "$1",
+        "example": "3"
       }
     }
   },
@@ -66,9 +51,9 @@
   "hours": {
     "message": "$HOURS$ hours ago",
     "placeholders": {
-      "hours" : {
-        "content" : "$1",
-        "example" : "5"
+      "hours": {
+        "content": "$1",
+        "example": "5"
       }
     }
   },
@@ -78,18 +63,18 @@
   "days": {
     "message": "$DAYS$ days ago",
     "placeholders": {
-      "days" : {
-        "content" : "$1",
-        "example" : "3"
+      "days": {
+        "content": "$1",
+        "example": "3"
       }
     }
   },
   "weeks": {
     "message": "$WEEKS$ weeks ago",
     "placeholders": {
-      "weeks" : {
-        "content" : "$1",
-        "example" : "3"
+      "weeks": {
+        "content": "$1",
+        "example": "3"
       }
     }
   },
@@ -98,24 +83,72 @@
     "message": "Detailed report"
   },
   "scoreTitle": {
-    "message": "Score:"
+    "message": "Score: "
   },
   "scoreResult": {
     "message": "$SCORE$/100",
     "placeholders": {
-      "score" : {
-        "content" : "$1",
-        "example" : "58"
+      "score": {
+        "content": "$1",
+        "example": "58"
       }
     }
   },
   "numberOfRequestsTitle": {
-    "message": "Number of requests:"
+    "message": "Number of requests: "
   },
   "sourceOfData": {
     "message": "source: Ecoindex"
   },
   "settings": {
     "message": "Settings"
+  },
+  "carTravelLabel": {
+    "message": "Car travel"
+  },
+  "smartphoneChargesLabel": {
+    "message": "Smartphone charges"
+  },
+  "coffeeCupsLabel": {
+    "message": "Cups of coffee"
+  },
+  "noLLMDataAvailable": {
+    "message": "No AI usage data available at the moment."
+  },
+  "llmImpactTitle": {
+    "message": "Carbon Impact of AIs"
+  },
+  "llmCarbonLabel": {
+    "message": "Total emissions (gCO2eq)"
+  },
+  "llmInteractionsLabel": {
+    "message": "Interactions"
+  },
+  "llmTokensLabel": {
+    "message": "Total Tokens"
+  },
+  "llmEquivalentTitle": {
+    "message": "Equivalent"
+  },
+  "clearLLMHistory": {
+    "message": "Clear AI History"
+  },
+  "learnMoreLLMImpact": {
+    "message": "Learn more about AI impact"
+  },
+  "llmServiceBreakdownTitle": {
+    "message": "Service Carbon Impact Breakdown"
+  },
+  "basedOnEcologits": {
+    "message": "Based on Ecologits emission factors"
+  },
+  "interactions": {
+    "message": "interactions"
+  },
+  "emissionFactorsDetails": {
+    "message": "Emission Factors Details"
+  },
+  "basedOnStudy": {
+    "message": "Based on the Ecologits research study"
   }
 }
