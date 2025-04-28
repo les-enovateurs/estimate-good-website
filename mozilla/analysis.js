@@ -150,7 +150,15 @@ browser.tabs.onUpdated.addListener(async (id, changeInfo, tab) => {
                 });
                 
                 // Update icon to show LLM tracking
-                updateIcon(tab.id, "LLM");
+                const llmData = window.llmTracker.getCurrentInteraction(tab.url);
+                const interaction = llmData.currentInteraction || llmData.lastInteraction;
+
+                const carbonImpact = interaction ? interaction.carbonImpact.toFixed(0) : 'LLM';
+                // Update icon to show LLM tracking
+                if(0 != carbonImpact){
+                    updateIcon(tab.id, getImpactSeverity(carbonImpact));
+                }
+
                 browser.pageAction.show(tab.id);
             } else {
                 // Fallback - we still show the LLM icon but we can't track interactions
@@ -168,6 +176,19 @@ browser.tabs.onUpdated.addListener(async (id, changeInfo, tab) => {
         callEcoIndex(tab.id, tab.url, false);
     }
 });
+
+function getImpactSeverity(carbonImpact) {
+    // Convert to number to be safe
+    const impact = parseFloat(carbonImpact);
+    
+    if (impact < 100) return "A";
+    if (impact < 200) return "B";
+    if (impact < 400) return "C";
+    if (impact < 800) return "D";
+    if (impact < 1000) return "E";
+    if (impact < 2000) return "F";
+    return "G";
+}
 
 // Message handler for communication between scripts
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {

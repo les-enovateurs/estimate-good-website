@@ -301,12 +301,12 @@ function getImpactSeverity(carbonImpact) {
     // Convert to number to be safe
     const impact = parseFloat(carbonImpact);
     
-    if (impact < 5) return "A";
-    if (impact < 15) return "B";
-    if (impact < 30) return "C";
-    if (impact < 60) return "D";
-    if (impact < 100) return "E";
-    if (impact < 200) return "F";
+    if (impact < 100) return "A";
+    if (impact < 200) return "B";
+    if (impact < 400) return "C";
+    if (impact < 800) return "D";
+    if (impact < 1000) return "E";
+    if (impact < 2000) return "F";
     return "G";
 }
 
