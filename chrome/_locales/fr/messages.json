@@ -14,14 +14,29 @@
   "visitedAtTable": {
     "message": "Visité à"
   },
-  "clearHistory": {
+  "clearAllData": {
     "message": "Supprimer l'historique"
   },
+  "llmEquivalentTitle": {
+    "message": "Equivalent environnemental"
+  },
+  "llmEnergyEquivalentTitle": {
+    "message": "Equivalent en électricité"
+  },
+  "llmCarbonLabel": {
+    "message": "Total carbone (gCO2eq)"
+  },
+  "llmInteractionsLabel": {
+    "message": "Conversations"
+  },
+  "llmTokensLabel": {
+    "message": "Electricité (Wh)"
+  },
   "settingsHeader": {
-    "message": "Parametres"
+    "message": "Statistiques"
   },
   "averageMonthTitle": {
-    "message": "La moyenne des notes ce mois-ci"
+    "message": "La moyenne des notes des sites web ce mois-ci"
   },
   "browserHistoryTitle": {
     "message": "Historique"
@@ -98,10 +113,81 @@
     "message": "Nombre de requêtes: "
   },
   "sourceOfData": {
-    "message": "source: Ecoindex"
+    "message": "source:"
   },
   "settings": {
     "message": "Options"
-  }
-
+  },
+  "carTravelLabel": {
+    "message": "Trajet en voiture"
+  },
+  "smartphoneChargesLabel": {
+    "message": "Charges de smartphone"
+  },
+  "coffeeCupsLabel": {
+    "message": "Litres de café"
+  },
+  "noLLMDataAvailable": {
+    "message": "Aucune donnée d'utilisation des LLM disponible pour l'instant."
+  },
+  "llmImpactTitle": {
+  "message": "Impact carbone"
+},
+"llmCarbonLabel": {
+  "message": "Emission total (gCO2eq)"
+},
+"llmInteractionsLabel": {
+  "message": "Conversations"
+},
+"llmTokensLabel": {
+  "message": "Electricité utilisé (Wh)"
+},
+"llmEquivalentTitle": {
+  "message": "Équivalent"
+},
+"clearLLMHistory": {
+  "message": "Effacer historique IA"
+},
+"learnMoreLLMImpact": {
+  "message": "En savoir plus sur l'impact des IA"
+},
+"llmServiceBreakdownTitle": {
+  "message": "Répartition de l'impact carbone par service"
+},
+"basedOnEcologits": {
+  "message": "Basé sur les facteurs d'émission Ecologits"
+},
+"interactions": {
+  "message": "Conversations"
+},
+"emissionFactorsDetails": {
+  "message": "Détails des facteurs d'émission"
+},
+"basedOnStudy": {
+  "message": "Basé sur l'étude de recherche Ecologits"
+},
+"llmEnergyLabel": {
+  "message": "Énergie (Wh)"
+},
+"llmEnergyEquivalentTitle": {
+  "message": "Équivalent Énergétique"
+},
+"smartphoneChargesEnergyLabel": {
+  "message": "Charges de Smartphone"
+},
+"ledBulbHoursLabel": {
+  "message": "Heures d'Ampoule LED"
+},
+"laptopMinutesLabel": {
+  "message": "Minutes d'Ordinateur Portable"
+},
+"carbonTabLabel": {
+  "message": "Impact Carbone"
+},
+"energyTabLabel": {
+  "message": "Impact Énergétique"
+},
+"llmServiceEnergyBreakdownTitle": {
+  "message": "Répartition de l'impact énergétique par service"
+}
 }
