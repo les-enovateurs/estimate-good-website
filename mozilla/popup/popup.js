@@ -118,11 +118,7 @@ async function displayLLMImpact(url) {
     
     try {
         // Get data directly from storage
-        const storageData = await new Promise(resolve => {
-            browser.storage.local.get(['llmInteractions', 'lastUpdated'], result => {
-                resolve(result);
-            });
-        });
+        const storageData = await browser.storage.local.get(['llmInteractions', 'lastUpdated']);
         
         if (storageData && storageData.llmInteractions) {
             // Find the interaction for this URL
@@ -256,16 +252,6 @@ async function displayLLMImpact(url) {
         <span class="button-text">${messageDashboard}</span>
     `;
     ecoIndexAnchor.href = "/options/options.html#llm-impact";
-
-    
-    // Remove settings button handler since it's redundant now
-    const settings = findById("settings");
-    settings.style.display = "none";
-    
-    const settingsText = findById("settings-text");
-    if (settingsText) {
-        settingsText.style.display = "none";
-    }
 }
 
 // Update the impact badge based on grade
