@@ -118,11 +118,7 @@ async function displayLLMImpact(url) {
     
     try {
         // Get data directly from storage
-        const storageData = await new Promise(resolve => {
-            browser.storage.local.get(['llmInteractions', 'lastUpdated'], result => {
-                resolve(result);
-            });
-        });
+        const storageData = await browser.storage.local.get(['llmInteractions', 'lastUpdated']);
         
         if (storageData && storageData.llmInteractions) {
             // Find the interaction for this URL
@@ -256,16 +252,6 @@ async function displayLLMImpact(url) {
         <span class="button-text">${messageDashboard}</span>
     `;
     ecoIndexAnchor.href = "/options/options.html#llm-impact";
-
-    
-    // Remove settings button handler since it's redundant now
-    const settings = findById("settings");
-    settings.style.display = "none";
-    
-    const settingsText = findById("settings-text");
-    if (settingsText) {
-        settingsText.style.display = "none";
-    }
 }
 
 // Update the impact badge based on grade
@@ -315,12 +301,12 @@ function getImpactSeverity(carbonImpact) {
     // Convert to number to be safe
     const impact = parseFloat(carbonImpact);
     
-    if (impact < 5) return "A";
-    if (impact < 15) return "B";
-    if (impact < 30) return "C";
-    if (impact < 60) return "D";
-    if (impact < 100) return "E";
-    if (impact < 200) return "F";
+    if (impact < 100) return "A";
+    if (impact < 200) return "B";
+    if (impact < 400) return "C";
+    if (impact < 800) return "D";
+    if (impact < 1000) return "E";
+    if (impact < 2000) return "F";
     return "G";
 }
 

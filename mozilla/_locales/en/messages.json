@@ -177,5 +177,8 @@
   },
   "llmServiceEnergyBreakdownTitle": {
     "message": "Service Energy Impact Breakdown"
+  },
+  "clearAllData": {
+    "message": "Clear history"
   }
 }
