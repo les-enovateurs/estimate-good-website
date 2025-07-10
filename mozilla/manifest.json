@@ -20,7 +20,6 @@
     "default_popup": "popup/popup.html"
   },
   "permissions": [
-    "activeTab",
     "tabs"
   ],
   "browser_specific_settings": {
