@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="options.css"/>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>EcoSurf Analyser</h1>
+      <h2 id="settings-header">Settings</h2>
+      
+      <!-- Website eco-impact section -->
+      <div class="card">
+        <h3 class="settings-category" id="average-month-title"></h3>
+        <div id="progress-bar">
+          <img id="grade-average-icon-progress-bar" src="/icons/A.jpg"/>
+        </div>
+      </div>
+      
+      <!-- NEW: LLM impact section -->
+      <div class="card" id="llm-impact">
+        <h3 class="settings-category" id="llm-impact-title"></h3>
+        
+        <div class="llm-stats-container">
+          <div class="llm-stat-box">
+            <div class="icon-container">
+              <svg width="40" fill="#30A8A7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M64 32C46.3 32 32 46.3 32 64l0 240 0 48 0 80c0 26.5 21.5 48 48 48l416 0c26.5 0 48-21.5 48-48l0-128 0-151.8c0-18.2-19.4-29.7-35.4-21.1L352 215.4l0-63.2c0-18.2-19.4-29.7-35.4-21.1L160 215.4 160 64c0-17.7-14.3-32-32-32L64 32z"/></svg>
+            </div>
+            <div class="stat-content">
+              <div class="llm-stat-value" id="llm-total-carbon">0.00</div>
+              <div class="llm-stat-label" id="llmCarbonLabel"></div>
+            </div>
+          </div>
+          
+          <div class="llm-stat-box">
+            <div class="icon-container">
+              <svg xmlns="http://www.w3.org/2000/svg" width="40" fill="#30A8A7" viewBox="0 0 448 512"><path d="M349.4 44.6c5.9-13.7 1.5-29.7-10.6-38.5s-28.6-8-39.9 1.8l-256 224c-10 8.8-13.6 22.9-8.9 35.3S50.7 288 64 288l111.5 0L98.6 467.4c-5.9 13.7-1.5 29.7 10.6 38.5s28.6 8 39.9-1.8l256-224c10-8.8 13.6-22.9 8.9-35.3s-16.6-20.7-30-20.7l-111.5 0L349.4 44.6z"/></svg>
+            </div>
+            <div class="stat-content">
+              <div class="llm-stat-value" id="llm-total-energy">0.00</div>
+              <div class="llm-stat-label" id="llm-energy-label"></div>
+            </div>
+          </div>
+          
+          <div class="llm-stat-box">
+            <div class="icon-container">
+              <svg xmlns="http://www.w3.org/2000/svg" width="40" fill="#30A8A7" viewBox="0 0 512 512"><path d="M512 240c0 114.9-114.6 208-256 208c-37.1 0-72.3-6.4-104.1-17.9c-11.9 8.7-31.3 20.6-54.3 30.6C73.6 471.1 44.7 480 16 480c-6.5 0-12.3-3.9-14.8-9.9c-2.5-6-1.1-12.8 3.4-17.4c0 0 0 0 0 0s0 0 0 0s0 0 0 0c0 0 0 0 0 0l.3-.3c.3-.3 .7-.7 1.3-1.4c1.1-1.2 2.8-3.1 4.9-5.7c4.1-5 9.6-12.4 15.2-21.6c10-16.6 19.5-38.4 21.4-62.9C17.7 326.8 0 285.1 0 240C0 125.1 114.6 32 256 32s256 93.1 256 208z"/></svg>
+            </div>
+            <div class="stat-content">
+              <div class="llm-stat-value" id="llm-interactions">0</div>
+              <div class="llm-stat-label" id="llmInteractionsLabel"></div>
+            </div>
+          </div>
+          
+          <div class="llm-stat-box" style="display: none;">
+            <div class="stat-content">
+              <div class="llm-stat-value" id="llm-tokens">0</div>
+              <div class="llm-stat-label" id="llmTokensLabel"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="llm-comparisons">
+          <h4 id="llmEquivalentTitle"></h4>
+          <div class="llm-comparison-items" id="llm-comparisons-list">
+            <!-- Will be populated by JavaScript -->
+          </div>
+        </div>
+        
+        <div class="llm-comparisons">
+          <h4 id="llmEnergyEquivalentTitle"></h4>
+          <div class="llm-comparison-items" id="llm-energy-comparisons-list">
+            <!-- Will be populated by JavaScript -->
+          </div>
+        </div>
+        
+        <div id="llm-chart-container">
+          <!-- Chart will be rendered here -->
+        </div>
+      </div>
+      
+      <!-- Website history section -->
+      <form class="card">
+        <h3 class="settings-category" id="browser-history-title"></h3>
+        <div class="container-table">
+          <table id="list-of-url-table"></table>
+        </div>
+        <div class="pagination-container">
+          <div class="number-items-pagination">
+            <p id="paginate-by-label"></p>
+            <select id="select-paginate-by">
+                <option>10</option>
+                <option>20</option>
+                <option>50</option>
+            </select>
+          </div>
+
+          <div id="pagination-pages">
+          </div>
+        </div>
+      </form>
+      
+      <!-- Clear data buttons -->
+      <div class="action-buttons">
+        <button type="submit" id="clearLLMHistory">Clear All Data</button>
+      </div>
+    </div>
+
+    <script type="application/javascript" src="../webextension/browser-polyfill.js"></script>
+    <script type="application/javascript" src="options.js"></script>
+  </body>
+</html>
