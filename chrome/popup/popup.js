@@ -287,6 +287,9 @@ function updateImpactBadge(grade) {
         case "G": badgeColor = "#f01c16"; break;
     }
     impactBadge.style.backgroundColor = badgeColor;
+    if(["C", "D", "E"].includes(grade)) {
+        impactBadge.style.color = "black";
+    }
 }
 
 // Enhance the border color update to also update the badge
