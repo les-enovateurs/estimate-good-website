@@ -77,12 +77,13 @@ chrome.tabs.query({currentWindow: true, active: true})
             
             // Now display LLM impact information with refreshed data
             displayLLMImpact(url);
-            return;
+            // it don't fully understand the return below. More importantly, its works with the return in the mozilla side           
+            //return;
         }
         
         // Continue with normal EcoIndex display
-        const localStorage = window.localStorage;
-        const parsedData = getResultFromUrl(url);
+        const parsedData = await getResultFromUrl(url);
+        console.log(parsedData)
         
         if (!parsedData) {
             // No data available yet
@@ -91,7 +92,6 @@ chrome.tabs.query({currentWindow: true, active: true})
         }
         
         const { id, score, requests, grade } = parsedData;
-        
         updateUrl(url);
         updateScore(score);
         updateNumberOfRequests(requests);
@@ -107,7 +107,7 @@ chrome.tabs.query({currentWindow: true, active: true})
         
         
     } catch (error) {
-        console.error("Error in popup initialization:", error);
+        console.error("Error llm in popup initialization:", error);
     }
 });
 
@@ -287,6 +287,9 @@ function updateImpactBadge(grade) {
         case "G": badgeColor = "#f01c16"; break;
     }
     impactBadge.style.backgroundColor = badgeColor;
+    if(["C", "D", "E"].includes(grade)) {
+        impactBadge.style.color = "black";
+    }
 }
 
 // Enhance the border color update to also update the badge
@@ -358,12 +361,14 @@ function updateUrl(url) {
 }
 
 function getResultFromUrl(url) {
-    const localStorageData = localStorage.getItem(url);
-    if(!localStorage) {
-        return;
-    }
-
-    return JSON.parse(localStorageData);
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get([url], function(item) {
+            if(!item) {
+                return;
+            }
+            resolve(JSON.parse(item[url]));
+        });
+    });
 }
 
 // tool functions

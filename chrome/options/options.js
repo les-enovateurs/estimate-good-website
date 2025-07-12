@@ -68,13 +68,13 @@ window.addEventListener('DOMContentLoaded', async (event) => {
     const averageMonthTitle = findById("average-month-title");
     averageMonthTitle.innerHTML = chrome.i18n.getMessage("averageMonthTitle");
 
-    const chromeHistoryTitle = findById("chrome-history-title");
-    chromeHistoryTitle.innerHTML = chrome.i18n.getMessage("chromeHistoryTitle");
+    const browserHistoryTitle = findById("browser-history-title");
+    browserHistoryTitle.innerHTML = chrome.i18n.getMessage("browserHistoryTitle");
 
     // progress bar
     const gradeIconProgressBar = findById("grade-average-icon-progress-bar");
 
-    const rowsSortedByVisitedAt = computeData();
+    const rowsSortedByVisitedAt = await computeData();
     const currentPage = 1;
 
     renderTable(rowsSortedByVisitedAt, currentPage);
@@ -92,7 +92,6 @@ window.addEventListener('DOMContentLoaded', async (event) => {
     clearButton.addEventListener('click', async () => {
         // Clear website history
         await chrome.storage.local.clear();
-        localStorage.clear();
         
         // Clear LLM data
         await chrome.runtime.sendMessage({
@@ -100,23 +99,26 @@ window.addEventListener('DOMContentLoaded', async (event) => {
         });
         
         // Refresh both sections
-        const rowsSortedByVisitedAt = computeData();
+        const rowsSortedByVisitedAt = await computeData();
         renderTable(rowsSortedByVisitedAt, currentPage);
         renderPagination(rowsSortedByVisitedAt.length, itemsPerPage, currentPage);
         setupLLMImpactSection();
     });
 });
 
-function computeData() {
-    const items = { ...localStorage };
-    const rows = Object.entries(items)
-    // sort desc by visited at
-    const rowsSortedByVisitedAt = rows.slice().sort(([keyA, valueA],[keyB, valueB]) => {
-        const a = JSON.parse(valueA);
-        const b = JSON.parse(valueB);
-        return a["visitedAt"] < b["visitedAt"];
+async function computeData() {
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get(null, function(items) {
+            const rows = Object.entries(items);
+            // sort desc by visited at
+            const rowsSortedByVisitedAt = rows.slice().sort(([keyA, valueA],[keyB, valueB]) => {
+                const a = JSON.parse(valueA);
+                const b = JSON.parse(valueB);
+                return a["visitedAt"] < b["visitedAt"];
+            });
+            resolve(rowsSortedByVisitedAt);
+        });
     });
-    return rowsSortedByVisitedAt;
 }
 
 function renderTable(rows, currentPage) {
@@ -224,22 +226,22 @@ function renderPagination(numberOfItems, itemsPerPage, currentPage) {
 
     const firstPageDom = document.createElement("button");
     firstPageDom.innerHTML = "<<";
-    firstPageDom.addEventListener('click', (event) => {
+    firstPageDom.addEventListener('click', async (event) => {
         event.preventDefault();
 
         const currentPage = 1;
-        const rows = computeData();
+        const rows =  await computeData();
         renderTable(rows, currentPage);
         renderPagination(rows.length, itemsPerPage, currentPage);
     });
 
     const lastPageDom = document.createElement("button");
     lastPageDom.innerHTML = ">>";
-    lastPageDom.addEventListener('click', (event) => {
+    lastPageDom.addEventListener('click', async (event) => {
         event.preventDefault();
 
         const currentPage = parseInt(Math.ceil(numberOfItems/itemsPerPage));
-        const rows = computeData();
+        const rows = await computeData();
         renderTable(rows, currentPage);
         renderPagination(rows.length, itemsPerPage, currentPage);
     });
@@ -261,11 +263,11 @@ function renderPagination(numberOfItems, itemsPerPage, currentPage) {
         if(i === currentPage) {
             buttonIndex.classList.toggle("pagination-selected")
         }
-        buttonIndex.addEventListener('click', (event) => {
+        buttonIndex.addEventListener('click', async (event) => {
             event.preventDefault();
 
             const currentPage = parseInt(i);
-            const rows = computeData();
+            const rows = await computeData();
             renderTable(rows, currentPage);
             renderPagination(rows.length, itemsPerPage, currentPage);
         });

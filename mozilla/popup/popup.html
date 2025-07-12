@@ -10,22 +10,17 @@
   <body>
     <div class="container">
       <header class="popup-header">
-        <div class="logo-container">
-          <div class="logo-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="#30A8A7" width="24" height="24" viewBox="0 0 448 512"><path d="M349.4 44.6c5.9-13.7 1.5-29.7-10.6-38.5s-28.6-8-39.9 1.8l-256 224c-10 8.8-13.6 22.9-8.9 35.3S50.7 288 64 288l111.5 0L98.6 467.4c-5.9 13.7-1.5 29.7 10.6 38.5s28.6 8 39.9-1.8l256-224c10-8.8 13.6-22.9 8.9-35.3s-16.6-20.7-30-20.7l-111.5 0L349.4 44.6z"/></svg>
-          </div>
-          <h1 class="extension-title">EcoSurf</h1>
-        </div>
-      
+        <svg xmlns="http://www.w3.org/2000/svg" fill="#30A8A7" width="24" height="24" viewBox="0 0 448 512">
+          <path d="M349.4 44.6c5.9-13.7 1.5-29.7-10.6-38.5s-28.6-8-39.9 1.8l-256 224c-10 8.8-13.6 22.9-8.9 35.3S50.7 288 64 288l111.5 0L98.6 467.4c-5.9 13.7-1.5 29.7 10.6 38.5s28.6 8 39.9-1.8l256-224c10-8.8 13.6-22.9 8.9-35.3s-16.6-20.7-30-20.7l-111.5 0L349.4 44.6z"/>
+        </svg>
+        <h1 class="extension-title">EcoSurf</h1>
       </header>
 
       <div class="current-url-container">
-        <div class="url-icon">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2C4.68629 2 2 4.68629 2 8C2 11.3137 4.68629 14 8 14Z" stroke="#30A8A7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M8 5.5V8.5L10 9.5" stroke="#30A8A7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
+        <svg class="url-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2C4.68629 2 2 4.68629 2 8C2 11.3137 4.68629 14 8 14Z" stroke="#30A8A7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8 5.5V8.5L10 9.5" stroke="#30A8A7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
         <p id="url" class="current-url" title="Current URL">loading...</p>
       </div>
 
@@ -34,18 +29,12 @@
         
         <div class="stats-container" id="stats">
           <div class="stat-box">
-            <div class="stat-header">
-              <!-- span class="stat-icon carbon-icon"></span>-->
-              <span id="score-title" class="stat-title">Score:</span>
-            </div>
+            <span id="score-title" class="stat-title">Score:</span>
             <div id="score" class="stat-value">50/100</div>
           </div>
           
           <div class="stat-box">
-            <div class="stat-header">
-               <!--<span class="stat-icon requests-icon"></span>-->
-              <span id="number-of-requests-title" class="stat-title">Number of requests:</span>
-            </div>
+            <span id="number-of-requests-title" class="stat-title">Number of requests:</span>
             <div id="number-of-requests" class="stat-value">40</div>
           </div>
           

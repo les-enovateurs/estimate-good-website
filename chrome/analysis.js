@@ -46,9 +46,10 @@ function renderResult(tabId, parsedData) {
     chrome.action.enable(tabId);
 }
 
-function storeResult(url, parsedData) {
+async function storeResult(url, parsedData) {
     const visitedAt = new Date();
-    localStorage.setItem(url, JSON.stringify({...parsedData, visitedAt }));
+    console.log(visitedAt, url)
+    await chrome.storage.local.set({[url]: JSON.stringify({ ...parsedData, visitedAt })});
 }
 
 // select only the information we need for the app
@@ -309,7 +310,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
             updateIcon(tabId, "LLM");
             chrome.action.enable(tabId);
         } else if (isValidUrl(tab.url)) {
-            getEcoIndexCachetResult(tabId, tab.url);
+            callEcoIndex(tab.id, tab.url, false);
         }
     }
 });
