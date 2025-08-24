@@ -1,42 +1,67 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="popup.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   </head>
 
   <body>
     <div class="container">
-      <div class="card" id="card-with-score">
-        <div id="stats">
-          <p id="url">browse-url.com</p>
-          <div id="score-container">
-            <span id="score-title">
-              Score:
-            </span>
-            <span id="score">50/100</span>
-          </div>
-          <div id="requests-container">
-            <span id="number-of-requests-title">
-              Number of requests:
-            </span>
-            <span id="number-of-requests">40</span>
-          </div>
-          <span id="source-of-data">source: ecoindex</span>
-        </div>
-        <a id="ecoindex-result" class="link-url" target="_blank" rel="noopener noreferrer">See detailed report</a>
+      <header class="popup-header">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="#30A8A7" width="24" height="24" viewBox="0 0 448 512">
+          <path d="M349.4 44.6c5.9-13.7 1.5-29.7-10.6-38.5s-28.6-8-39.9 1.8l-256 224c-10 8.8-13.6 22.9-8.9 35.3S50.7 288 64 288l111.5 0L98.6 467.4c-5.9 13.7-1.5 29.7 10.6 38.5s28.6 8 39.9-1.8l256-224c10-8.8 13.6-22.9 8.9-35.3s-16.6-20.7-30-20.7l-111.5 0L349.4 44.6z"/>
+        </svg>
+        <h1 class="extension-title">EcoSurf</h1>
+      </header>
+
+      <div class="current-url-container">
+        <svg class="url-icon" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M8 14C11.3137 14 14 11.3137 14 8C14 4.68629 11.3137 2 8 2C4.68629 2 2 4.68629 2 8C2 11.3137 4.68629 14 8 14Z" stroke="#30A8A7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M8 5.5V8.5L10 9.5" stroke="#30A8A7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <p id="url" class="current-url" title="Current URL">loading...</p>
       </div>
 
-      <div class="container-footer">
-        <button id="settings" href="/options/options.html" target="_blank" rel="noopener noreferrer">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16px"><!--! Font Awesome Pro 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2024 Fonticons, Inc. -->
-            <path fill="#FFFFFF" d="M328 0l14.6 66.8c11.9 5.5 23.3 12 33.8 19.6l65.2-20.8 72 124.7-50.6 46.1c.6 6.4 .9 12.9 .9 19.5s-.3 13.1-.9 19.5l50.6 46.1-72 124.7-65.2-20.8c-10.6 7.5-21.9 14.1-33.8 19.6L328 512H184l-14.6-66.8c-11.9-5.5-23.3-12-33.8-19.6L70.3 446.4l-72-124.7 50.6-46.1c-.6-6.4-.9-12.9-.9-19.5s.3-13.1 .9-19.5L-1.7 190.4l72-124.7 65.2 20.8c10.6-7.5 21.9-14.1 33.8-19.6L184 0H328zm63 132.2l-22.9 7.3-19.5-13.9c-8.2-5.8-16.9-10.9-26-15.1l-21.8-10-5.1-23.4L289.4 48H222.6l-6.4 29.1-5.1 23.4-21.8 10c-9.2 4.2-17.9 9.3-26 15.1l-19.5 13.9L121 132.2l-28.4-9L59.2 180.9l22 20.1 17.7 16.1-2.2 23.8c-.5 5-.7 10-.7 15.1s.2 10.1 .7 15.1l2.2 23.8L81.2 311l-22 20.1 33.4 57.8 28.4-9 22.9-7.3 19.5 13.9c8.2 5.8 16.9 10.9 26 15.1l21.8 10 5.1 23.4 6.4 29.1h66.7l6.4-29.1 5.1-23.4 21.8-10c9.2-4.2 17.9-9.3 26-15.1l19.5-13.9 22.9 7.3 28.4 9 33.4-57.8L430.8 311l-17.7-16.1 2.2-23.8c.5-5 .7-10 .7-15.1s-.2-10.1-.7-15.1l-2.2-23.8L430.8 201l22.1-20.1-33.4-57.8-28.4 9zM304 256a48 48 0 1 0 -96 0 48 48 0 1 0 96 0zm-144 0a96 96 0 1 1 192 0 96 96 0 1 1 -192 0z"/>
-          </svg>
+      <div class="card" id="card-with-score">
+        <div class="impact-badge" id="impact-badge">A</div>
+        
+        <div class="stats-container" id="stats">
+          <div class="stat-box">
+            <span id="score-title" class="stat-title">Score:</span>
+            <div id="score" class="stat-value">50/100</div>
+          </div>
+          
+          <div class="stat-box">
+            <span id="number-of-requests-title" class="stat-title">Number of requests:</span>
+            <div id="number-of-requests" class="stat-value">40</div>
+          </div>
+          
+          <div class="info-source">
+            <span id="source-of-data">source: ecoindex</span>
+          </div>
+        </div>
+        
+        <a id="ecoindex-result" class="action-button" target="_blank" rel="noopener noreferrer">
+          <span class="button-text">View Impact Dashboard</span>
+        </a>
+      </div>
 
-          <span id="settings-text">Settings</span>
-        </button>
+      <div class="popup-footer">
+        
+        <!-- Added new section: Made with love by Les E-novateurs -->
+        <div class="made-with-love">
+          Made with 
+          <span class="heart-icon">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#ff4e4e" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+          </span>
+          by <a href="https://les-enovateurs.com" target="_blank" class="team-link">Les E-novateurs</a> team
+        </div>
       </div>
     </div>
+    <script src="popup.js"></script>
   </body>
-
-  <script src="popup.js"></script>
 </html>
