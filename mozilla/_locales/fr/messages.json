@@ -102,6 +102,112 @@
   },
   "settings": {
     "message": "Options"
-  }
+  },
 
+  "privacyTitle": {
+    "message": "Protection des données"
+  },
+  "easyAccessLabel": {
+    "message": "Facilité d'accès:"
+  },
+  "exportEmailLabel": {
+    "message": "Email export:"
+  },
+  "deleteEmailLabel": {
+    "message": "Email suppression:"
+  },
+  "exportUrlLabel": {
+    "message": "Lien export:"
+  },
+  "badgeForm": {
+    "message": "Formulaire"
+  },
+  "badgeEmail": {
+    "message": "Email"
+  },
+  "badgePostal": {
+    "message": "Courrier"
+  },
+  "badgeIdCard": {
+    "message": "CNI requise"
+  },
+  "unlockMyDataLink": {
+    "message": "Plus sur Unlock My Data"
+  },
+  "loadingText": {
+    "message": "Chargement..."
+  },
+
+  "chartsTitle": {
+    "message": "Statistiques"
+  },
+  "chartEvolutionTitle": {
+    "message": "Évolution du score"
+  },
+  "chartDistributionTitle": {
+    "message": "Répartition par note"
+  },
+  "chartTopSitesTitle": {
+    "message": "Top 10 des sites"
+  },
+  "btnBestSites": {
+    "message": "Meilleurs"
+  },
+  "btnWorstSites": {
+    "message": "Pires"
+  },
+  "averageScore": {
+    "message": "Score moyen"
+  },
+  "score": {
+    "message": "Score"
+  },
+
+  "breachTitle": {
+    "message": "Fuites de données"
+  },
+  "breachAffectedAccounts": {
+    "message": "comptes affectés"
+  },
+  "breachCheckLink": {
+    "message": "Vérifier sur Have I Been Pwned"
+  },
+
+  "termsTitle": {
+    "message": "Modifications CGU"
+  },
+  "termsLastUpdate": {
+    "message": "Dernière mise à jour: "
+  },
+  "termsViewChanges": {
+    "message": "Voir les changements"
+  },
+  "termsArchiveLink": {
+    "message": "Source: Open Terms Archive"
+  },
+
+  "badgeSettingsTitle": {
+    "message": "Affichage"
+  },
+  "badgeToggleLabel": {
+    "message": "Afficher le badge flottant"
+  },
+  "badgeToggleDescription": {
+    "message": "Affiche un badge flottant sur les sites avec le score EcoIndex et les infos de confidentialité"
+  },
+  "badgePrivacyTitle": {
+    "message": "Accès aux données"
+  },
+  "badgeBreachesTitle": {
+    "message": "Fuites de données"
+  },
+  "badgeTermsTitle": {
+    "message": "Modifications CGU"
+  },
+  "badgeAccessMethods": {
+    "message": "Méthodes:"
+  },
+  "badgeMore": {
+    "message": "autres"
+  }
 }

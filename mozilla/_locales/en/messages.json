@@ -117,5 +117,112 @@
   },
   "settings": {
     "message": "Settings"
+  },
+
+  "privacyTitle": {
+    "message": "Data Privacy"
+  },
+  "easyAccessLabel": {
+    "message": "Access ease:"
+  },
+  "exportEmailLabel": {
+    "message": "Export email:"
+  },
+  "deleteEmailLabel": {
+    "message": "Delete email:"
+  },
+  "exportUrlLabel": {
+    "message": "Export URL:"
+  },
+  "badgeForm": {
+    "message": "Form"
+  },
+  "badgeEmail": {
+    "message": "Email"
+  },
+  "badgePostal": {
+    "message": "Postal"
+  },
+  "badgeIdCard": {
+    "message": "ID Required"
+  },
+  "unlockMyDataLink": {
+    "message": "More on Unlock My Data"
+  },
+  "loadingText": {
+    "message": "Loading..."
+  },
+
+  "chartsTitle": {
+    "message": "Statistics"
+  },
+  "chartEvolutionTitle": {
+    "message": "Score evolution"
+  },
+  "chartDistributionTitle": {
+    "message": "Grade distribution"
+  },
+  "chartTopSitesTitle": {
+    "message": "Top 10 sites"
+  },
+  "btnBestSites": {
+    "message": "Best"
+  },
+  "btnWorstSites": {
+    "message": "Worst"
+  },
+  "averageScore": {
+    "message": "Average score"
+  },
+  "score": {
+    "message": "Score"
+  },
+
+  "breachTitle": {
+    "message": "Data Breaches"
+  },
+  "breachAffectedAccounts": {
+    "message": "accounts affected"
+  },
+  "breachCheckLink": {
+    "message": "Check on Have I Been Pwned"
+  },
+
+  "termsTitle": {
+    "message": "Terms Changes"
+  },
+  "termsLastUpdate": {
+    "message": "Last update: "
+  },
+  "termsViewChanges": {
+    "message": "View changes"
+  },
+  "termsArchiveLink": {
+    "message": "Source: Open Terms Archive"
+  },
+
+  "badgeSettingsTitle": {
+    "message": "Display"
+  },
+  "badgeToggleLabel": {
+    "message": "Show floating badge"
+  },
+  "badgeToggleDescription": {
+    "message": "Display a floating badge on websites with EcoIndex score and privacy info"
+  },
+  "badgePrivacyTitle": {
+    "message": "Data access"
+  },
+  "badgeBreachesTitle": {
+    "message": "Data breaches"
+  },
+  "badgeTermsTitle": {
+    "message": "Terms changes"
+  },
+  "badgeAccessMethods": {
+    "message": "Methods:"
+  },
+  "badgeMore": {
+    "message": "more"
   }
 }

@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="utf-8" />
@@ -6,6 +7,10 @@
 
   <body>
     <div class="container">
+      <div id="loader" class="loader-container">
+        <div class="loader-spinner"></div>
+        <span id="loader-text">Loading...</span>
+      </div>
       <div class="card" id="card-with-score">
         <div id="stats">
           <p id="url">browse-url.com</p>
@@ -24,6 +29,57 @@
           <span id="source-of-data">source: ecoindex</span>
         </div>
         <a id="ecoindex-result" class="link-url" target="_blank" rel="noopener noreferrer">See detailed report</a>
+      </div>
+
+      <div id="privacy-card" class="card privacy-card" style="display: none;">
+        <div class="privacy-header">
+          <span id="privacy-title">Data Privacy</span>
+          <span id="service-name" class="service-name"></span>
+        </div>
+        <div id="privacy-content" class="privacy-content">
+          <div class="privacy-row">
+            <span id="easy-access-label">Access ease:</span>
+            <span id="easy-access-value" class="privacy-value"></span>
+          </div>
+          <div class="privacy-row" id="export-email-row" style="display: none;">
+            <span id="export-email-label">Export email:</span>
+            <a id="export-email-value" class="link-url privacy-value"></a>
+          </div>
+          <div class="privacy-row" id="delete-email-row" style="display: none;">
+            <span id="delete-email-label">Delete email:</span>
+            <a id="delete-email-value" class="link-url privacy-value"></a>
+          </div>
+          <div class="privacy-row" id="export-url-row" style="display: none;">
+            <span id="export-url-label">Export URL:</span>
+            <a id="export-url-value" class="link-url privacy-value" target="_blank" rel="noopener noreferrer">Link</a>
+          </div>
+          <div class="privacy-badges" id="privacy-badges">
+            <span id="badge-form" class="badge" style="display: none;">Form</span>
+            <span id="badge-email" class="badge" style="display: none;">Email</span>
+            <span id="badge-postal" class="badge" style="display: none;">Postal</span>
+            <span id="badge-id-card" class="badge badge-warning" style="display: none;">ID Required</span>
+          </div>
+        </div>
+        <a id="unlock-my-data-link" class="link-url" href="https://unlock-my-data.com/" target="_blank" rel="noopener noreferrer">More on Unlock My Data</a>
+      </div>
+
+      <!-- Data Breaches Card -->
+      <div id="breach-card" class="card breach-card" style="display: none;">
+        <div class="breach-header">
+          <span id="breach-title">Data Breaches</span>
+          <span id="breach-count" class="breach-count"></span>
+        </div>
+        <div id="breach-list" class="breach-list"></div>
+        <a id="haveibeenpwned-link" class="link-url" href="https://haveibeenpwned.com/" target="_blank" rel="noopener noreferrer">Check on Have I Been Pwned</a>
+      </div>
+
+      <!-- Terms Archive Card -->
+      <div id="terms-card" class="card terms-card" style="display: none;">
+        <div class="terms-header">
+          <span id="terms-title">Terms Changes</span>
+        </div>
+        <div id="terms-list" class="terms-list"></div>
+        <a id="terms-archive-link" class="link-url" href="https://opentermsarchive.org/" target="_blank" rel="noopener noreferrer">Source: Open Terms Archive</a>
       </div>
 
       <div class="container-footer">

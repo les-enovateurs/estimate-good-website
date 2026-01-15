@@ -105,3 +105,239 @@ button:hover {
   flex-direction: row;
   gap: 4px;
 }
+
+/* Privacy Card Styles */
+.privacy-card {
+  border-color: #6c5ce7 !important;
+}
+
+.privacy-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#privacy-title {
+  font-weight: bold;
+  font-size: larger;
+  color: #9286f6;
+}
+
+.service-name {
+  font-size: 0.85rem;
+  color: #a0a0a0;
+}
+
+.privacy-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.privacy-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.privacy-value {
+  font-weight: bold;
+  font-size: 0.9rem;
+  text-align: right;
+  word-break: break-all;
+  max-width: 180px;
+}
+
+.privacy-badges {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.3rem;
+}
+
+.badge {
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  background-color: #34bc6e;
+  color: white;
+}
+
+.badge-warning {
+  background-color: #fb9929;
+}
+
+#unlock-my-data-link {
+  font-size: 0.85rem;
+  margin-top: 0.3rem;
+}
+
+/* Loader Styles */
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  gap: 1rem;
+}
+
+.loader-container.hidden {
+  display: none;
+}
+
+.loader-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #292e33;
+  border-top: 4px solid var(--secondary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+#loader-text {
+  font-size: 0.9rem;
+  color: #a0a0a0;
+}
+
+/* Hide cards while loading */
+.card.hidden {
+  display: none;
+}
+
+/* Breach Card Styles */
+.breach-card {
+  border-color: #e74c3c !important;
+}
+
+.breach-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#breach-title {
+  font-weight: bold;
+  font-size: larger;
+  color: #e74c3c;
+}
+
+.breach-count {
+  background-color: #e74c3c;
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.breach-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.breach-item {
+  background-color: rgba(231, 76, 60, 0.1);
+  padding: 0.5rem;
+  border-radius: 4px;
+  border-left: 3px solid #e74c3c;
+}
+
+.breach-item-title {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.breach-item-date {
+  font-size: 0.75rem;
+  color: #a0a0a0;
+}
+
+.breach-item-count {
+  font-size: 0.75rem;
+  color: #e74c3c;
+}
+
+#haveibeenpwned-link {
+  font-size: 0.85rem;
+  margin-top: 0.3rem;
+}
+
+/* Terms Archive Card Styles */
+.terms-card {
+  border-color: #3498db !important;
+}
+
+.terms-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+#terms-title {
+  font-weight: bold;
+  font-size: larger;
+  color: #3498db;
+}
+
+.terms-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.terms-item {
+  background-color: rgba(52, 152, 219, 0.1);
+  padding: 0.5rem;
+  border-radius: 4px;
+  border-left: 3px solid #3498db;
+}
+
+.terms-item-title {
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.terms-item-service {
+  font-size: 0.75rem;
+  color: #a0a0a0;
+}
+
+.terms-item-dates {
+  font-size: 0.75rem;
+  color: #3498db;
+}
+
+.terms-item a {
+  color: var(--secondary-color);
+  text-decoration: none;
+  font-size: 0.8rem;
+}
+
+.terms-item a:hover {
+  text-decoration: underline;
+}
+
+#terms-archive-link {
+  font-size: 0.85rem;
+  margin-top: 0.3rem;
+}
