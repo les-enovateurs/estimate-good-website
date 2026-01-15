@@ -1,44 +1,104 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
+<head>
+    <meta charset="utf-8"/>
     <link rel="stylesheet" href="options.css"/>
-  </head>
+    <script src="chart.js"></script>
+</head>
 
-  <body>
-    <div class="container">
-      <h1>EcoSurf Analyser</h1>
-      <h2 id="settings-header">Settings</h2>
-      <div class="card">
-        <h3 class="settings-category" id="average-month-title"></h3>
-        <div id="progress-bar">
-          <img id="grade-average-icon-progress-bar" src="/icons/A.jpg"/>
+<body>
+<div class="container">
+    <h1>EcoSurf Analyser</h1>
+    <h2 id="settings-header">Settings</h2>
+
+    <!-- Badge Settings -->
+    <div class="card">
+        <h3 class="settings-category" id="badge-settings-title">Display</h3>
+        <div class="setting-row">
+            <div class="setting-info">
+                <label for="badge-toggle" id="badge-toggle-label">Show floating badge</label>
+                <p class="setting-description" id="badge-toggle-description">Display a floating badge on websites with
+                    EcoIndex score and privacy info</p>
+            </div>
+            <label class="switch">
+                <input type="checkbox" id="badge-toggle" checked>
+                <span class="slider"></span>
+            </label>
         </div>
-      </div>
-      <form class="card">
-        <h3 class="settings-category" id="browser-history-title"></h3>
-        <div class="container-table">
-          <table id="list-of-url-table"></table>
-        </div>
-        <div class="pagination-container">
-          <div class="number-items-pagination">
-            <p id="paginate-by-label"></p>
-            <select id="select-paginate-by">
-                <option>10</option>
-                <option>20</option>
-                <option>50</option>
+        <div class="setting-row">
+            <div class="setting-info">
+                <label for="badge-language" id="badge-language-label">Language</label>
+                <p class="setting-description" id="badge-language-description">Force the language of the badge
+                    content</p>
+            </div>
+            <select id="badge-language" class="setting-select">
+                <option value="">System</option>
+                <option value="en">English</option>
+                <option value="fr">Français</option>
             </select>
-          </div>
-
-          <div id="pagination-pages">
-          </div>
         </div>
-      </form>
-      <div>
-        <button type="submit" id="clearHistory">Clear History</button>
-      </div>
     </div>
 
-    <script src="options.js"></script>
-  </body>
+    <div class="card">
+        <h3 class="settings-category" id="average-month-title"></h3>
+        <div id="progress-bar">
+            <img id="grade-average-icon-progress-bar" src="/icons/A.jpg"/>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="card">
+        <h3 class="settings-category" id="charts-title">Statistics</h3>
+        <div class="charts-container">
+            <div class="chart-wrapper">
+                <h4 id="chart-evolution-title">Score evolution</h4>
+                <div class="chart-canvas-container">
+                    <canvas id="chart-evolution"></canvas>
+                </div>
+            </div>
+            <div class="chart-wrapper">
+                <h4 id="chart-distribution-title">Grade distribution</h4>
+                <div class="chart-canvas-container">
+                    <canvas id="chart-distribution"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="chart-wrapper chart-full-width">
+            <h4 id="chart-top-sites-title">Top 10 sites</h4>
+            <div class="top-sites-toggle">
+                <button id="btn-best-sites" class="toggle-btn active" type="button">Best</button>
+                <button id="btn-worst-sites" class="toggle-btn" type="button">Worst</button>
+            </div>
+            <div class="chart-canvas-container">
+                <canvas id="chart-top-sites"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <form class="card">
+        <h3 class="settings-category" id="browser-history-title"></h3>
+        <div class="container-table">
+            <table id="list-of-url-table"></table>
+        </div>
+        <div class="pagination-container">
+            <div class="number-items-pagination">
+                <p id="paginate-by-label"></p>
+                <select id="select-paginate-by">
+                    <option>10</option>
+                    <option>20</option>
+                    <option>50</option>
+                </select>
+            </div>
+
+            <div id="pagination-pages">
+            </div>
+        </div>
+    </form>
+    <div>
+        <button type="submit" id="clearHistory">Clear History</button>
+    </div>
+</div>
+
+<script src="options.js"></script>
+</body>
 </html>
